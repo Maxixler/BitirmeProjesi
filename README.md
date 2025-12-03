@@ -13,7 +13,7 @@ Temel amaç, bir LoRa modülü tarafından üretilen 868 MHz kablosuz sinyalleri
 
 ### Donanım
 *   **SDR:** USRP E310 (Embedded Serisi)
-*   **Ana Bilgisayar (Host):** Arch Linux yüklü PC
+*   **Ana Bilgisayar (Host):** Linux yüklü PC
 *   **LoRa Modülü:** Ebyte E220-900T22D
 *   **Bağlantı:** Ethernet (Doğrudan bağlantı), USB-Seri (Konsol erişimi)
 
@@ -75,7 +75,7 @@ uhd_find_devices
 RF ön yüzünü test etmek için Python betiğini doğrudan USRP E310 üzerinde çalıştırın.
 
 ```bash
-python3 sineWaveGRC.py
+python3 main.py
 ```
 *   **Başarı Göstergesi:** `[INFO] ... Performing CODEC loopback test ... passed`
 
