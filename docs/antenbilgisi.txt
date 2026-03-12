@@ -1,0 +1,21 @@
+MRTK-Q7027I28 LTE/4G ANTEN SMA ERKEK 7dBi 3 Metre
+
+Electrical	 
+Frequency Range	698-960/1710-2700MHz
+Gain	7dBi
+V.S.W.R	≤2.0
+Radiation	Omni-Direction
+Polarization	Vertical
+Maximum Input Power	50W
+Impedance	50Ώ
+Connector	SMA Male
+Cable Type	RG174
+Cable Length	3M
+Antenna Radome Material	Aluminum
+Mount way	Magnetic
+Mechanical	 
+Dimensions	Φ29x315mm
+Weight	60g
+Operating Temperature	-40℃ to+70℃
+RoHS Compliant	YES
+Kazanç	:	7dBi
