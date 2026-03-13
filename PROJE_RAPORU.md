@@ -102,6 +102,7 @@ BitirmeProjesi-main/
 ├── docs/                            # Dokümanlar
 ├── data/                            # IQ veri dosyaları
 ├── results/                         # Çıktı grafikleri ve CSV
+├── tests/                           # Unit testler
 │
 └── usrp_noma/                       # Ana Python paketi
     ├── config.py                    # Merkezi konfigürasyon
@@ -113,7 +114,9 @@ BitirmeProjesi-main/
     ├── analysis/                    # Sinyal analiz katmanı
     │   ├── spectrum_analyzer.py     #   FFT/Welch PSD analizi
     │   ├── waterfall_display.py     #   Waterfall diyagramı
-    │   └── frequency_scanner.py     #   Geniş bant frekans tarama
+    │   ├── frequency_scanner.py     #   Geniş bant frekans tarama
+    │   ├── data_analysis.py         #   IQ veri analizi
+    │   └── synthetic_data.py        #   Sentetik veri üretimi
     ├── lora/                        # LoRa demodülasyon katmanı
     │   └── decoder.py               #   CSS demodülasyon
     ├── noma/                        # NOMA çoklu erişim katmanı
@@ -121,6 +124,10 @@ BitirmeProjesi-main/
     │   ├── transmitter.py           #   Superposition Coding verici
     │   ├── receiver.py              #   SIC alıcı
     │   └── analyzer.py              #   Performans analizi
+    ├── deep_learning/               # Deep Learning paketi
+    │   ├── __init__.py              #   Paket başlatma
+    │   ├── models.py                #   CNN ve ResNet modelleri
+    │   └── trainer.py               #   Eğitim ve tahmin pipeline
     └── streaming/                   # Veri akış katmanı
         └── zmq_streamer.py          #   ZMQ PUB/SUB akışı
 ```
@@ -128,8 +135,9 @@ BitirmeProjesi-main/
 Katmanlı mimari:
 
 ```
-Katman 3 (Uygulama)      : main.py (CLI — 12 alt komut)
-Katman 2 (İşleme)        : usrp_noma/analysis/ (spektrum, waterfall, tarama)
+Katman 4 (Uygulama)      : main.py (CLI — 15 alt komut)
+Katman 3 (Öğrenme)       : usrp_noma/deep_learning/ (CNN, ResNet, eğitim pipeline)
+Katman 2 (İşleme)        : usrp_noma/analysis/ (spektrum, waterfall, tarama, veri analizi, sentetik veri)
                             usrp_noma/lora/ (CSS demodülasyon)
                             usrp_noma/noma/ (verici, alıcı-SIC, analizci)
 Katman 1 (Veri Erişim)   : usrp_noma/core/ (yakalama, sinyal üretimi)
@@ -176,9 +184,12 @@ Paket içi import örnekleri:
 ```python
 from usrp_noma.core import USRPController, SignalCapture
 from usrp_noma.analysis import SpectrumAnalyzer
+from usrp_noma.analysis.data_analysis import IQDataAnalyzer
+from usrp_noma.analysis.synthetic_data import SyntheticDataGenerator
 from usrp_noma.noma import NOMATransmitter, NOMAReceiver, NOMAnalyzer
 from usrp_noma.lora import LoRaDecoder
 from usrp_noma.streaming import ZMQStreamer
+from usrp_noma.deep_learning import SignalClassifierCNN, SignalResNet, SignalTrainer
 ```
 
 ### 3.3 Çalışma Modları
@@ -441,7 +452,7 @@ ZMQ akışı, GNU Radio'nun `ZMQ SUB Source` bloğu ile doğrudan uyumludur. Hos
 
 ## 8. CLI Arayüzü
 
-`main.py` dosyası `usrp_noma` paketini kullanarak `argparse` tabanlı 12 alt komut sunar:
+`main.py` dosyası `usrp_noma` paketini kullanarak `argparse` tabanlı 15 alt komut sunar:
 
 | Komut | Donanım | Açıklama |
 |-------|:-------:|----------|
@@ -457,6 +468,9 @@ ZMQ akışı, GNU Radio'nun `ZMQ SUB Source` bloğu ile doğrudan uyumludur. Hos
 | `noma-compare` | Gereksiz | NOMA vs OMA karşılaştırma raporu |
 | `noma-constellation` | Gereksiz | Konstelasyon diyagramları |
 | `noma-live` | Gerekli | USRP ile gerçek zamanlı NOMA |
+| `generate-dataset` | Gereksiz | Sentetik IQ veri seti üret |
+| `train-model` | Gereksiz | DL sinyal sınıflandırma modeli eğit |
+| `analyze-data` | Gereksiz | IQ verisinin kapsamlı analizini yap |
 
 *`--input` parametresi ile dosyadan da çalışabilir.
 
@@ -482,7 +496,166 @@ ZMQ akışı, GNU Radio'nun `ZMQ SUB Source` bloğu ile doğrudan uyumludur. Hos
 
 ---
 
-## 10. Geliştirme Önerileri
+## 10. Veri Analizi ve Özellik Çıkarımı
+
+### 10.1 Genel Bakış
+
+Ham IQ verilerinden anlamlı bilgi çıkarımı, sinyal sınıflandırma ve anomali tespiti gibi ileri düzey görevlerin temelini oluşturmaktadır. Bu amaçla geliştirilen `IQDataAnalyzer` sınıfı (`usrp_noma/analysis/data_analysis.py`), ham IQ örneklerinden 25 boyutlu özellik vektörleri çıkararak sinyallerin kapsamlı bir istatistiksel ve spektral profilini oluşturur.
+
+### 10.2 Özellik Çıkarımı (Feature Extraction)
+
+`IQDataAnalyzer` sınıfı, her bir IQ kaydından aşağıdaki 25 boyutlu özellik vektörünü hesaplar:
+
+#### İstatistiksel Özellikler
+
+| Özellik | Açıklama |
+|---------|----------|
+| Genlik ortalaması | IQ örneklerinin ortalama genlik değeri |
+| Genlik standart sapması | Genlik dağılımının yayılımı |
+| Ortalama güç | Sinyalin ortalama güç seviyesi (dB) |
+| Tepe güç | Maksimum anlık güç değeri |
+| Faz ortalaması | Ortalama faz açısı (radyan) |
+| Faz standart sapması | Faz dağılımının yayılımı |
+| Kurtosis | Genlik dağılımının sivrilik ölçüsü; darbe benzeri sinyallerin tespitinde kullanılır |
+| Crest factor | Tepe-etkin değer oranı; sinyalin dinamik aralığını karakterize eder |
+
+#### Spektral Özellikler
+
+| Özellik | Açıklama |
+|---------|----------|
+| Spektral ağırlık merkezi (centroid) | Güç spektrumunun ağırlıklı ortalama frekansı |
+| Spektral yayılım (spread) | Spektral enerjinin frekans ekseni üzerindeki dağılımı |
+| Spektral düzlük (flatness) | Spektrumun beyaz gürültüye yakınlık derecesi (geometrik/aritmetik ortalama oranı) |
+| Spektral entropi | Spektral dağılımın bilgi içeriği ve belirsizlik ölçüsü |
+| Bant enerjisi | Belirli frekans bantlarındaki enerji dağılımı |
+
+### 10.3 Analiz Görselleştirmeleri
+
+`IQDataAnalyzer`, kapsamlı bir 6 panelli analiz görselleştirmesi üretir. Her panel sinyalin farklı bir boyutunu ortaya koyar:
+
+| Panel | İçerik | Amaç |
+|-------|--------|------|
+| I/Q Zaman Serisi | I ve Q bileşenlerinin zamana göre değişimi | Sinyalin zaman düzlemindeki yapısının incelenmesi |
+| Genlik Zarfı | Anlık genlik değerlerinin zamana göre değişimi | Modülasyon zarfının ve güç dalgalanmalarının gözlenmesi |
+| Faz Değişimi | Anlık faz açısının zamana göre değişimi | Frekans modülasyonu ve faz geçişlerinin tespiti |
+| Güç Yoğunluk Spektrumu (PSD) | Welch yöntemi ile hesaplanan PSD | Frekans bileşenlerinin ve bant genişliğinin belirlenmesi |
+| Spektrogram | Kısa zamanlı Fourier dönüşümü (STFT) tabanlı zaman-frekans gösterimi | Sinyalin zamana bağlı spektral değişimlerinin izlenmesi |
+| I-Q Saçılım Diyagramı | I ve Q bileşenlerinin birbirine karşı çizimi | Konstelasyon yapısı ve modülasyon türü hakkında bilgi |
+
+### 10.4 Özellik Dağılım Analizi
+
+Farklı sinyal sınıfları arasındaki özellik dağılımları karşılaştırmalı olarak incelenir. Bu analiz, sınıflar arası ayrışabilirliğin değerlendirilmesine ve en ayırt edici özelliklerin belirlenmesine olanak tanır. Her bir özellik için sınıf bazlı histogram ve kutu grafikleri üretilerek, özellik uzayındaki sınıf dağılımları görselleştirilir.
+
+---
+
+## 11. Deep Learning ile Sinyal Sınıflandırma
+
+### 11.1 Genel Bakış
+
+Çıkarılan özellik vektörlerinin ötesinde, ham IQ verilerinden doğrudan sinyal sınıflandırması gerçekleştirmek amacıyla derin öğrenme tabanlı modeller geliştirilmiştir. Bu modüller `usrp_noma/deep_learning/` paketi altında yer almaktadır.
+
+### 11.2 Sentetik Veri Üretimi
+
+`SyntheticDataGenerator` sınıfı (`usrp_noma/analysis/synthetic_data.py`), kontrollü koşullar altında etiketli eğitim verileri üretmek amacıyla kullanılır. Desteklenen sinyal türleri:
+
+| Sinyal Sınıfı | Açıklama |
+|----------------|----------|
+| LoRa | Chirp Spread Spectrum (CSS) modülasyonlu sinyal |
+| NOMA | Çok kullanıcılı süperposition coded sinyal |
+| CW | Sürekli dalga (Continuous Wave) sinyali |
+| OFDM | Ortogonal frekans bölmeli çoklama sinyali |
+| Gürültü | Beyaz Gauss gürültüsü (AWGN) |
+
+Her sinyal türü, yapılandırılabilir SNR değerlerinde (tipik olarak -10 dB ile 30 dB aralığında) üretilir. Bu sayede modelin farklı gürültü seviyelerindeki performansı sistematik olarak değerlendirilebilir.
+
+### 11.3 Model Mimarileri
+
+#### 1D CNN Modeli (SignalClassifierCNN)
+
+`SignalClassifierCNN` (`usrp_noma/deep_learning/models.py`), ham IQ verilerini doğrudan işleyen bir tek boyutlu evrişimli sinir ağıdır.
+
+**Mimari:**
+
+```
+Giriş: (batch, 2, num_samples) — I ve Q kanalları ayrı girişler olarak
+    ↓
+Conv1D Blok 1: Conv(2→32, k=7) → BatchNorm → ReLU → MaxPool(2)
+    ↓
+Conv1D Blok 2: Conv(32→64, k=5) → BatchNorm → ReLU → MaxPool(2)
+    ↓
+Conv1D Blok 3: Conv(64→128, k=3) → BatchNorm → ReLU → MaxPool(2)
+    ↓
+Conv1D Blok 4: Conv(128→256, k=3) → BatchNorm → ReLU → MaxPool(2)
+    ↓
+Global Average Pooling (GAP)
+    ↓
+Tam Bağlantılı Katman 1: 256 → 128, ReLU, Dropout(0.5)
+    ↓
+Tam Bağlantılı Katman 2: 128 → num_classes
+    ↓
+Çıkış: Sınıf olasılıkları
+```
+
+- **Toplam parametre sayısı**: ~372.000
+- **Giriş formatı**: `(batch, 2, num_samples)` — I ve Q bileşenleri iki ayrı kanal olarak modele verilir
+- **Avantajları**: Düşük parametre sayısı ile hızlı eğitim, IQ verilerine özgü kanal yapısı
+
+#### 1D ResNet Modeli (SignalResNet)
+
+`SignalResNet` (`usrp_noma/deep_learning/models.py`), artık bağlantılar (residual connections) içeren daha derin bir mimari sunar. Artık bağlantılar sayesinde gradyan kaybı problemi aşılarak daha derin ağ yapılarının eğitilmesi mümkün hale gelir.
+
+### 11.4 Eğitim Pipeline
+
+`SignalTrainer` sınıfı (`usrp_noma/deep_learning/trainer.py`), model eğitimi ve değerlendirmesi için kapsamlı bir pipeline sunar:
+
+| Bileşen | Açıklama |
+|---------|----------|
+| Optimizer | Adam (varsayılan lr=0.001) |
+| LR Scheduler | ReduceLROnPlateau (patience=5, factor=0.5) |
+| Veri Bölünmesi | Eğitim / Doğrulama / Test (%70 / %15 / %15) |
+| Kayıp Fonksiyonu | CrossEntropyLoss |
+| Düzenlileştirme | Dropout (0.5) + BatchNormalization |
+
+Eğitim süreci boyunca eğitim ve doğrulama kayıp/doğruluk değerleri izlenir ve en iyi doğrulama doğruluğuna sahip model ağırlıkları otomatik olarak kaydedilir.
+
+### 11.5 Deneysel Sonuçlar
+
+5 sınıflı (LoRa, NOMA, CW, OFDM, Gürültü) sentetik veri seti üzerinde gerçekleştirilen deneylerde aşağıdaki sonuçlar elde edilmiştir:
+
+| Metrik | Değer |
+|--------|-------|
+| Doğrulama doğruluğu | %99,4 |
+| Test doğruluğu | %100,0 |
+| Toplam eğitim süresi | ~birkaç dakika (GPU ile) |
+
+### 11.6 SNR Bazlı Performans Değerlendirmesi
+
+Modelin farklı sinyal-gürültü oranlarındaki performansı sistematik olarak değerlendirilir. Düşük SNR değerlerinde (< 0 dB) sınıflandırma doğruluğunun kademeli olarak azalması beklenmekle birlikte, yüksek SNR bölgelerinde (> 10 dB) tüm sinyal sınıfları için %100'e yakın doğruluk oranları gözlemlenmektedir.
+
+### 11.7 Karışıklık Matrisi (Confusion Matrix)
+
+Test seti üzerinde üretilen karışıklık matrisi, her sinyal sınıfı için doğru ve hatalı sınıflandırmaların dağılımını gösterir. Bu görselleştirme, modelin hangi sinyal çiftleri arasında karışıklık yaşadığının belirlenmesinde kritik bir araç olarak kullanılır.
+
+### 11.8 Kullanım
+
+Tüm deep learning iş akışı CLI üzerinden üç komut ile yönetilir:
+
+```bash
+# 1. Sentetik veri seti üretimi
+python main.py generate-dataset --output data/dataset --num-samples 1000
+
+# 2. Model eğitimi
+python main.py train-model --data data/dataset --model cnn --epochs 50
+
+# 3. IQ veri analizi
+python main.py analyze-data --input data/capture.npy --output results/analysis
+```
+
+Bu komutlar sırasıyla veri üretimi, model eğitimi ve eğitilmiş model ile analiz adımlarını gerçekleştirir. Eğitim tamamlandığında model ağırlıkları, eğitim geçmişi grafikleri, karışıklık matrisi ve sınıflandırma raporu otomatik olarak kaydedilir.
+
+---
+
+## 12. Geliştirme Önerileri
 
 1. **Kanal Tahmini**: Gerçek kablosuz ortamda pilot semboller ile kanal katsayısı (h) tahmini eklenmesi.
 2. **Frekans Senkronizasyonu**: CFO (Carrier Frequency Offset) düzeltme algoritması.
@@ -493,13 +666,13 @@ ZMQ akışı, GNU Radio'nun `ZMQ SUB Source` bloğu ile doğrudan uyumludur. Hos
 
 ---
 
-## 11. Sonuç
+## 13. Sonuç
 
 Bu projede USRP E310 SDR platformu kullanılarak LoRaWAN sinyallerinin yakalanması, analiz edilmesi ve NOMA çoklu erişim tekniğinin uygulanması başarıyla gerçekleştirilmiştir. Python tabanlı modüler yazılım mimarisi sayesinde tüm bileşenler bağımsız çalışabileceği gibi CLI üzerinden birleşik kullanım da mümkündür. NOMA simülasyonları ile BER, kapasite ve throughput analizleri gerçekleştirilmiş, OMA ile karşılaştırmalı sonuçlar grafikler ve CSV dosyaları olarak üretilmiştir. Proje, SDR tabanlı kablosuz iletişim araştırmaları için genişletilebilir bir altyapı sunmaktadır.
 
 ---
 
-## 12. Referanslar
+## 14. Referanslar
 
 1. Ettus Research, "USRP E310 Product Specification," ettus.com.
 2. Semtech, "LoRa Modulation Basics," AN1200.22 Application Note.

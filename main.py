@@ -30,7 +30,8 @@ logger = setup_logger("Main")
 
 def detect_mode():
     """Calisma modunu otomatik algila (embedded / network)."""
-    hostname = os.popen("hostname").read().strip()
+    import platform
+    hostname = platform.node()
     if "e3" in hostname.lower() or "ettus" in hostname.lower():
         return "embedded"
     if os.path.exists("/etc/uhd"):
@@ -486,6 +487,159 @@ def cmd_stream(args):
         print(f"Bilinmeyen rol: {args.role}. 'pub' veya 'sub' kullanin.")
 
 
+def cmd_generate_dataset(args):
+    """Sentetik IQ veri seti uretir (Deep Learning egitimi icin)."""
+    from usrp_noma.analysis import SyntheticDataGenerator
+
+    gen = SyntheticDataGenerator(sample_rate=args.rate)
+
+    snr_range = list(range(int(args.snr_min), int(args.snr_max) + 1, int(args.snr_step)))
+
+    print(f"Veri seti uretiliyor...")
+    print(f"  Sinif basina ornek: {args.samples}")
+    print(f"  Sinyal uzunlugu: {args.length} IQ ornek")
+    print(f"  SNR araligi: {snr_range} dB")
+    print()
+
+    data, labels, snrs, class_names = gen.generate_dataset(
+        samples_per_class=args.samples,
+        num_samples_per_signal=args.length,
+        snr_range_dB=snr_range,
+        save_dir=args.output_dir,
+    )
+
+    print(f"\nVeri seti olusturuldu:")
+    print(f"  Toplam: {len(labels)} ornek")
+    print(f"  Siniflar: {class_names}")
+    print(f"  Kayit: {args.output_dir}/")
+
+
+def cmd_train_model(args):
+    """Deep Learning modelini egitir."""
+    from usrp_noma.deep_learning.models import SignalClassifierCNN, SignalResNet
+    from usrp_noma.deep_learning.trainer import DLTrainer
+    from usrp_noma.analysis import IQDataAnalyzer
+
+    # Veri yukle
+    data_dir = args.data_dir
+    data = np.load(os.path.join(data_dir, "iq_dataset.npy"))
+    labels = np.load(os.path.join(data_dir, "labels.npy"))
+    snrs = np.load(os.path.join(data_dir, "snrs.npy"))
+
+    # Metadata oku
+    class_names = ["lora", "noma", "cw", "ofdm", "noise"]
+    meta_path = os.path.join(data_dir, "dataset_info.meta")
+    if os.path.exists(meta_path):
+        with open(meta_path) as f:
+            for line in f:
+                if line.startswith("classes="):
+                    class_names = line.strip().split("=", 1)[1].split(",")
+
+    print(f"Veri yuklendi: {len(labels)} ornek, {len(class_names)} sinif")
+
+    # Train/val/test split
+    from sklearn.model_selection import train_test_split
+    indices = np.arange(len(labels))
+    train_idx, test_idx = train_test_split(indices, test_size=0.2, stratify=labels, random_state=42)
+    train_idx, val_idx = train_test_split(train_idx, test_size=0.15, stratify=labels[train_idx], random_state=42)
+
+    train_data, train_labels = data[train_idx], labels[train_idx]
+    val_data, val_labels = data[val_idx], labels[val_idx]
+    test_data, test_labels = data[test_idx], labels[test_idx]
+    test_snrs = snrs[test_idx]
+
+    print(f"  Egitim: {len(train_labels)}, Validasyon: {len(val_labels)}, Test: {len(test_labels)}")
+
+    # Model sec
+    num_classes = len(class_names)
+    input_length = data.shape[1]
+
+    if args.model == "resnet":
+        model = SignalResNet(num_classes=num_classes, input_length=input_length)
+        print(f"Model: SignalResNet")
+    else:
+        model = SignalClassifierCNN(num_classes=num_classes, input_length=input_length)
+        print(f"Model: SignalClassifierCNN")
+
+    param_count = sum(p.numel() for p in model.parameters())
+    print(f"Parametre sayisi: {param_count:,}")
+
+    # Egitim
+    save_dir = args.output_dir
+    trainer = DLTrainer(model, class_names)
+
+    results = trainer.train(
+        train_data, train_labels,
+        val_data=val_data, val_labels=val_labels,
+        epochs=args.epochs,
+        batch_size=args.batch_size,
+        lr=args.lr,
+        save_dir=save_dir,
+    )
+
+    # Test degerlendirmesi
+    print("\n--- Test Sonuclari ---")
+    test_results = trainer.evaluate_detailed(test_data, test_labels)
+
+    # SNR bazli performans
+    snr_acc = trainer.evaluate_by_snr(test_data, test_labels, test_snrs)
+    trainer.plot_accuracy_vs_snr(snr_acc, save_path=os.path.join(save_dir, "accuracy_vs_snr.png"))
+
+    # Karisiklik matrisi
+    analyzer = IQDataAnalyzer()
+    analyzer.plot_confusion_matrix(
+        test_results["targets"], test_results["predictions"],
+        class_names, title="Sinyal Siniflandirma — Karisiklik Matrisi",
+        save_path=os.path.join(save_dir, "confusion_matrix.png"),
+    )
+
+    print(f"\nSonuclar kaydedildi: {save_dir}/")
+    print(f"  - training_curves.png")
+    print(f"  - accuracy_vs_snr.png")
+    print(f"  - confusion_matrix.png")
+    print(f"  - best_model.pth / final_model.pth")
+
+
+def cmd_analyze_data(args):
+    """IQ verisinin kapsamli analizini yapar."""
+    from usrp_noma.analysis import IQDataAnalyzer
+
+    analyzer = IQDataAnalyzer(sample_rate=args.rate)
+
+    # Veri yukle
+    if args.input.endswith(".npy"):
+        data, metadata = load_iq_data(args.input)
+        if "sample_rate" in metadata:
+            analyzer.sample_rate = float(metadata["sample_rate"])
+    else:
+        data = np.load(args.input)
+
+    print(f"Veri yuklendi: {len(data)} ornek, {len(data)/analyzer.sample_rate:.3f} saniye")
+
+    # Istatistikler
+    stats = analyzer.compute_statistics(data)
+    print("\n--- IQ Veri Istatistikleri ---")
+    for key, val in stats.items():
+        if isinstance(val, float):
+            print(f"  {key}: {val:.6f}")
+        else:
+            print(f"  {key}: {val}")
+
+    # Ozellik cikarimi
+    features = analyzer.extract_features(data)
+    print(f"\nOzellik vektoru: {len(features)} boyut")
+
+    # Kapsamli analiz grafigi
+    center_freq = args.freq
+    save_dir = args.output_dir
+    analyzer.plot_comprehensive_analysis(
+        data, center_freq=center_freq,
+        title=f"IQ Analiz — {freq_to_str(center_freq) if center_freq else 'Bilinmeyen'}",
+        save_dir=save_dir,
+    )
+    print(f"\nAnaliz grafigi: {save_dir}/iq_analysis.png")
+
+
 def parse_freq(value):
     """Frekans degerini parse eder (ornek: "868e6", "868M", "2.4G")."""
     value = value.strip().upper()
@@ -498,6 +652,8 @@ def parse_freq(value):
 
 def build_parser():
     """Argparse parser olusturur."""
+    from usrp_noma import __version__
+
     parser = argparse.ArgumentParser(
         description="USRP E310 & LoRaWAN & NOMA Sinyal Analiz Araci",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -519,6 +675,8 @@ Ornekler:
         """,
     )
 
+    parser.add_argument("--version", action="version",
+                        version=f"%(prog)s {__version__}")
     parser.add_argument("--mode", choices=["embedded", "network"],
                         help="Calisma modu (otomatik algilanir)")
     parser.add_argument("--addr", default=config.USRP_ADDR,
@@ -656,6 +814,35 @@ Ornekler:
                      default=config.NOMA_DEFAULT_MODULATION)
     sub.add_argument("--output-dir", default=config.PLOT_OUTPUT_DIR)
     sub.set_defaults(func=cmd_noma_live)
+
+    # --- generate-dataset ---
+    sub = subparsers.add_parser("generate-dataset", help="Sentetik IQ veri seti uret (DL egitimi icin)")
+    sub.add_argument("--samples", type=int, default=300, help="Sinif basina ornek sayisi")
+    sub.add_argument("--length", type=int, default=4096, help="Sinyal basina IQ ornek sayisi")
+    sub.add_argument("--rate", type=parse_freq, default=config.DEFAULT_SAMPLE_RATE)
+    sub.add_argument("--snr-min", type=float, default=0)
+    sub.add_argument("--snr-max", type=float, default=25)
+    sub.add_argument("--snr-step", type=float, default=5)
+    sub.add_argument("--output-dir", default="data")
+    sub.set_defaults(func=cmd_generate_dataset)
+
+    # --- train-model ---
+    sub = subparsers.add_parser("train-model", help="Deep Learning sinyal siniflandirma modeli egit")
+    sub.add_argument("--data-dir", default="data", help="Veri seti dizini")
+    sub.add_argument("--model", choices=["cnn", "resnet"], default="cnn", help="Model mimarisi")
+    sub.add_argument("--epochs", type=int, default=50)
+    sub.add_argument("--batch-size", type=int, default=32)
+    sub.add_argument("--lr", type=float, default=1e-3)
+    sub.add_argument("--output-dir", default=config.PLOT_OUTPUT_DIR)
+    sub.set_defaults(func=cmd_train_model)
+
+    # --- analyze-data ---
+    sub = subparsers.add_parser("analyze-data", help="IQ verisinin kapsamli analizini yap")
+    sub.add_argument("--input", "-i", required=True, help="IQ veri dosyasi (.npy)")
+    sub.add_argument("--freq", type=parse_freq, default=config.DEFAULT_CENTER_FREQ)
+    sub.add_argument("--rate", type=parse_freq, default=config.DEFAULT_SAMPLE_RATE)
+    sub.add_argument("--output-dir", default=config.PLOT_OUTPUT_DIR)
+    sub.set_defaults(func=cmd_analyze_data)
 
     return parser
 

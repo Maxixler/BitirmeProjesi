@@ -89,7 +89,9 @@ BitirmeProjesi-main/
     │   ├── __init__.py              # Lazy import: SpectrumAnalyzer, WaterfallDisplay, FrequencyScanner
     │   ├── spectrum_analyzer.py     # Welch/FFT PSD, tepe bulma, canli spektrum
     │   ├── waterfall_display.py     # Waterfall (selale) diyagram, dairesel tampon
-    │   └── frequency_scanner.py     # Genis bant frekans tarama, CSV export
+    │   ├── frequency_scanner.py     # Genis bant frekans tarama, CSV export
+    │   ├── data_analysis.py         # IQ veri analizi, 25-boyutlu ozellik cikarimi
+    │   └── synthetic_data.py        # Sentetik IQ veri uretici (DL egitimi)
     │
     ├── lora/                        # LoRa demodulasyon katmani
     │   ├── __init__.py              # Lazy import: LoRaDecoder
@@ -102,9 +104,17 @@ BitirmeProjesi-main/
     │   ├── receiver.py              # Alici: AWGN, SIC (Successive Interference Cancellation), BER
     │   └── analyzer.py              # Monte Carlo sim, NOMA vs OMA, 7 grafik, CSV
     │
-    └── streaming/                   # Veri akis katmani
-        ├── __init__.py              # Lazy import: ZMQStreamer
-        └── zmq_streamer.py          # ZMQ PUB/SUB IQ veri akisi (GNU Radio uyumlu)
+    ├── streaming/                   # Veri akis katmani
+    │   ├── __init__.py              # Lazy import: ZMQStreamer
+    │   └── zmq_streamer.py          # ZMQ PUB/SUB IQ veri akisi (GNU Radio uyumlu)
+    │
+    └── deep_learning/               # Deep Learning sinyal siniflandirma
+        ├── __init__.py              # Lazy import
+        ├── models.py                # SignalClassifierCNN, SignalResNet
+        └── trainer.py               # DLTrainer, DLPredictor, IQDataset
+│
+├── tests/
+│   └── test_project.py              # 21 birim testi
 ```
 
 ---
@@ -415,6 +425,9 @@ Import: `argparse`, `os`, `sys`, `numpy`, `usrp_noma.config`, `usrp_noma.utils.{
 | `cmd_noma_constellation(args)` | `noma-constellation` | `NOMATransmitter, NOMAReceiver, NOMAnalyzer` |
 | `cmd_noma_live(args)` | `noma-live` | `USRPController, SignalCapture, NOMATransmitter, NOMAReceiver, NOMAnalyzer` |
 | `cmd_stream(args)` | `stream` | `USRPController, ZMQStreamer` |
+| `cmd_generate_dataset(args)` | `generate-dataset` | `SyntheticDataGenerator` |
+| `cmd_train_model(args)` | `train-model` | `DLTrainer, SignalClassifierCNN, SignalResNet` |
+| `cmd_analyze_data(args)` | `analyze-data` | `IQDataAnalyzer` |
 | `parse_freq(value)` | — | — (K/M/G suffix destegi) |
 | `build_parser()` | — | — |
 | `main()` | — | — |
@@ -447,6 +460,9 @@ from usrp_noma.streaming import ZMQStreamer
 | `matplotlib` | spectrum_analyzer, waterfall_display, noma/analyzer (7 grafik) | Zorunlu (gorsellestime) |
 | `pyzmq` | streaming/zmq_streamer (PUB/SUB) | Opsiyonel (streaming kullanilmazsa gerekmez) |
 | `uhd` | core/usrp_controller (UHD Python API) | Sistem paketi — sadece USRP bagliyken gerekli |
+| `torch` | deep_learning/ (CNN, ResNet modelleri) | Zorunlu (DL icin) |
+| `scikit-learn` | deep_learning/trainer (classification_report, train_test_split) | Zorunlu (DL icin) |
+| `pandas` | Veri analizi | Opsiyonel |
 
 ---
 
@@ -614,17 +630,27 @@ Up-chirp ile down-chirp çarpılınca sabit frekanslı sinüzoidal ortaya çıka
 ### Oturum 3: Dokümantasyon
 - README.md ve PROJE_RAPORU.md oluşturuldu
 
-### Oturum 4: Paket Yapısına Geçiş
-- Kullanıcı isteği: "dosyalar çok ayrık ayrık oldu, bitirme projesine layık bir şekilde klasörle"
-- `usrp_noma/` paket yapısı tasarlandı ve uygulandı
-- noma.py 4 dosyaya bölündü: modulation.py, transmitter.py, receiver.py, analyzer.py
-- Tüm importlar `usrp_noma.` prefiksi ile güncellendi
-- `__init__.py` dosyaları lazy import kullanacak şekilde yazıldı (eksik bağımlılıklarda hata vermez)
-- Eski düz dosyalar silindi, setup.py oluşturuldu, .gitignore eklendi
-- antenbilgisi.txt -> docs/ taşındı
-- README.md ve PROJE_RAPORU.md yeni yapıya göre güncellendi
-- Tüm dosyalar py_compile ile derleme testi yapıldı — hatasız
-- NOMA pipeline (TX->AWGN->SIC->BER) çalışma zamanında test edildi — başarılı
+### Oturum 4: Paket Yapisina Gecis
+- Kullanici istegi: "dosyalar cok ayrik ayrik oldu, bitirme projesine layik bir sekilde klasorle"
+- `usrp_noma/` paket yapisi tasarlandi ve uygulandi
+- noma.py 4 dosyaya bolundu: modulation.py, transmitter.py, receiver.py, analyzer.py
+- Tum importlar `usrp_noma.` prefiksi ile guncellendi
+- `__init__.py` dosyalari lazy import kullanacak sekilde yazildi (eksik bagimliliklarda hata vermez)
+- Eski duz dosyalar silindi, setup.py olusturuldu, .gitignore eklendi
+- antenbilgisi.txt -> docs/ tasindi
+- README.md ve PROJE_RAPORU.md yeni yapiya gore guncellendi
+- Tum dosyalar py_compile ile derleme testi yapildi — hatasiz
+- NOMA pipeline (TX->AWGN->SIC->BER) calisma zamaninda test edildi — basarili
+
+### Oturum 5: Veri Analizi ve Deep Learning
+- IQDataAnalyzer: 25 boyutlu ozellik cikarimi (zaman + frekans + istatistiksel)
+- SyntheticDataGenerator: LoRa, NOMA, CW, OFDM, gurultu sinyal uretimi
+- SignalClassifierCNN: 4 blok 1D CNN, 372K parametre, %99.4 val accuracy
+- SignalResNet: Residual baglantili derin model
+- DLTrainer: Egitim, validasyon, SNR bazli performans analizi
+- main.py'ye 3 yeni CLI komutu: generate-dataset, train-model, analyze-data
+- 21 birim testi eklendi (6 test sinifi)
+- Tum NOMA simulasyonlari calistirilip results/ dizininde sonuclar uretildi
 
 ### Tasarım Kararları
 1. **Lazy import (`__getattr__`)** kullanıldı çünkü: `uhd`, `scipy`, `zmq` her ortamda yüklü olmayabilir. Import zamanında değil, kullanım zamanında hata verilir.
@@ -674,6 +700,11 @@ Up-chirp ile down-chirp çarpılınca sabit frekanslı sinüzoidal ortaya çıka
 | `noma/analyzer.py` | 704 | NOMAnalyzer (14 metot) |
 | `streaming/zmq_streamer.py` | 185 | ZMQStreamer (6 metot) |
 | `main.py` | 685 | 14 fonksiyon |
+| `analysis/data_analysis.py` | ~280 | IQDataAnalyzer (7 metot) |
+| `analysis/synthetic_data.py` | ~230 | SyntheticDataGenerator (8 metot) |
+| `deep_learning/models.py` | ~150 | SignalClassifierCNN, ResidualBlock, SignalResNet |
+| `deep_learning/trainer.py` | ~310 | DLTrainer (11 metot), DLPredictor (3 metot), IQDataset |
+| `tests/test_project.py` | ~190 | 21 birim testi (6 test sinifi) |
 
 ---
 

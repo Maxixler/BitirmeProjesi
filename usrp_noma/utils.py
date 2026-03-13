@@ -4,7 +4,6 @@ USRP E310 & LoRaWAN Sinyal Analiz Projesi - Yardimci Fonksiyonlar
 
 import logging
 import os
-import time
 from datetime import datetime
 
 import numpy as np

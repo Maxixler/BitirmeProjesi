@@ -8,7 +8,7 @@ Preamble algilama, dechirp islemi, sembol cozumleme.
 import numpy as np
 
 from usrp_noma import config
-from usrp_noma.utils import setup_logger, linear_to_dB
+from usrp_noma.utils import setup_logger
 
 logger = setup_logger("LoRaDecoder")
 
