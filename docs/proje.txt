@@ -1,0 +1,27 @@
+Proje Taslağı: SDR Tabanlı Kaçak Repeater (Tekrarlayıcı) Tespit Sistemi
+1. Problem Tanımı: Girişim (Interference) ve Kapsama Sorunları
+Kaçak Repeater Kullanımı: Yetkisiz kişilerin kapsama alanını artırmak için kullandığı standart dışı repeater cihazları, spektrumda girişim (interference) yaratarak çevre halkının şebeke kalitesini düşürmektedir.
+
+Sinyal Zayıflaması: Bu bozucu sinyaller, ana baz istasyonunun sinyalini bastırarak bölgedeki kullanıcıların çağrı düşmesi, düşük hız veya bağlantı kopması yaşamasına neden olur.
+
+Mevcut Yöntem: Şu an bu cihazların tespiti; Rohde & Schwarz gibi yüksek maliyetli profesyonel spektrum analizörleri ile saha ekipleri tarafından manuel olarak, sinyal yönü aranarak yapılmaktadır.
+
+2. Önerilen Çözüm ve Teknik Yaklaşım (USRP E310 Kullanımı)
+Projenin temel hedefi, USRP E310 Yazılım Tabanlı Radyo (SDR) kullanarak bu manuel süreci otomatize eden ve maliyeti düşüren bir sistem geliştirmektir.
+
+Bozucu Sinyal Kaynağının Tespiti: Havada bulunan girişim sinyallerinin spektrum analizi yapılarak kaynağın frekans ve karakteristiğinin belirlenmesi.
+
+Sinyal Gücü Analizi (RSSI): Yakalanan sinyallerin güç seviyelerine göre ayrıştırılması ve kaynağa olan yakınlığın matematiksel olarak kestirilmesi.
+
+Yazılımsal Yönlendirme Sistemi (Direction Finding):
+
+Sinyal kalitesini en üst düzeye çıkarmak için antenin sağa veya sola kaç derecelik açıyla çevrilmesi gerektiğini söyleyen bir kullanıcı arayüzü/yazılım geliştirilmesi.
+
+Bu sistemin, sahada çalışan teknik personele "X derece sağa dön" gibi direktifler vererek kaçak cihazın konumunu (nokta atışı) belirlemesi.
+
+3. Projenin Sağlayacağı Faydalar
+Operasyonel Verimlilik: Manuel aramaya kıyasla kaçak cihazların çok daha kısa sürede tespit edilmesini sağlar.
+
+Maliyet Avantajı: Pahalı ölçüm cihazları yerine SDR tabanlı, taşınabilir ve uygun maliyetli bir çözüm sunar.
+
+Kullanıcı Deneyimi: Şebeke kirliliğini temizleyerek Turkcell kullanıcılarının servis kalitesini artırır.
