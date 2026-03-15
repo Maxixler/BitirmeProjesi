@@ -50,6 +50,11 @@ def freq_to_str(freq_hz):
 def save_iq_data(data, filename, sample_rate=None, center_freq=None):
     """IQ verisini dosyaya kaydeder.
 
+    Desteklenen formatlar:
+    - .npy: NumPy binary (varsayilan)
+    - .raw, .bin: Ham binary complex64 (GNU Radio uyumlu)
+    - .complex64, .cf32, .fc32: GNU Radio complex float32
+
     Args:
         data: numpy complex64/complex128 dizisi
         filename: Kayit dosya yolu
@@ -62,7 +67,9 @@ def save_iq_data(data, filename, sample_rate=None, center_freq=None):
 
     if filename.endswith(".npy"):
         np.save(filename, data.astype(np.complex64))
-    elif filename.endswith(".raw"):
+    elif any(filename.endswith(ext) for ext in
+             (".raw", ".bin", ".complex64", ".cf32", ".fc32")):
+        # GNU Radio uyumlu: ham complex64 binary
         data.astype(np.complex64).tofile(filename)
     else:
         np.save(filename, data.astype(np.complex64))
@@ -77,10 +84,18 @@ def save_iq_data(data, filename, sample_rate=None, center_freq=None):
                 f.write(f"center_freq={center_freq}\n")
             f.write(f"timestamp={datetime.now().isoformat()}\n")
             f.write(f"num_samples={len(data)}\n")
+            f.write(f"dtype=complex64\n")
 
 
 def load_iq_data(filename):
     """IQ verisini dosyadan yukler.
+
+    Desteklenen formatlar:
+    - .npy: NumPy binary
+    - .raw, .bin: Ham binary complex64
+    - .complex64, .cf32, .fc32: GNU Radio complex float32
+    - .cf64: Complex float64
+    - .s16, .sc16, .cs16: Signed 16-bit interleaved I/Q (UHD sc16 / RTL-SDR)
 
     Args:
         filename: Kayit dosya yolu
@@ -88,12 +103,31 @@ def load_iq_data(filename):
     Returns:
         tuple: (data, metadata_dict)
     """
-    if filename.endswith(".npy"):
+    ext = os.path.splitext(filename)[1].lower()
+
+    if ext == ".npy":
         data = np.load(filename)
-    elif filename.endswith(".raw"):
+        if not np.iscomplexobj(data):
+            # Gercek dizi ise interleaved I/Q olarak yorumla
+            data = data[0::2] + 1j * data[1::2]
+        data = data.astype(np.complex64)
+    elif ext in (".raw", ".bin", ".complex64", ".cf32", ".fc32"):
+        # GNU Radio complex float32: interleaved float32 I/Q cifleri
         data = np.fromfile(filename, dtype=np.complex64)
+    elif ext == ".cf64":
+        # Complex float64
+        data = np.fromfile(filename, dtype=np.complex128).astype(np.complex64)
+    elif ext in (".s16", ".sc16", ".cs16"):
+        # Signed 16-bit interleaved I/Q (UHD sc16 formati)
+        raw = np.fromfile(filename, dtype=np.int16)
+        data = (raw[0::2] + 1j * raw[1::2]).astype(np.complex64)
+        data /= 32768.0  # [-1, 1] araligina normalize et
     else:
-        data = np.load(filename)
+        # Bilinmeyen format: complex64 olarak dene
+        try:
+            data = np.fromfile(filename, dtype=np.complex64)
+        except Exception:
+            data = np.load(filename)
 
     metadata = {}
     meta_file = filename + ".meta"
@@ -103,7 +137,7 @@ def load_iq_data(filename):
                 line = line.strip()
                 if "=" in line:
                     key, val = line.split("=", 1)
-                    metadata[key] = val
+                    metadata[key.strip()] = val.strip()
 
     return data, metadata
 
