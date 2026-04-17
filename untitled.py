@@ -68,12 +68,116 @@ class untitled(gr.top_block, Qt.QWidget):
         self.variable_constellation_0 = variable_constellation_0 = digital.constellation_qpsk().base()
         self.variable_constellation_0.set_npwr(1.0)
         self.sps = sps = 2
-        self.samp_rate = samp_rate = 32000
+        self.samp_rate = samp_rate = 256000
 
         ##################################################
         # Blocks
         ##################################################
 
+        self.root_raised_cosine_filter_0 = filter.fir_filter_ccf(
+            1,
+            firdes.root_raised_cosine(
+                1,
+                samp_rate,
+                (samp_rate/sps),
+                0.35,
+                (11*sps)))
+        self.qtgui_time_sink_x_0_0_0 = qtgui.time_sink_f(
+            1024, #size
+            samp_rate, #samp_rate
+            "cac giriş", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_time_sink_x_0_0_0.set_update_time(0.10)
+        self.qtgui_time_sink_x_0_0_0.set_y_axis(0, 2)
+
+        self.qtgui_time_sink_x_0_0_0.set_y_label('Amplitude', "")
+
+        self.qtgui_time_sink_x_0_0_0.enable_tags(True)
+        self.qtgui_time_sink_x_0_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_0_0_0.enable_autoscale(False)
+        self.qtgui_time_sink_x_0_0_0.enable_grid(False)
+        self.qtgui_time_sink_x_0_0_0.enable_axis_labels(True)
+        self.qtgui_time_sink_x_0_0_0.enable_control_panel(False)
+        self.qtgui_time_sink_x_0_0_0.enable_stem_plot(False)
+
+
+        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
+            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ['blue', 'red', 'green', 'black', 'cyan',
+            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+        styles = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1]
+
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_time_sink_x_0_0_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_time_sink_x_0_0_0.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_0_0_0.set_line_alpha(i, alphas[i])
+
+        self._qtgui_time_sink_x_0_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0_0.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_time_sink_x_0_0_0_win)
+        self.qtgui_time_sink_x_0_0 = qtgui.time_sink_f(
+            1024, #size
+            samp_rate, #samp_rate
+            "cac cıkıs", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_time_sink_x_0_0.set_update_time(0.10)
+        self.qtgui_time_sink_x_0_0.set_y_axis(0, 2)
+
+        self.qtgui_time_sink_x_0_0.set_y_label('Amplitude', "")
+
+        self.qtgui_time_sink_x_0_0.enable_tags(True)
+        self.qtgui_time_sink_x_0_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_0_0.enable_autoscale(False)
+        self.qtgui_time_sink_x_0_0.enable_grid(False)
+        self.qtgui_time_sink_x_0_0.enable_axis_labels(True)
+        self.qtgui_time_sink_x_0_0.enable_control_panel(False)
+        self.qtgui_time_sink_x_0_0.enable_stem_plot(False)
+
+
+        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
+            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ['blue', 'red', 'green', 'black', 'cyan',
+            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+        styles = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1]
+
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_time_sink_x_0_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_time_sink_x_0_0.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_0_0.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_0_0.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_0_0.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_0_0.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_0_0.set_line_alpha(i, alphas[i])
+
+        self._qtgui_time_sink_x_0_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_0.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_time_sink_x_0_0_win)
         self.qtgui_const_sink_x_0 = qtgui.const_sink_c(
             1024, #size
             "", #name
@@ -127,9 +231,11 @@ class untitled(gr.top_block, Qt.QWidget):
             digital.IR_MMSE_8TAP,
             128,
             [])
+        self.digital_scrambler_bb_0 = digital.scrambler_bb(0x8A, 0x7F, 7)
         self.digital_diff_decoder_bb_0 = digital.diff_decoder_bb(4, digital.DIFF_DIFFERENTIAL)
-        self.digital_costas_loop_cc_0 = digital.costas_loop_cc(0.06, 4, False)
-        self.digital_correlate_access_code_xx_ts_0 = digital.correlate_access_code_bb_ts('0100111001001111010011010100000101010011010110010101001100100001',
+        self.digital_descrambler_bb_0 = digital.descrambler_bb(0x8A, 0x7F, 7)
+        self.digital_costas_loop_cc_0 = digital.costas_loop_cc(0.1, 4, False)
+        self.digital_correlate_access_code_xx_ts_0 = digital.correlate_access_code_bb_ts('11100001010110101110100010010011',
           1, "sync_found")
         self.digital_constellation_modulator_0 = digital.generic_mod(
             constellation=variable_constellation_0,
@@ -142,43 +248,58 @@ class untitled(gr.top_block, Qt.QWidget):
             truncate=False)
         self.digital_constellation_decoder_cb_0 = digital.constellation_decoder_cb(variable_constellation_0)
         self.channels_channel_model_0 = channels.channel_model(
-            noise_voltage=0.0,
+            noise_voltage=0.05,
             frequency_offset=0.0,
             epsilon=1.0,
             taps=[1.0],
             noise_seed=0,
             block_tags=False)
-        self.blocks_vector_source_x_0 = blocks.vector_source_b((78, 79, 77, 65, 83, 89, 83, 33), True, 1, [])
+        self.blocks_vector_source_x_0 = blocks.vector_source_b((225, 90, 232, 147), True, 1, [])
         self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
-        self.blocks_stream_mux_1 = blocks.stream_mux(gr.sizeof_char*1, (8, 100))
+        self.blocks_stream_mux_0 = blocks.stream_mux(gr.sizeof_char*1, (32, 1024))
+        self.blocks_repack_bits_bb_1_0_0_0 = blocks.repack_bits_bb(8, 1, "", False, gr.GR_MSB_FIRST)
+        self.blocks_repack_bits_bb_1_0_0 = blocks.repack_bits_bb(8, 1, "", False, gr.GR_MSB_FIRST)
+        self.blocks_repack_bits_bb_1_0 = blocks.repack_bits_bb(1, 8, "", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_1 = blocks.repack_bits_bb(1, 8, "", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_0 = blocks.repack_bits_bb(2, 1, "", False, gr.GR_MSB_FIRST)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Desktop\\proje\\giris.txt', True, 0, 0)
+        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\giris.txt', True, 0, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
-        self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Desktop\\proje\\son.txt', False)
+        self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\son.txt', False)
         self.blocks_file_sink_1.set_unbuffered(False)
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Desktop\\proje\\test.txt', False)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\test.txt', False)
         self.blocks_file_sink_0.set_unbuffered(False)
+        self.blocks_char_to_float_0_0 = blocks.char_to_float(1, 1)
+        self.blocks_char_to_float_0 = blocks.char_to_float(1, 1)
 
 
         ##################################################
         # Connections
         ##################################################
+        self.connect((self.blocks_char_to_float_0, 0), (self.qtgui_time_sink_x_0_0, 0))
+        self.connect((self.blocks_char_to_float_0_0, 0), (self.qtgui_time_sink_x_0_0_0, 0))
         self.connect((self.blocks_file_source_0, 0), (self.blocks_file_sink_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.blocks_stream_mux_1, 1))
-        self.connect((self.blocks_repack_bits_bb_0, 0), (self.digital_correlate_access_code_xx_ts_0, 0))
+        self.connect((self.blocks_file_source_0, 0), (self.blocks_repack_bits_bb_1_0_0, 0))
+        self.connect((self.blocks_repack_bits_bb_0, 0), (self.blocks_char_to_float_0_0, 0))
+        self.connect((self.blocks_repack_bits_bb_0, 0), (self.digital_descrambler_bb_0, 0))
         self.connect((self.blocks_repack_bits_bb_1, 0), (self.blocks_file_sink_1, 0))
-        self.connect((self.blocks_stream_mux_1, 0), (self.digital_constellation_modulator_0, 0))
+        self.connect((self.blocks_repack_bits_bb_1_0, 0), (self.digital_constellation_modulator_0, 0))
+        self.connect((self.blocks_repack_bits_bb_1_0_0, 0), (self.blocks_stream_mux_0, 1))
+        self.connect((self.blocks_repack_bits_bb_1_0_0_0, 0), (self.blocks_stream_mux_0, 0))
+        self.connect((self.blocks_stream_mux_0, 0), (self.digital_scrambler_bb_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.channels_channel_model_0, 0))
-        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_stream_mux_1, 0))
-        self.connect((self.channels_channel_model_0, 0), (self.digital_symbol_sync_xx_0, 0))
+        self.connect((self.blocks_vector_source_x_0, 0), (self.blocks_repack_bits_bb_1_0_0_0, 0))
+        self.connect((self.channels_channel_model_0, 0), (self.root_raised_cosine_filter_0, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.digital_diff_decoder_bb_0, 0))
         self.connect((self.digital_constellation_modulator_0, 0), (self.blocks_throttle2_0, 0))
+        self.connect((self.digital_correlate_access_code_xx_ts_0, 0), (self.blocks_char_to_float_0, 0))
         self.connect((self.digital_correlate_access_code_xx_ts_0, 0), (self.blocks_repack_bits_bb_1, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.digital_constellation_decoder_cb_0, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.qtgui_const_sink_x_0, 0))
+        self.connect((self.digital_descrambler_bb_0, 0), (self.digital_correlate_access_code_xx_ts_0, 0))
         self.connect((self.digital_diff_decoder_bb_0, 0), (self.blocks_repack_bits_bb_0, 0))
+        self.connect((self.digital_scrambler_bb_0, 0), (self.blocks_repack_bits_bb_1_0, 0))
         self.connect((self.digital_symbol_sync_xx_0, 0), (self.digital_costas_loop_cc_0, 0))
+        self.connect((self.root_raised_cosine_filter_0, 0), (self.digital_symbol_sync_xx_0, 0))
 
 
     def closeEvent(self, event):
@@ -202,6 +323,7 @@ class untitled(gr.top_block, Qt.QWidget):
     def set_sps(self, sps):
         self.sps = sps
         self.digital_symbol_sync_xx_0.set_sps(self.sps)
+        self.root_raised_cosine_filter_0.set_taps(firdes.root_raised_cosine(1, self.samp_rate, (self.samp_rate/self.sps), 0.35, (11*self.sps)))
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -209,6 +331,9 @@ class untitled(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.blocks_throttle2_0.set_sample_rate(self.samp_rate)
+        self.qtgui_time_sink_x_0_0.set_samp_rate(self.samp_rate)
+        self.qtgui_time_sink_x_0_0_0.set_samp_rate(self.samp_rate)
+        self.root_raised_cosine_filter_0.set_taps(firdes.root_raised_cosine(1, self.samp_rate, (self.samp_rate/self.sps), 0.35, (11*self.sps)))
 
 
 
@@ -219,7 +344,7 @@ def main(top_block_cls=untitled, options=None):
 
     tb = top_block_cls()
 
-    tb.start()
+    tb.start(1024)
     tb.flowgraph_started.set()
 
     tb.show()
