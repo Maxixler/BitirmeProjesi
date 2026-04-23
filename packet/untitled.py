@@ -70,7 +70,7 @@ class untitled(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate = 50000
         self.qpsk = qpsk = digital.constellation_rect([-1-1j, -1+1j, 1+1j, 1-1j], [0, 1, 3, 2],
         4, 2, 2, 1, 1).base()
-        self.packet_len = packet_len = 91
+        self.packet_len = packet_len = 110
         self.ldpc_enc_def = ldpc_enc_def = fec.ldpc_encoder_make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\n_0300_k_0152_gap_03.alist')
         self.ldpc_dec_def = ldpc_dec_def = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\n_0300_k_0152_gap_03.alist', 50)
         self.hdr_format_rx = hdr_format_rx = digital.header_format_default("", 0, 1)
@@ -305,6 +305,7 @@ class untitled(gr.top_block, Qt.QWidget):
         self.blocks_repack_bits_bb_0 = blocks.repack_bits_bb(1, 8, "", False, gr.GR_MSB_FIRST)
         self.blocks_multiply_const_vxx_1 = blocks.multiply_const_ff((-2.0))
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(0.5)
+        self.blocks_keep_m_in_n_0 = blocks.keep_m_in_n(gr.sizeof_char, 110, 114, 0)
         self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\giris.txt', True, 0, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
         self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\son.txt', False)
@@ -326,9 +327,10 @@ class untitled(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_char_to_float_0_1, 0), (self.qtgui_time_sink_x_0_0_0, 0))
         self.connect((self.blocks_char_to_float_0_2, 0), (self.blocks_add_const_vxx_0, 0))
         self.connect((self.blocks_file_source_0, 0), (self.blocks_throttle2_0, 0))
+        self.connect((self.blocks_keep_m_in_n_0, 0), (self.blocks_file_sink_0, 0))
         self.connect((self.blocks_multiply_const_vxx_0, 0), (self.channels_channel_model_0, 0))
         self.connect((self.blocks_multiply_const_vxx_1, 0), (self.fec_extended_decoder_0, 0))
-        self.connect((self.blocks_repack_bits_bb_0, 0), (self.blocks_file_sink_0, 0))
+        self.connect((self.blocks_repack_bits_bb_0, 0), (self.blocks_keep_m_in_n_0, 0))
         self.connect((self.blocks_repack_bits_bb_0_0, 0), (self.digital_constellation_modulator_0, 0))
         self.connect((self.blocks_repack_bits_bb_0_0_0, 0), (self.digital_scrambler_bb_0, 0))
         self.connect((self.blocks_repack_bits_bb_0_0_0_0, 0), (self.blocks_tagged_stream_mux_0, 0))
