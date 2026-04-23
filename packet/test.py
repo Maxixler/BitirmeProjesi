@@ -24,6 +24,7 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 import sip
+import test_epy_block_0 as epy_block_0  # embedded python block
 import threading
 
 
@@ -71,7 +72,7 @@ class test(gr.top_block, Qt.QWidget):
         self.ldpc_enc = ldpc_enc = fec.ldpc_encoder_make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\n_0300_k_0152_gap_03.alist')
         self.ldpc_dec = ldpc_dec = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\n_0300_k_0152_gap_03.alist', 50)
         self.hdr_format_rx = hdr_format_rx = digital.header_format_default("", 0, 1)
-        self.hdr_format = hdr_format = digital.header_format_default('1010101011110000101010101111000010101010111100001010101011110000',1, 1)
+        self.hdr_format = hdr_format = digital.header_format_default('1010101011110000101010101111000010101010111100001010101011110000',1, 8)
 
         ##################################################
         # Blocks
@@ -84,7 +85,7 @@ class test(gr.top_block, Qt.QWidget):
             1, #number of inputs
             None # parent
         )
-        self.qtgui_time_sink_x_0_2.set_update_time(0.10)
+        self.qtgui_time_sink_x_0_2.set_update_time(0.1)
         self.qtgui_time_sink_x_0_2.set_y_axis(-1, 1)
 
         self.qtgui_time_sink_x_0_2.set_y_label('Amplitude', "")
@@ -132,7 +133,7 @@ class test(gr.top_block, Qt.QWidget):
             1, #number of inputs
             None # parent
         )
-        self.qtgui_time_sink_x_0_1.set_update_time(0.10)
+        self.qtgui_time_sink_x_0_1.set_update_time(0.1)
         self.qtgui_time_sink_x_0_1.set_y_axis(-1, 1)
 
         self.qtgui_time_sink_x_0_1.set_y_label('Amplitude', "")
@@ -180,7 +181,7 @@ class test(gr.top_block, Qt.QWidget):
             1, #number of inputs
             None # parent
         )
-        self.qtgui_time_sink_x_0_0.set_update_time(0.10)
+        self.qtgui_time_sink_x_0_0.set_update_time(0.1)
         self.qtgui_time_sink_x_0_0.set_y_axis(-1, 1)
 
         self.qtgui_time_sink_x_0_0.set_y_label('Amplitude', "")
@@ -228,7 +229,7 @@ class test(gr.top_block, Qt.QWidget):
             1, #number of inputs
             None # parent
         )
-        self.qtgui_time_sink_x_0.set_update_time(0.10)
+        self.qtgui_time_sink_x_0.set_update_time(0.1)
         self.qtgui_time_sink_x_0.set_y_axis(-1, 1)
 
         self.qtgui_time_sink_x_0.set_y_label('Amplitude', "")
@@ -271,14 +272,14 @@ class test(gr.top_block, Qt.QWidget):
         self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
         self.fec_extended_encoder_0 = fec.extended_encoder(encoder_obj_list=ldpc_enc, threading='capillary', puncpat='11')
         self.fec_extended_decoder_0 = fec.extended_decoder(decoder_obj_list=ldpc_dec, threading='capillary', ann=None, puncpat='11', integration_period=10000)
+        self.epy_block_0 = epy_block_0.custom_header_parser()
         self.digital_scrambler_bb_0 = digital.scrambler_bb(0x8A, 0x7F, 7)
-        self.digital_protocol_parser_b_0 = digital.protocol_parser_b(hdr_format_rx)
         self.digital_protocol_formatter_bb_0 = digital.protocol_formatter_bb(hdr_format, "packet_len")
         self.digital_header_payload_demux_0 = digital.header_payload_demux(
             32,
             1,
             0,
-            "packet_len",
+            "payload symbols",
             "packet_len",
             False,
             gr.sizeof_char,
@@ -294,7 +295,7 @@ class test(gr.top_block, Qt.QWidget):
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_char*1, "packet_len", 0)
         self.blocks_tagged_stream_multiply_length_0 = blocks.tagged_stream_multiply_length(gr.sizeof_char*1, 'packet_len', (300.0/152.0))
         self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 91, "packet_len")
-        self.blocks_repack_bits_bb_0_0_0_0 = blocks.repack_bits_bb(1, 8, "packet_len", False, gr.GR_MSB_FIRST)
+        self.blocks_repack_bits_bb_0_0_0_0 = blocks.repack_bits_bb(1, 8, "", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_0_0_0 = blocks.repack_bits_bb(1, 8, "packet_len", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_0_0 = blocks.repack_bits_bb(8, 1, "packet_len", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_0 = blocks.repack_bits_bb(8, 1, "packet_len", False, gr.GR_MSB_FIRST)
@@ -314,7 +315,7 @@ class test(gr.top_block, Qt.QWidget):
         ##################################################
         # Connections
         ##################################################
-        self.msg_connect((self.digital_protocol_parser_b_0, 'info'), (self.digital_header_payload_demux_0, 'header_data'))
+        self.msg_connect((self.epy_block_0, 'header_data'), (self.digital_header_payload_demux_0, 'header_data'))
         self.connect((self.blocks_add_const_vxx_0, 0), (self.blocks_multiply_const_vxx_0, 0))
         self.connect((self.blocks_char_to_float_0, 0), (self.blocks_add_const_vxx_0, 0))
         self.connect((self.blocks_char_to_float_1, 0), (self.qtgui_time_sink_x_0, 0))
@@ -340,7 +341,7 @@ class test(gr.top_block, Qt.QWidget):
         self.connect((self.digital_descrambler_bb_0, 0), (self.blocks_repack_bits_bb_0_0_0_0, 0))
         self.connect((self.digital_header_payload_demux_0, 1), (self.blocks_char_to_float_0, 0))
         self.connect((self.digital_header_payload_demux_0, 0), (self.blocks_char_to_float_1, 0))
-        self.connect((self.digital_header_payload_demux_0, 0), (self.digital_protocol_parser_b_0, 0))
+        self.connect((self.digital_header_payload_demux_0, 0), (self.epy_block_0, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_repack_bits_bb_0_0, 0))
         self.connect((self.digital_scrambler_bb_0, 0), (self.fec_extended_encoder_0, 0))
         self.connect((self.fec_extended_decoder_0, 0), (self.blocks_char_to_float_1_2, 0))

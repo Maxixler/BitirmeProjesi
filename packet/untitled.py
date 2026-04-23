@@ -27,6 +27,7 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 import sip
 import threading
+import untitled_epy_block_0 as epy_block_0  # embedded python block
 
 
 
@@ -66,14 +67,14 @@ class untitled(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate = samp_rate = 1000000
-        self.qpsk = qpsk = digital.constellation_rect([-1-1j, -1+1j, 1-1j, 1+1j], [0, 1, 2, 3],
+        self.samp_rate = samp_rate = 50000
+        self.qpsk = qpsk = digital.constellation_rect([-1-1j, -1+1j, 1+1j, 1-1j], [0, 1, 3, 2],
         4, 2, 2, 1, 1).base()
         self.packet_len = packet_len = 91
         self.ldpc_enc_def = ldpc_enc_def = fec.ldpc_encoder_make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\n_0300_k_0152_gap_03.alist')
         self.ldpc_dec_def = ldpc_dec_def = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\n_0300_k_0152_gap_03.alist', 50)
         self.hdr_format_rx = hdr_format_rx = digital.header_format_default("", 0, 1)
-        self.hdr_format = hdr_format = digital.header_format_default("1010101011110000101010101111000010101010111100001010101011110000",0, 1)
+        self.hdr_format = hdr_format = digital.header_format_default("1010101011110000101010101111000010101010111100001010101011110000",1, 8)
 
         ##################################################
         # Blocks
@@ -243,6 +244,7 @@ class untitled(gr.top_block, Qt.QWidget):
         self.top_layout.addWidget(self._qtgui_sink_x_0_win)
         self.fec_extended_encoder_0 = fec.extended_encoder(encoder_obj_list=ldpc_enc_def, threading='capillary', puncpat='11')
         self.fec_extended_decoder_0 = fec.extended_decoder(decoder_obj_list=ldpc_dec_def, threading='capillary', ann=None, puncpat='11', integration_period=10000)
+        self.epy_block_0 = epy_block_0.custom_header_parser()
         self.digital_symbol_sync_xx_0 = digital.symbol_sync_cc(
             digital.TED_SIGNAL_TIMES_SLOPE_ML,
             4,
@@ -251,18 +253,18 @@ class untitled(gr.top_block, Qt.QWidget):
             0.1,
             1.5,
             1,
-            digital.constellation_bpsk().base(),
+            digital.constellation_qpsk().base(),
             digital.IR_MMSE_8TAP,
             128,
             [])
         self.digital_scrambler_bb_0 = digital.scrambler_bb(0x8A, 0x7F, 7)
-        self.digital_protocol_parser_b_0 = digital.protocol_parser_b(hdr_format_rx)
         self.digital_protocol_formatter_bb_0 = digital.protocol_formatter_bb(hdr_format, "packet_len")
+        self.digital_map_bb_0 = digital.map_bb([0,1,3,2])
         self.digital_header_payload_demux_0 = digital.header_payload_demux(
-            96,
+            32,
             1,
             0,
-            "packet_len",
+            "payload symbols",
             "packet_len",
             False,
             gr.sizeof_char,
@@ -274,7 +276,7 @@ class untitled(gr.top_block, Qt.QWidget):
         self.digital_descrambler_bb_0 = digital.descrambler_bb(0x8A, 0x7F, 7)
         self.digital_crc32_bb_0 = digital.crc32_bb(False, "packet_len", True)
         self.digital_costas_loop_cc_0 = digital.costas_loop_cc(0.005, 4, False)
-        self.digital_correlate_access_code_tag_xx_0 = digital.correlate_access_code_tag_bb('1010101011110000101010101111000010101010111100001010101011110000', 2, 'packet_len')
+        self.digital_correlate_access_code_tag_xx_0 = digital.correlate_access_code_tag_bb('1010101011110000101010101111000010101010111100001010101011110000', 8, 'packet_len')
         self.digital_constellation_modulator_0 = digital.generic_mod(
             constellation=qpsk,
             differential=True,
@@ -286,7 +288,7 @@ class untitled(gr.top_block, Qt.QWidget):
             truncate=False)
         self.digital_constellation_decoder_cb_0 = digital.constellation_decoder_cb(qpsk)
         self.channels_channel_model_0 = channels.channel_model(
-            noise_voltage=0.1,
+            noise_voltage=0.0,
             frequency_offset=0.0,
             epsilon=1.0,
             taps=[1.0],
@@ -300,8 +302,8 @@ class untitled(gr.top_block, Qt.QWidget):
         self.blocks_repack_bits_bb_0_0_0_0 = blocks.repack_bits_bb(8, 1, "packet_len", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_0_0_0 = blocks.repack_bits_bb(8, 1, "packet_len", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_0_0 = blocks.repack_bits_bb(1, 8, "packet_len", False, gr.GR_MSB_FIRST)
-        self.blocks_repack_bits_bb_0 = blocks.repack_bits_bb(1, 8, "packet_len", False, gr.GR_MSB_FIRST)
-        self.blocks_multiply_const_vxx_1 = blocks.multiply_const_ff(2.0)
+        self.blocks_repack_bits_bb_0 = blocks.repack_bits_bb(1, 8, "", False, gr.GR_MSB_FIRST)
+        self.blocks_multiply_const_vxx_1 = blocks.multiply_const_ff((-2.0))
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_cc(0.5)
         self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, 'C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\giris.txt', True, 0, 0)
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
@@ -317,7 +319,7 @@ class untitled(gr.top_block, Qt.QWidget):
         ##################################################
         # Connections
         ##################################################
-        self.msg_connect((self.digital_protocol_parser_b_0, 'info'), (self.digital_header_payload_demux_0, 'header_data'))
+        self.msg_connect((self.epy_block_0, 'header_data'), (self.digital_header_payload_demux_0, 'header_data'))
         self.connect((self.blocks_add_const_vxx_0, 0), (self.blocks_multiply_const_vxx_1, 0))
         self.connect((self.blocks_char_to_float_0, 0), (self.qtgui_time_sink_x_0, 0))
         self.connect((self.blocks_char_to_float_0_0, 0), (self.qtgui_time_sink_x_0_0, 0))
@@ -346,10 +348,11 @@ class untitled(gr.top_block, Qt.QWidget):
         self.connect((self.digital_costas_loop_cc_0, 0), (self.qtgui_sink_x_0, 0))
         self.connect((self.digital_crc32_bb_0, 0), (self.blocks_repack_bits_bb_0_0_0, 0))
         self.connect((self.digital_descrambler_bb_0, 0), (self.blocks_repack_bits_bb_0, 0))
-        self.connect((self.digital_diff_decoder_bb_0, 0), (self.blocks_unpack_k_bits_bb_0, 0))
+        self.connect((self.digital_diff_decoder_bb_0, 0), (self.digital_map_bb_0, 0))
         self.connect((self.digital_header_payload_demux_0, 1), (self.blocks_char_to_float_0, 0))
         self.connect((self.digital_header_payload_demux_0, 1), (self.blocks_char_to_float_0_2, 0))
-        self.connect((self.digital_header_payload_demux_0, 0), (self.digital_protocol_parser_b_0, 0))
+        self.connect((self.digital_header_payload_demux_0, 0), (self.epy_block_0, 0))
+        self.connect((self.digital_map_bb_0, 0), (self.blocks_unpack_k_bits_bb_0, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_repack_bits_bb_0_0_0_0, 0))
         self.connect((self.digital_scrambler_bb_0, 0), (self.fec_extended_encoder_0, 0))
         self.connect((self.digital_symbol_sync_xx_0, 0), (self.digital_costas_loop_cc_0, 0))

@@ -37,7 +37,7 @@ blocks:
   id: variable_header_format_default
   parameters:
     access_code: '1010101011110000101010101111000010101010111100001010101011110000'
-    bps: '1'
+    bps: '8'
     comment: ''
     threshold: '1'
   states:
@@ -168,7 +168,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1384, 628.0]
+    coordinate: [1368, 620.0]
     rotation: 0
     state: enabled
 - name: blocks_char_to_float_1
@@ -367,7 +367,7 @@ blocks:
     endianness: gr.GR_MSB_FIRST
     k: '1'
     l: '8'
-    len_tag_key: '"packet_len"'
+    len_tag_key: '""'
     maxoutbuf: '0'
     minoutbuf: '0'
   states:
@@ -537,7 +537,7 @@ blocks:
     header_len: '32'
     header_padding: '0'
     items_per_symbol: '1'
-    length_tag_key: '"packet_len"'
+    length_tag_key: '"payload symbols"'
     maxoutbuf: '0'
     minoutbuf: '0'
     output_symbols: 'False'
@@ -570,22 +570,6 @@ blocks:
     coordinate: [1632, 204.0]
     rotation: 0
     state: enabled
-- name: digital_protocol_parser_b_0
-  id: digital_protocol_parser_b
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    format: hdr_format_rx
-    maxoutbuf: '0'
-    minoutbuf: '0'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [976, 840.0]
-    rotation: 0
-    state: enabled
 - name: digital_scrambler_bb_0
   id: digital_scrambler_bb
   parameters:
@@ -602,6 +586,38 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [1128, 220.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\nimport pmt\n\n\nclass\
+      \ custom_header_parser(gr.sync_block):\n    def __init__(self):\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='custom_header_parser',\n            in_sig=[np.byte],\n\
+      \            out_sig=[]\n        )\n        self.message_port_register_out(pmt.intern('header_data'))\n\
+      \        self.buf = []\n\n    def work(self, input_items, output_items):\n \
+      \       inp = input_items[0]\n        self.buf.extend(inp.tolist())\n      \
+      \  while len(self.buf) >= 32:\n            bits = self.buf[:32]\n          \
+      \  self.buf = self.buf[32:]\n            len1 = 0\n            for i in range(16):\n\
+      \                len1 = (len1 << 1) | (bits[i] & 1)\n            len2 = 0\n\
+      \            for i in range(16, 32):\n                len2 = (len2 << 1) | (bits[i]\
+      \ & 1)\n            if len1 == len2 and 0 < len1 < 10000:\n                msg\
+      \ = pmt.make_dict()\n                msg = pmt.dict_add(msg, pmt.intern('payload\
+      \ symbols'), pmt.from_long(len1))\n                self.message_port_pub(pmt.intern('header_data'),\
+      \ msg)\n            else:\n                self.message_port_pub(pmt.intern('header_data'),\
+      \ pmt.PMT_F)\n        return len(inp)\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('custom_header_parser', 'custom_header_parser', [], [('0', 'byte',
+      1)], [('header_data', 'message', 1)], '', [])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [976, 840.0]
     rotation: 0
     state: enabled
 - name: fec_extended_decoder_0
@@ -717,7 +733,7 @@ blocks:
     tr_slope: qtgui.TRIG_SLOPE_POS
     tr_tag: '""'
     type: float
-    update_time: '0.10'
+    update_time: '0.1'
     width1: '1'
     width10: '1'
     width2: '1'
@@ -814,7 +830,7 @@ blocks:
     tr_slope: qtgui.TRIG_SLOPE_POS
     tr_tag: '""'
     type: float
-    update_time: '0.10'
+    update_time: '0.1'
     width1: '1'
     width10: '1'
     width2: '1'
@@ -911,7 +927,7 @@ blocks:
     tr_slope: qtgui.TRIG_SLOPE_POS
     tr_tag: '""'
     type: float
-    update_time: '0.10'
+    update_time: '0.1'
     width1: '1'
     width10: '1'
     width2: '1'
@@ -1008,7 +1024,7 @@ blocks:
     tr_slope: qtgui.TRIG_SLOPE_POS
     tr_tag: '""'
     type: float
-    update_time: '0.10'
+    update_time: '0.1'
     width1: '1'
     width10: '1'
     width2: '1'
@@ -1082,11 +1098,11 @@ connections:
 - [digital_crc32_bb_0, '0', blocks_repack_bits_bb_0, '0']
 - [digital_descrambler_bb_0, '0', blocks_repack_bits_bb_0_0_0_0, '0']
 - [digital_header_payload_demux_0, '0', blocks_char_to_float_1, '0']
-- [digital_header_payload_demux_0, '0', digital_protocol_parser_b_0, '0']
+- [digital_header_payload_demux_0, '0', epy_block_0, '0']
 - [digital_header_payload_demux_0, '1', blocks_char_to_float_0, '0']
 - [digital_protocol_formatter_bb_0, '0', blocks_repack_bits_bb_0_0, '0']
-- [digital_protocol_parser_b_0, info, digital_header_payload_demux_0, header_data]
 - [digital_scrambler_bb_0, '0', fec_extended_encoder_0, '0']
+- [epy_block_0, header_data, digital_header_payload_demux_0, header_data]
 - [fec_extended_decoder_0, '0', blocks_char_to_float_1_2, '0']
 - [fec_extended_decoder_0, '0', digital_descrambler_bb_0, '0']
 - [fec_extended_encoder_0, '0', blocks_tagged_stream_multiply_length_0, '0']
