@@ -28,6 +28,7 @@ from gnuradio import eng_notation
 import sip
 import threading
 import untitled_epy_block_0 as epy_block_0  # embedded python block
+import untitled_epy_block_seq_num as epy_block_seq_num  # embedded python block
 
 
 
@@ -73,7 +74,8 @@ class untitled(gr.top_block, Qt.QWidget):
         self.packet_len = packet_len = 110
         self.ldpc_enc_def = ldpc_enc_def = fec.ldpc_encoder_make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\n_0300_k_0152_gap_03.alist')
         self.ldpc_dec_def = ldpc_dec_def = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\packet\\n_0300_k_0152_gap_03.alist', 50)
-        self.hdr_format_rx = hdr_format_rx = digital.header_format_default("", 0, 1)
+        self.header_len = header_len = 32
+        self.hdr_format_rx = hdr_format_rx = digital.header_format_counter("1010101011110000101010101111000010101010111100001010101011110000", 1, 8)
         self.hdr_format = hdr_format = digital.header_format_default("1010101011110000101010101111000010101010111100001010101011110000",1, 8)
 
         ##################################################
@@ -244,7 +246,8 @@ class untitled(gr.top_block, Qt.QWidget):
         self.top_layout.addWidget(self._qtgui_sink_x_0_win)
         self.fec_extended_encoder_0 = fec.extended_encoder(encoder_obj_list=ldpc_enc_def, threading='capillary', puncpat='11')
         self.fec_extended_decoder_0 = fec.extended_decoder(decoder_obj_list=ldpc_dec_def, threading='capillary', ann=None, puncpat='11', integration_period=10000)
-        self.epy_block_0 = epy_block_0.custom_header_parser()
+        self.epy_block_seq_num = epy_block_seq_num.sequence_number_generator()
+        self.epy_block_0 = epy_block_0.arq_header_parser()
         self.digital_symbol_sync_xx_0 = digital.symbol_sync_cc(
             digital.TED_SIGNAL_TIMES_SLOPE_ML,
             4,
@@ -338,7 +341,7 @@ class untitled(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_tagged_stream_multiply_length_0, 0), (self.blocks_tagged_stream_mux_0, 1))
         self.connect((self.blocks_tagged_stream_multiply_length_0, 0), (self.digital_protocol_formatter_bb_0, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.blocks_repack_bits_bb_0_0, 0))
-        self.connect((self.blocks_throttle2_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
+        self.connect((self.blocks_throttle2_0, 0), (self.epy_block_seq_num, 0))
         self.connect((self.blocks_unpack_k_bits_bb_0, 0), (self.blocks_char_to_float_0_1, 0))
         self.connect((self.blocks_unpack_k_bits_bb_0, 0), (self.digital_correlate_access_code_tag_xx_0, 0))
         self.connect((self.channels_channel_model_0, 0), (self.digital_symbol_sync_xx_0, 0))
@@ -358,6 +361,7 @@ class untitled(gr.top_block, Qt.QWidget):
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_repack_bits_bb_0_0_0_0, 0))
         self.connect((self.digital_scrambler_bb_0, 0), (self.fec_extended_encoder_0, 0))
         self.connect((self.digital_symbol_sync_xx_0, 0), (self.digital_costas_loop_cc_0, 0))
+        self.connect((self.epy_block_seq_num, 0), (self.blocks_stream_to_tagged_stream_0, 0))
         self.connect((self.fec_extended_decoder_0, 0), (self.digital_descrambler_bb_0, 0))
         self.connect((self.fec_extended_encoder_0, 0), (self.blocks_tagged_stream_multiply_length_0, 0))
 
@@ -407,6 +411,12 @@ class untitled(gr.top_block, Qt.QWidget):
 
     def set_ldpc_dec_def(self, ldpc_dec_def):
         self.ldpc_dec_def = ldpc_dec_def
+
+    def get_header_len(self):
+        return self.header_len
+
+    def set_header_len(self, header_len):
+        self.header_len = header_len
 
     def get_hdr_format_rx(self):
         return self.hdr_format_rx

@@ -17,7 +17,7 @@ QPSK modülasyonu ile **Scrambler** ve **LDPC** kanal kodlaması kullanan bir **
 | Değişken | Değer | Açıklama |
 |---|---|---|
 | `samp_rate` | `1,000,000` (1 MHz) | Örnekleme hızı |
-| `packet_len` | **`91`** byte | Her paketin boyutu (LDPC k=152 ile uyumlu: (91+4)×8=760=5×152) |
+| `packet_len` | **`110`** byte | Her paketin boyutu (LDPC k=152 ile uyumlu: (110+4)×8=912=6×152) |
 | `qpsk` | `constellation_rect` | QPSK: noktalar `[-1-1j, -1+1j, 1+1j, 1-1j]`, symbol map `[0, 1, 3, 2]` (Gray kodlu) |
 | `hdr_format` | `header_format_default` | 64-bit erişim kodu, **`bps=1`**, `threshold=0` |
 | `ldpc_enc_def` | `ldpc_encoder` | LDPC kodlayıcı — `n_0300_k_0152_gap_03.alist`, dim1=1 |
@@ -44,11 +44,11 @@ QPSK modülasyonu ile **Scrambler** ve **LDPC** kanal kodlaması kullanan bir **
 
 ### Paket/LDPC Uyumu
 ```
-packet_len = 91 byte
-CRC sonrası = 95 packed byte
-Unpack sonrası = 760 bit
-760 ÷ 152 = 5 codeword (TAM BÖLÜNÜR ✓)
-FEC çıkış = 5 × 300 = 1500 bit
+packet_len = 110 byte
+CRC sonrası = 114 packed byte
+Unpack sonrası = 912 bit
+912 ÷ 152 = 6 codeword (TAM BÖLÜNÜR ✓)
+FEC çıkış = 6 × 300 = 1800 bit
 ```
 
 ---
@@ -65,22 +65,22 @@ Throttle (1 MHz)
     │
     ▼
 Stream to Tagged Stream
-    │  packet_len=91, tag="packet_len"
+    │  packet_len=110, tag="packet_len"
     ▼
 CRC32 (ekleme, packed=True)
-    │  +4 byte CRC → 95 packed byte/paket, tag=95
+    │  +4 byte CRC → 114 packed byte/paket, tag=114
     ▼
-Repack Bits (8→1)                    ← EKLENDİ
-    │  95 packed → 760 unpacked byte
-    │  len_tag_key="packet_len", tag=760
+Repack Bits (8→1)                    
+    │  114 packed → 912 unpacked byte
+    │  len_tag_key="packet_len", tag=912
     ▼
 Scrambler
     │  mask=0x8A, seed=0x7F, len=7
-    │  760 unpacked byte (bit-level XOR)
+    │  912 unpacked byte (bit-level XOR)
     ▼
 FEC Extended Encoder (LDPC)
     │  puncpat='11', capillary threading
-    │  760 bit → 5 codeword → 1500 bit
+    │  912 bit → 6 codeword → 1800 bit
     │
     ├──────────────────────────────────────┐
     │                                      │
@@ -93,10 +93,10 @@ Protocol Formatter                    (payload data)
     ▼                                      │
 Tagged Stream Mux  ◄───────────────────────┘
     │  lengthtagname="packet_len"
-    │  [header(96) | payload(1500)] = 1596 byte
+    │  [header(96) | payload(1800)] = 1896 byte
     ▼
-Repack Bits (1→8)                    ← EKLENDİ
-    │  1596 unpacked → 199.5 → 200 packed byte
+Repack Bits (1→8)                    
+    │  1896 unpacked → 237 packed byte
     │  len_tag_key="packet_len"
     ▼
 Constellation Modulator (QPSK)
@@ -154,18 +154,22 @@ Header/Payload Demux
     │                     (header_data feedback)
     │
     └── Port 1 (Payload)
-         │  float soft bits (1500 items)
+         │  float soft bits (1800 items)
          ▼
     FEC Extended Decoder (LDPC)
          │  max_iter=50, capillary
-         │  1500 → 760 decoded bits
+         │  1800 → 912 decoded bits
          ▼
     Descrambler
          │  mask=0x8A, seed=0x7F, len=7
          ▼
     Repack Bits (1→8)
          │  len_tag_key="packet_len"
-         │  760 unpacked → 95 packed byte
+         │  912 unpacked → 114 packed byte
+         ▼
+    Keep M in N
+         │  m=110, n=114, offset=0
+         │  4 byte CRC'yi kırpar
          ▼
     File Sink (son.txt)
 ```
@@ -212,6 +216,7 @@ Header/Payload Demux
 | `fec_extended_decoder_0` | LDPC Decoder | max_iter=50, capillary |
 | `digital_descrambler_bb_0` | Descrambler | mask=0x8A, seed=0x7F, len=7 |
 | `blocks_repack_bits_bb_0` | Repack Bits | k=1, l=8, **len_tag_key="packet_len"** |
+| `blocks_keep_m_in_n_0` | Keep M in N | **m=110**, **n=114** (4 byte CRC'yi kaldırır) |
 | `blocks_file_sink_0` | File Sink | `son.txt`, byte |
 
 ---
@@ -233,7 +238,7 @@ file_source → throttle → stream_to_tagged → crc32
 virtual_source → symbol_sync → costas_loop → soft_decoder
   → correlate_access_code → header_payload_demux
   → (port 0) multiply_const(×-1) → binary_slicer → protocol_parser → msg→demux
-  → (port 1) fec_decoder → descrambler → repack(1→8) → file_sink
+  → (port 1) fec_decoder → descrambler → repack(1→8) → keep_m_in_n → file_sink
 ```
 
 ---
@@ -261,10 +266,11 @@ virtual_source → symbol_sync → costas_loop → soft_decoder
 | 4 | hdr_format bps | 1→2→**1** | **1** | Header ve payload aynı formatta (1 bit/byte) olmalı |
 | 5 | header_payload_demux header_len | 32→16→**32** | **32** | bps=1 ile header 32 bit = 32 float item |
 | 6 | Tüm Repack blokları len_tag_key | `""` | **`"packet_len"`** | Tagged stream tag'larının propagasyonu için zorunlu |
-| 7 | packet_len | 96 | **91** | (91+4)×8=760=5×152 → LDPC k=152 ile tam bölünür |
+| 7 | packet_len | 91 | **110** | Byte-Shift Hatası: (110+4)×8=912 bit (114 byte). FEC çıkışı 1800 bit = Tam 225 byte. |
 | 8 | tagged_stream_mux lengthtagname | `""` | **`"packet_len"`** | Mux'un paket sınırlarını tanıması için zorunlu |
 | 9 | packet_headergenerator | Silindi | **protocol_formatter_bb** | Yeni header formatter bloğu |
 | 10 | Multiply Const (×-1) | — | Header path'e eklendi | Soft bit polarite düzeltme |
+| 11 | Keep M in N Bloğu | — | RX çıkışına Eklendi | CRC bitlerini (4 byte) dosyaya yazılmadan önce silmek için. |
 
 ---
 
@@ -281,30 +287,30 @@ virtual_source → symbol_sync → costas_loop → soft_decoder
 ## 10. Paket Boyut Hesabı
 
 ```
-packet_len = 91 byte
+packet_len = 110 byte
   │
   ▼ CRC32 (+4 byte)
-95 packed byte (tag=95)
+114 packed byte (tag=114)
   │
   ▼ Repack (8→1)
-760 unpacked byte (tag=760)
+912 unpacked byte (tag=912)
   │
   ▼ Scrambler (uzunluk değişmez)
-760 unpacked byte
+912 unpacked byte
   │
   ▼ LDPC Encoder (k=152, n=300)
-5 codeword × 300 = 1500 unpacked byte (tag=1500)
+6 codeword × 300 = 1800 unpacked byte (tag=1800)
   │
   ├─→ Protocol Formatter: 64 AC + 32 header = 96 byte header
   │
   ▼ Tagged Stream Mux
-96 + 1500 = 1596 unpacked byte
+96 + 1800 = 1896 unpacked byte
   │
   ▼ Repack (1→8)
-1596/8 = 199.5 → 200 packed byte
+1896/8 = 237 packed byte
   │
   ▼ QPSK Modulator (2 bit/symbol, sps=4)
-200 × 8 / 2 = 800 QPSK symbol × 4 = 3200 complex sample
+237 × 8 / 2 = 948 QPSK symbol × 4 = 3792 complex sample
   │
   ▼ ×0.5 → Channel → RX
 ```
@@ -317,15 +323,15 @@ packet_len = 91 byte
 graph TD
     subgraph TX ["Verici (TX)"]
         A["📄 File Source<br/>giris.txt"] --> B["⏱ Throttle<br/>1 MHz"]
-        B --> C["🏷 Stream→Tagged<br/>packet_len=91"]
+        B --> C["🏷 Stream→Tagged<br/>packet_len=110"]
         C --> D["🔒 CRC32<br/>packed=True, +4 byte"]
-        D --> RP1["🔧 Repack 8→1<br/>95→760 byte"]
+        D --> RP1["🔧 Repack 8→1<br/>114→912 byte"]
         RP1 --> E["🔀 Scrambler<br/>0x8A/0x7F/7"]
-        E --> F["📡 LDPC Encoder<br/>760→1500 bit"]
+        E --> F["📡 LDPC Encoder<br/>912→1800 bit"]
         F --> G["📋 Protocol Formatter<br/>bps=1, 96 byte header"]
         F --> H["📦 Tagged Stream Mux<br/>lengthtagname=packet_len"]
         G --> H
-        H --> RP2["🔧 Repack 1→8<br/>1596→200 byte"]
+        H --> RP2["🔧 Repack 1→8<br/>1896→237 byte"]
         RP2 --> I["📻 QPSK Modulator<br/>diff=False, sps=4"]
         I --> J["✖ ×0.5"]
     end
@@ -346,8 +352,9 @@ graph TD
         R -.->|msg: info| P
         P -->|Payload| S["📡 LDPC Decoder<br/>max_iter=50"]
         S --> T["🔀 Descrambler<br/>0x8A/0x7F/7"]
-        T --> U["🔧 Repack 1→8"]
-        U --> V["📄 File Sink<br/>son.txt"]
+        T --> U["🔧 Repack 1→8<br/>912→114 byte"]
+        U --> V1["✂ Keep M in N<br/>m=110, n=114"]
+        V1 --> V["📄 File Sink<br/>son.txt"]
     end
 ```
 
@@ -365,23 +372,32 @@ graph TD
 - `correlate_access_code` yanlış tag'larla karışabilir
 - Potansiyel çözüm: `block_tags=True` yap
 
-### 12.3. Scrambler State Senkronizasyonu
-- `digital_scrambler_bb` stream modunda çalışır, paket sınırlarında state sıfırlanmaz
-- Potansiyel desenkronizasyon riski
-
-### 12.4. RX Tarafı CRC Kontrolü
-- TX'te CRC ekleniyor ama RX'te CRC kontrol bloğu yok
-- `son.txt`'de CRC byte'ları da veri olarak yazılıyor (4 ekstra byte/paket)
+### 12.3. Multiplicative Descrambler Senkronizasyon Kaybı (Sync Loss)
+- `digital_scrambler_bb` ve `descrambler_bb` blokları Multiplicative (kendini senkronize eden) tiptedir ve senkronizasyon için 7 bit'e ihtiyaç duyarlar.
+- RX simülasyonu başlarken Costas Loop oturana kadar ilk paket (Packet 0) kaybolur. Bu nedenle RX Descrambler'ın durumu (state), TX Scrambler'ın durumundan 912 bit geride kalır.
+- Bu senkronizasyon eksikliği, başarılı alınan ilk paketin ve **her ardışık paketin ilk byte'ında** kalıcı 1 byte'lık bozulmaya (garbage data) neden olmaktadır.
+- Bu hata LDPC kod çözücüden *sonra* gerçekleştiği için FEC bunu düzeltemez. Çözüm olarak ileride "Dummy Byte" eklentisi (Python Block) düşünülebilir.
 
 ---
 
-## 13. Sonraki Adımlar
+## 13. Yapılacaklar Listesi (Kayıpsız İletim ARQ Protokolü)
 
-1. **Simülasyonu çalıştır** — hata mesajlarını kontrol et
-2. **`son.txt` vs `giris.txt` karşılaştır** — byte-level diff
-3. **BER testi** — gürültüsüz ortamda BER=0 olmalı
-4. **Gürültü ekleme** — `noise_voltage` > 0 ile performans testi
-5. **Frekans/zamanlama ofset testi** — gerçekçi kanal koşulları
+Alıcı paketi aldıktan sonra doğruluğunu teyit edip, başarılıysa yeni paketi isteyeceği (Wi-Fi/Bluetooth mantığında) tam kayıpsız bir haberleşme mimarisi kurmak için izlenecek adımlar:
+
+1. **RX Tarafında Paket Doğrulama (CRC Check):** 
+   - Şu an sadece kırpılıp atılan 4 byte'lık CRC verisinin, alıcıda `digital_crc32_bb` (veya benzeri bir Python bloğu) ile gerçekten kontrol edilerek paketin sağlam (hatasız) ulaşıp ulaşmadığının tespit edilmesi.
+
+2. **Geri Besleme Kanalı (Reverse Channel / ACK-NACK):** 
+   - Alıcıdan (RX) vericiye (TX) doğru çalışan, sadece onay mesajlarını (ACK: Başarılı, NACK: Hatalı) iletecek düşük veri hızlı ikinci bir haberleşme kanalının (veya message passing yapısının) kurulması.
+
+3. **Verici Durum Makinesi (Stop-and-Wait ARQ):**
+   - TX tarafındaki dosya okuma mantığının değiştirilmesi. Vericinin bir paketi gönderdikten sonra durup alıcıdan `ACK` beklemesi; `ACK` gelirse bir sonraki pakete geçmesi, hata mesajı veya zaman aşımı (timeout) olursa aynı paketi tekrar göndermesi.
+
+4. **Paket Sıra Numaraları (Sequence Numbering):**
+   - Header yapısına (Protocol Formatter) paket sıra numaralarının eklenmesi. Böylece alıcının aynı paketi (retransmission durumunda) yanlışlıkla iki kez dosyaya yazmasının önüne geçilmesi.
+
+5. **Gürültülü Ortamda Kayıpsızlık Testi:**
+   - Kanal modeline bilinçli olarak gürültü (`noise_voltage > 0`) eklenip paket düşmeleri yaratılarak, sistemin kendi kendini toparlayıp `son.txt` dosyasını `giris.txt` ile %100 aynı (lossless) şekilde oluşturduğunun kanıtlanması.
 
 ---
 
