@@ -30,6 +30,7 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import gr, pdu
 import LDPC_epy_block_0 as epy_block_0  # embedded python block
+import LDPC_epy_block_1 as epy_block_1  # embedded python block
 import sip
 import threading
 
@@ -98,8 +99,8 @@ class LDPC(gr.top_block, Qt.QWidget):
         self.postamble_size = postamble_size = 8
         self.payload_size = payload_size = 77
         self.noise = noise = 0.1
-        self.ldpc_enc = ldpc_enc = fec.ldpc_encoder_make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\n_1296_k_0648_ieee.alist')
-        self.ldpc_dec = ldpc_dec = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\n_1296_k_0648_ieee.alist', 50)
+        self.ldpc_enc = ldpc_enc = fec.ldpc_encoder_make('C:\\Users\\DELL\\Downloads\\BitirmeProjesi2\\n_1296_k_0648_ieee.alist')
+        self.ldpc_dec = ldpc_dec = fec.ldpc_decoder.make('C:\\Users\\DELL\\Downloads\\BitirmeProjesi2\\n_1296_k_0648_ieee.alist', 50)
         self.hdr = hdr = digital.header_format_default(digital.packet_utils.default_access_code, 0)
         self.freq_offset = freq_offset = 0.01
         self.constel = constel = digital.constellation_bpsk().base()
@@ -244,6 +245,7 @@ class LDPC(gr.top_block, Qt.QWidget):
         self.filter_fft_rrc_filter_0 = filter.fft_filter_ccc(1, firdes.root_raised_cosine(1, samp_rate, (samp_rate/sps), 0.35, (11*sps)), 1)
         self.fec_extended_encoder_0 = fec.extended_encoder(encoder_obj_list=ldpc_enc, threading='capillary', puncpat='11')
         self.fec_extended_decoder_0 = fec.extended_decoder(decoder_obj_list=ldpc_dec, threading='capillary', ann=None, puncpat='11', integration_period=10000)
+        self.epy_block_1 = epy_block_1.feedback_estimator()
         self.epy_block_0 = epy_block_0.blk(modulus=2)
         self.digital_symbol_sync_xx_0 = digital.symbol_sync_cc(
             digital.TED_SIGNAL_TIMES_SLOPE_ML,
@@ -336,11 +338,12 @@ class LDPC(gr.top_block, Qt.QWidget):
         self.connect((self.digital_costas_loop_cc_0, 0), (self.digital_constellation_soft_decoder_cf_0, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.qtgui_time_sink_x_1_0, 0))
         self.connect((self.digital_crc32_bb_0, 0), (self.blocks_repack_bits_bb_0, 0))
-        self.connect((self.digital_crc32_bb_1, 0), (self.blocks_file_sink_0, 0))
-        self.connect((self.digital_crc32_bb_1, 0), (self.pdu_tagged_stream_to_pdu_0, 0))
+        self.connect((self.digital_crc32_bb_1, 0), (self.epy_block_1, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_tagged_stream_mux_0, 1))
         self.connect((self.digital_symbol_sync_xx_0, 0), (self.digital_costas_loop_cc_0, 0))
         self.connect((self.epy_block_0, 0), (self.digital_correlate_access_code_xx_ts_0, 0))
+        self.connect((self.epy_block_1, 0), (self.blocks_file_sink_0, 0))
+        self.connect((self.epy_block_1, 0), (self.pdu_tagged_stream_to_pdu_0, 0))
         self.connect((self.fec_extended_decoder_0, 0), (self.blocks_tagged_stream_multiply_length_0_1, 0))
         self.connect((self.fec_extended_encoder_0, 0), (self.blocks_tagged_stream_multiply_length_0, 0))
         self.connect((self.filter_fft_rrc_filter_0, 0), (self.digital_symbol_sync_xx_0, 0))

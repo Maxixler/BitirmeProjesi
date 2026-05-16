@@ -93,7 +93,7 @@ blocks:
     comment: ''
     dim1: '4'
     dim2: '4'
-    file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\n_1296_k_0648_ieee.alist
+    file: C:\Users\DELL\Downloads\BitirmeProjesi2\n_1296_k_0648_ieee.alist
     max_iter: '50'
     ndim: '0'
     value: '"ok"'
@@ -110,7 +110,7 @@ blocks:
     comment: ''
     dim1: '1'
     dim2: '4'
-    file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\n_1296_k_0648_ieee.alist
+    file: C:\Users\DELL\Downloads\BitirmeProjesi2\n_1296_k_0648_ieee.alist
     ndim: '0'
     value: '"ok"'
   states:
@@ -237,7 +237,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [592, 1948.0]
+    coordinate: [744, 1976.0]
     rotation: 0
     state: true
 - name: blocks_file_source_0
@@ -274,7 +274,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [920, 1856.0]
+    coordinate: [1064, 1888.0]
     rotation: 0
     state: enabled
 - name: blocks_multiply_const_vxx_0
@@ -747,17 +747,6 @@ blocks:
     coordinate: [272, 1868.0]
     rotation: 0
     state: enabled
-- name: feedback_estimator_0
-  id: feedback_estimator
-  parameters:
-    comment: ''
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [400, 1800.0]
-    rotation: 0
-    state: enabled
 - name: digital_protocol_formatter_bb_0
   id: digital_protocol_formatter_bb
   parameters:
@@ -868,6 +857,40 @@ blocks:
     bus_source: false
     bus_structure: null
     coordinate: [528, 1620.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_1
+  id: epy_block
+  parameters:
+    _source_code: "import numpy as np\nfrom gnuradio import gr\n\nclass feedback_estimator(gr.sync_block):\n\
+      \      def __init__(self):\n          gr.sync_block.__init__(\n            \
+      \  self,\n              name=\"feedback_estimator\",\n              in_sig=[np.uint8],\n\
+      \              out_sig=[np.uint8]\n          )\n          self.iteration = 0\n\
+      \          self.last_mean = 127.5\n          self.adaptation_rate = 0.01\n\n\
+      \      def work(self, input_items, output_items):\n          in0 = input_items[0]\n\
+      \          out = output_items[0]\n          out[:] = in0  # Pass-through\n\n\
+      \          if len(in0) == 0:\n              return len(output_items[0])\n\n\
+      \          # Simple signal quality estimation\n          data_float = np.array(in0,\
+      \ dtype=np.float64)\n          current_mean = np.mean(data_float)\n        \
+      \  current_var = np.var(data_float)\n\n          mean_error = abs(current_mean\
+      \ - self.last_mean)\n          var_error = abs(current_var - 5400.0) / 5400.0\n\
+      \          error_metric = (mean_error / 127.5) + var_error\n\n          self.iteration\
+      \ += 1\n\n          # In a real implementation, you would adjust parameters\
+      \ here\n          # For GRC, we'll output a message or use a workaround\n\n\
+      \          if self.iteration % 100 == 0:\n              print(f\"Feedback: iter={self.iteration},\
+      \ error={error_metric:.4f}\")\n\n          return len(output_items[0])"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    _io_cache: ('feedback_estimator', 'feedback_estimator', [], [('0', 'byte', 1)],
+      [('0', 'byte', 1)], '', [])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [528, 1896.0]
     rotation: 0
     state: enabled
 - name: fec_extended_decoder_0
@@ -984,7 +1007,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [568, 1884.0]
+    coordinate: [752, 1880.0]
     rotation: 0
     state: enabled
 - name: qtgui_time_sink_x_0_0
@@ -1452,12 +1475,12 @@ connections:
 - [digital_costas_loop_cc_0, '0', qtgui_time_sink_x_1_0, '0']
 - [digital_costas_loop_cc_0, '0', virtual_sink_3, '0']
 - [digital_crc32_bb_0, '0', blocks_repack_bits_bb_0, '0']
-- [digital_crc32_bb_1, '0', feedback_estimator_0, '0']
-- [feedback_estimator_0, '0', blocks_file_sink_0, '0']
-- [feedback_estimator_0, '0', pdu_tagged_stream_to_pdu_0, '0']
+- [digital_crc32_bb_1, '0', epy_block_1, '0']
 - [digital_protocol_formatter_bb_0, '0', virtual_sink_0_0, '0']
 - [digital_symbol_sync_xx_0, '0', digital_costas_loop_cc_0, '0']
 - [epy_block_0, '0', digital_correlate_access_code_xx_ts_0, '0']
+- [epy_block_1, '0', blocks_file_sink_0, '0']
+- [epy_block_1, '0', pdu_tagged_stream_to_pdu_0, '0']
 - [fec_extended_decoder_0, '0', blocks_tagged_stream_multiply_length_0_1, '0']
 - [fec_extended_encoder_0, '0', blocks_tagged_stream_multiply_length_0, '0']
 - [filter_fft_rrc_filter_0, '0', digital_symbol_sync_xx_0, '0']
