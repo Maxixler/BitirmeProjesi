@@ -747,6 +747,17 @@ blocks:
     coordinate: [272, 1868.0]
     rotation: 0
     state: enabled
+- name: feedback_estimator_0
+  id: feedback_estimator
+  parameters:
+    comment: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [400, 1800.0]
+    rotation: 0
+    state: enabled
 - name: digital_protocol_formatter_bb_0
   id: digital_protocol_formatter_bb
   parameters:
@@ -1441,8 +1452,9 @@ connections:
 - [digital_costas_loop_cc_0, '0', qtgui_time_sink_x_1_0, '0']
 - [digital_costas_loop_cc_0, '0', virtual_sink_3, '0']
 - [digital_crc32_bb_0, '0', blocks_repack_bits_bb_0, '0']
-- [digital_crc32_bb_1, '0', blocks_file_sink_0, '0']
-- [digital_crc32_bb_1, '0', pdu_tagged_stream_to_pdu_0, '0']
+- [digital_crc32_bb_1, '0', feedback_estimator_0, '0']
+- [feedback_estimator_0, '0', blocks_file_sink_0, '0']
+- [feedback_estimator_0, '0', pdu_tagged_stream_to_pdu_0, '0']
 - [digital_protocol_formatter_bb_0, '0', virtual_sink_0_0, '0']
 - [digital_symbol_sync_xx_0, '0', digital_costas_loop_cc_0, '0']
 - [epy_block_0, '0', digital_correlate_access_code_xx_ts_0, '0']

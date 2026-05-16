@@ -14,6 +14,8 @@ from gnuradio import qtgui
 from PyQt5 import QtCore
 from gnuradio import blocks
 import pmt
+import random
+import numpy as np
 from gnuradio import blocks, gr
 from gnuradio import channels
 from gnuradio.filter import firdes
@@ -30,6 +32,101 @@ from gnuradio import eng_notation
 from gnuradio import gr, pdu
 import sip
 import threading
+
+
+class feedback_estimator(gr.sync_block):
+    """
+    Feedback estimator block that adjusts channel parameters based on received signal quality
+    For now, uses a simple heuristic based on data variance as a proxy for signal quality
+    """
+    def __init__(self, tb_instance):
+        gr.sync_block.__init__(
+            self,
+            name="feedback_estimator",
+            in_sig=[np.uint8],
+            out_sig=[np.uint8]
+        )
+        self.tb = tb_instance
+        self.iteration = 0
+        self.last_mean = 127.5  # Expected mean for random data
+        self.adaptation_rate = 0.01
+
+    def work(self, input_items, output_items):
+        """Process input and adjust parameters based on signal quality estimate"""
+        in0 = input_items[0]
+        out = output_items[0]
+
+        # Copy input to output (pass-through)
+        out[:] = in0
+
+        # Skip if no data
+        if len(in0) == 0:
+            return len(output_items[0])
+
+        # Convert to float for statistical analysis
+        data_float = np.array(in0, dtype=np.float64)
+
+        # Compute simple statistics
+        current_mean = np.mean(data_float)
+        current_var = np.var(data_float)
+
+        # For random binary data, we expect mean ~127.5 and variance ~(255^2)/12 ≈ 5400
+        # Deviations from this might indicate signal issues
+
+        # Calculate how far we are from ideal random data statistics
+        mean_error = abs(current_mean - self.last_mean)
+        var_error = abs(current_var - 5400.0) / 5400.0  # Normalize
+
+        # Combined error metric (lower is better)
+        error_metric = (mean_error / 127.5) + var_error
+
+        self.iteration += 1
+
+        # Adaptive parameter adjustment
+        # If error is high, we explore more; if error is low, we exploit/converge
+        if self.iteration < 10:
+            # Initial exploration phase
+            explore_factor = 1.0
+        else:
+            # Decrease exploration over time
+            explore_factor = max(0.1, 1.0 / (1 + self.iteration * 0.001))
+
+        step_size = 0.05 * explore_factor
+
+        # Adjust parameters based on error
+        # High error -> increase exploration (more aggressive adjustment)
+        # Low error -> fine-tune around current values
+
+        # Time offset adjustment (centered around 1.0)
+        current_time = self.tb.get_time_offset()
+        time_error = current_time - 1.0
+        time_adjustment = -step_size * time_error * (1.0 + error_metric)
+        new_time = max(0.999, min(1.001, current_time + time_adjustment))
+        self.tb.set_time_offset(new_time)
+
+        # Frequency offset adjustment (centered around 0.0)
+        current_freq = self.tb.get_freq_offset()
+        freq_adjustment = -step_size * current_freq * (1.0 + error_metric)
+        new_freq = max(-0.25, min(0.25, current_freq + freq_adjustment))
+        self.tb.set_freq_offset(new_freq)
+
+        # Noise adjustment (we want lower noise, but not too aggressive)
+        current_noise = self.tb.get_noise()
+        # If error is high, assume we need more noise margin (paradoxical but helps exploration)
+        # If error is low, we can reduce noise margin
+        noise_adjustment = step_size * (error_metric - 0.5)  # Positive when error > 0.5
+        new_noise = max(0.0, min(2.0, current_noise + noise_adjustment))
+        self.tb.set_noise(new_noise)
+
+        # Update our running mean estimate
+        self.last_mean = 0.9 * self.last_mean + 0.1 * current_mean
+
+        # Log occasionally
+        if self.iteration % 100 == 0:
+            print(f"Feedback: iter={self.iteration}, error={error_metric:.4f}, "
+                  f"time_offset={new_time:.4f}, freq_offset={new_freq:.4f}, noise={new_noise:.4f}")
+
+        return len(output_items[0])
 
 
 def snipfcn_snippet_0(self):
@@ -290,6 +387,7 @@ class bpskfile5(gr.top_block, Qt.QWidget):
         self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
         self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, 'bpsk_receive.txt', False)
         self.blocks_file_sink_0.set_unbuffered(False)
+        self.feedback_estimator_0 = feedback_estimator(self)
 
 
         ##################################################
@@ -316,8 +414,9 @@ class bpskfile5(gr.top_block, Qt.QWidget):
         self.connect((self.digital_costas_loop_cc_0, 0), (self.qtgui_time_sink_x_1_0, 0))
         self.connect((self.digital_crc32_bb_0, 0), (self.blocks_tagged_stream_mux_0, 2))
         self.connect((self.digital_crc32_bb_0, 0), (self.digital_protocol_formatter_bb_0, 0))
-        self.connect((self.digital_crc32_bb_1, 0), (self.blocks_file_sink_0, 0))
-        self.connect((self.digital_crc32_bb_1, 0), (self.pdu_tagged_stream_to_pdu_0, 0))
+        self.connect((self.digital_crc32_bb_1, 0), (self.feedback_estimator_0, 0))
+        self.connect((self.feedback_estimator_0, 0), (self.blocks_file_sink_0, 0))
+        self.connect((self.feedback_estimator_0, 0), (self.pdu_tagged_stream_to_pdu_0, 0))
         self.connect((self.digital_diff_decoder_bb_0, 0), (self.digital_correlate_access_code_xx_ts_0, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_tagged_stream_mux_0, 1))
         self.connect((self.digital_symbol_sync_xx_0, 0), (self.digital_costas_loop_cc_0, 0))
