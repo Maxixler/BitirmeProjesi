@@ -115,15 +115,16 @@ class blk(gr.basic_block):
                 # Genlik ve Faz Kestirimi
                 tx1_energy = np.sum(np.abs(tx1_chunk_diff)**2)
                 if tx1_energy > 1e-6:
-                    amplitude_scale = np.abs(best_val) / tx1_energy
+                    estimated_amp = np.abs(best_val) / tx1_energy
                 else:
-                    amplitude_scale = self.near_user_amplitude
+                    estimated_amp = self.near_user_amplitude
 
                 phase_offset = np.angle(best_val)
 
                 # Geçerli eşleşme kontrolü (Korelasyon yeterince yüksek mi?)
-                if amplitude_scale >= 0.3 * self.near_user_amplitude:
-                    amplitude_scale = np.clip(amplitude_scale, 0.4 * self.near_user_amplitude, 1.6 * self.near_user_amplitude)
+                if estimated_amp >= 0.3 * self.near_user_amplitude:
+                    # Statik genlik kullanımı (Over-subtraction engelleniyor!)
+                    amplitude_scale = self.near_user_amplitude
                     
                     # Girişim sinyalini sentezle ve çıkar
                     interference_signal = tx1_chunk_diff * amplitude_scale * np.exp(1j * phase_offset)
@@ -131,7 +132,7 @@ class blk(gr.basic_block):
 
                     self.pkt_counter += 1
                     shift = payload_start_abs - (self.next_packet_start_abs + 2048) if self.pkt_counter > 1 else payload_start_abs - 2048
-                    print(f"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp: {amplitude_scale:.3f}")
+                    print(f"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp (Static): {amplitude_scale:.3f} (Est: {estimated_amp:.3f})")
 
                     # Bir sonraki paketin başlangıç indeksini güncelle
                     self.next_packet_start_abs = payload_start_abs - 2048 + 3408

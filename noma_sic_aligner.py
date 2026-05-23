@@ -145,20 +145,20 @@ class blk(gr.basic_block):
             # D. Genlik ve Faz Kestirimi
             tx1_energy = np.sum(np.abs(tx1_chunk_diff)**2)
             if tx1_energy > 1e-6:
-                amplitude_scale = np.abs(best_val) / tx1_energy
+                estimated_amp = np.abs(best_val) / tx1_energy
             else:
-                amplitude_scale = self.near_user_amplitude
+                estimated_amp = self.near_user_amplitude
 
             # E. Dinamik Eşleşme Kontrolü (Packet Matcher / Drop Protection)
-            if amplitude_scale < 0.4 * self.near_user_amplitude:
+            if estimated_amp < 0.4 * self.near_user_amplitude:
                 # Korelasyon düşükse bu bir öncül-etiket fazlalığıdır, silme yapmadan geçiyoruz.
                 self.pending_payload_starts.pop(0)
                 continue
 
             self.pkt_counter += 1
 
-            # Genliği normal sınırlar içinde kısıtla
-            amplitude_scale = np.clip(amplitude_scale, 0.4 * self.near_user_amplitude, 1.6 * self.near_user_amplitude)
+            # Statik genlik kullanımı (Over-subtraction engelleniyor!)
+            amplitude_scale = self.near_user_amplitude
             phase_offset = np.angle(best_val)
 
             # F. Tam Hizalanmış Girişim Sinyalini Sentezle
@@ -173,7 +173,7 @@ class blk(gr.basic_block):
             # İşlenen paketi listeden çıkar
             self.pending_payload_starts.pop(0)
 
-            print(f"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp: {amplitude_scale:.3f}")
+            print(f"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp (Static): {amplitude_scale:.3f} (Est: {estimated_amp:.3f})")
 
         # 5. Çıkışa Güvenli Örnekleri Yazma (Streaming Output)
         if len(self.pending_payload_starts) > 0:
