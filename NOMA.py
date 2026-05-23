@@ -82,6 +82,7 @@ class NOMA(gr.top_block, Qt.QWidget):
         self.payload_size = payload_size = 77
         self.noise = noise = 0.1
         self.ldpc_enc = ldpc_enc = fec.ldpc_encoder_make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\n_1296_k_0648_ieee.alist')
+        self.ldpc_dec_2 = ldpc_dec_2 = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\n_1296_k_0648_ieee.alist', 50)
         self.ldpc_dec = ldpc_dec = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\n_1296_k_0648_ieee.alist', 50)
         self.hdr = hdr = digital.header_format_default(digital.packet_utils.default_access_code, 0)
         self.freq_offset = freq_offset = 0.01
@@ -284,7 +285,7 @@ class NOMA(gr.top_block, Qt.QWidget):
         self.fec_extended_encoder_0_0_0 = fec.extended_encoder(encoder_obj_list=ldpc_enc, threading='capillary', puncpat='11')
         self.fec_extended_encoder_0_0 = fec.extended_encoder(encoder_obj_list=ldpc_enc, threading='capillary', puncpat='11')
         self.fec_extended_encoder_0 = fec.extended_encoder(encoder_obj_list=ldpc_enc, threading='capillary', puncpat='11')
-        self.fec_extended_decoder_0_0 = fec.extended_decoder(decoder_obj_list=ldpc_dec, threading='capillary', ann=None, puncpat='11', integration_period=10000)
+        self.fec_extended_decoder_0_0 = fec.extended_decoder(decoder_obj_list=ldpc_dec_2, threading='capillary', ann=None, puncpat='11', integration_period=10000)
         self.fec_extended_decoder_0 = fec.extended_decoder(decoder_obj_list=ldpc_dec, threading='capillary', ann=None, puncpat='11', integration_period=10000)
         self.epy_block_1 = epy_block_1.blk(sample_rate=samp_rate, near_user_amplitude=0.864, search_window=32, payload_size=1296, payload_offset=64)
         self.epy_block_0_0 = epy_block_0_0.blk(modulus=2)
@@ -556,6 +557,12 @@ class NOMA(gr.top_block, Qt.QWidget):
 
     def set_ldpc_enc(self, ldpc_enc):
         self.ldpc_enc = ldpc_enc
+
+    def get_ldpc_dec_2(self):
+        return self.ldpc_dec_2
+
+    def set_ldpc_dec_2(self, ldpc_dec_2):
+        self.ldpc_dec_2 = ldpc_dec_2
 
     def get_ldpc_dec(self):
         return self.ldpc_dec

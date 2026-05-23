@@ -122,9 +122,12 @@ class blk(gr.basic_block):
                 phase_offset = np.angle(best_val)
 
                 # Geçerli eşleşme kontrolü (Korelasyon yeterince yüksek mi?)
-                if estimated_amp >= 0.3 * self.near_user_amplitude:
-                    # Statik genlik kullanımı (Over-subtraction engelleniyor!)
-                    amplitude_scale = self.near_user_amplitude
+                if estimated_amp >= 0.03:
+                    # Dinamik genlik ölçekleme (Aynı/Farklı dosya tespiti)
+                    if estimated_amp > 1.10:
+                        amplitude_scale = estimated_amp / 1.5
+                    else:
+                        amplitude_scale = estimated_amp
                     
                     # Girişim sinyalini sentezle ve çıkar
                     interference_signal = tx1_chunk_diff * amplitude_scale * np.exp(1j * phase_offset)
@@ -132,7 +135,12 @@ class blk(gr.basic_block):
 
                     self.pkt_counter += 1
                     shift = payload_start_abs - (self.next_packet_start_abs + 2048) if self.pkt_counter > 1 else payload_start_abs - 2048
-                    print(f"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp (Static): {amplitude_scale:.3f} (Est: {estimated_amp:.3f})")
+                    
+                    # Debug dosyamıza yazalım
+                    with open("debug_sic.txt", "a") as f_dbg:
+                        f_dbg.write(f"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp (Dynamic): {amplitude_scale:.3f} (Est: {estimated_amp:.3f})\\n")
+                    
+                    print(f"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp (Dynamic): {amplitude_scale:.3f} (Est: {estimated_amp:.3f})")
 
                     # Bir sonraki paketin başlangıç indeksini güncelle
                     self.next_packet_start_abs = payload_start_abs - 2048 + 3408
@@ -143,7 +151,9 @@ class blk(gr.basic_block):
                     continue
 
             # Eşleşme başarısız ise bu paketi tampondan atla ki kuyruk kilitlenmesin
-            print(f"[SIC Aligner] Correlation too low or search failed. Skipping reconstructed packet.")
+            with open("debug_sic.txt", "a") as f_dbg:
+                f_dbg.write(f"[SIC Aligner] Correlation too low or search failed. Skipping reconstructed packet (Est: {estimated_amp:.3f}).\\n")
+            print(f"[SIC Aligner] Correlation too low or search failed. Skipping reconstructed packet (Est: {estimated_amp:.3f}).")
             self.pkt_counter += 1
             self.next_packet_start_abs += 3408
             self.buffer_tx1 = self.buffer_tx1[self.payload_size:]
@@ -200,6 +210,37 @@ for conn in grc_data.get('connections', []):
 for conn in connections_to_remove:
     grc_data['connections'].remove(conn)
     print(f"Removed connection: {conn}")
+
+# 3. Create a second LDPC decoder instance to avoid thread conflicts (data race) on identical transmissions
+original_ldpc_dec = None
+for block in grc_data.get('blocks', []):
+    if block.get('id') == 'variable_ldpc_decoder_def' and block.get('name') == 'ldpc_dec':
+        original_ldpc_dec = block
+        break
+
+if original_ldpc_dec:
+    import copy
+    ldpc_dec_2 = copy.deepcopy(original_ldpc_dec)
+    ldpc_dec_2['name'] = 'ldpc_dec_2'
+    if 'coordinate' in ldpc_dec_2.get('states', {}):
+        ldpc_dec_2['states']['coordinate'][1] += 50
+    
+    # Check if already added
+    has_ldpc_dec_2 = False
+    for block in grc_data.get('blocks', []):
+        if block.get('name') == 'ldpc_dec_2':
+            has_ldpc_dec_2 = True
+            break
+    if not has_ldpc_dec_2:
+        grc_data['blocks'].append(ldpc_dec_2)
+        print("Added new variable_ldpc_decoder_def block named ldpc_dec_2.")
+
+# Update the User 2 decoder block to use ldpc_dec_2
+for block in grc_data.get('blocks', []):
+    if block.get('name') == 'fec_extended_decoder_0_0':
+        block['parameters']['decoder_list'] = 'ldpc_dec_2'
+        block['parameters']['decoder_obj_list'] = 'ldpc_dec_2'
+        print("Updated fec_extended_decoder_0_0 to use ldpc_dec_2.")
 
 # Save the updated GRC file
 with open(grc_path, 'w', encoding='utf-8') as f:
