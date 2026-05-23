@@ -123,11 +123,8 @@ class blk(gr.basic_block):
 
                 # Geçerli eşleşme kontrolü (Korelasyon yeterince yüksek mi?)
                 if estimated_amp >= 0.03:
-                    # Dinamik genlik ölçekleme (Aynı/Farklı dosya tespiti)
-                    if estimated_amp > 1.10:
-                        amplitude_scale = estimated_amp / 1.5
-                    else:
-                        amplitude_scale = estimated_amp
+                    # Statik Genlik Kullanimi (Tum Durumlarda Matematiksel Olarak Tam Cikarma)
+                    amplitude_scale = self.near_user_amplitude
                     
                     # Girişim sinyalini sentezle ve çıkar
                     interference_signal = tx1_chunk_diff * amplitude_scale * np.exp(1j * phase_offset)
@@ -242,8 +239,20 @@ for block in grc_data.get('blocks', []):
         block['parameters']['decoder_obj_list'] = 'ldpc_dec_2'
         print("Updated fec_extended_decoder_0_0 to use ldpc_dec_2.")
 
+# 4. Update User 2 scrambler seeds to decouple same-payload correlation
+for block in grc_data.get('blocks', []):
+    if block.get('name') in ['digital_additive_scrambler_xx_0_1', 'digital_additive_scrambler_xx_0_0_0']:
+        block['parameters']['mask'] = '0xAB'
+        block['parameters']['seed'] = '0x55'
+        print(f"Updated User 2 scrambler block {block.get('name')} to use mask 0xAB and seed 0x55.")
+
 # Save the updated GRC file
 with open(grc_path, 'w', encoding='utf-8') as f:
     yaml.dump(grc_data, f, default_flow_style=False, allow_unicode=True)
 
 print("Saved updated NOMA.grc successfully!")
+
+# Save the updated Python block directly to prevent import mismatches
+with open("NOMA_epy_block_1.py", "w", encoding="utf-8") as f:
+    f.write(new_source_code)
+print("Saved updated NOMA_epy_block_1.py successfully!")

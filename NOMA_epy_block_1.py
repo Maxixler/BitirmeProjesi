@@ -117,11 +117,8 @@ class blk(gr.basic_block):
 
                 # Geçerli eşleşme kontrolü (Korelasyon yeterince yüksek mi?)
                 if estimated_amp >= 0.03:
-                    # Dinamik genlik ölçekleme (Aynı/Farklı dosya tespiti)
-                    if estimated_amp > 1.10:
-                        amplitude_scale = estimated_amp / 1.5
-                    else:
-                        amplitude_scale = estimated_amp
+                    # Statik Genlik Kullanimi (Tum Durumlarda Matematiksel Olarak Tam Cikarma)
+                    amplitude_scale = self.near_user_amplitude
                     
                     # Girişim sinyalini sentezle ve çıkar
                     interference_signal = tx1_chunk_diff * amplitude_scale * np.exp(1j * phase_offset)
