@@ -42,3 +42,34 @@ Sistemi aşırı yük altında test etmek ve kararlılığını doğrulamak içi
 
 ### Stres Testi Analizi ve Yorumu
 150 KB'lık stres testi, NOMA SIC Aligner bloğunun kesintisiz uzun süreli veri akışlarında da tampon taşması yapmadan ve hafıza kilitlenmesine yol açmadan çalıştığını kanıtlamıştır. Hızlandırılmış 200k sembol/sn kanal koşulunda, her iki kullanıcı da verilerini sıfır sızıntı ve sıfır hata ile alabilmiştir. Yazılan tüm 98.021 karakter tamamen hatasız çözülmüştür. 90 saniyelik simülasyon süresi sonunda kalan paketlerin çözülememesinin nedeni bit hataları değil, capillary LDPC decoder C++ thread'lerinin CPU hız sınırına takılmasıdır. Bu sonuç, static amplitude subtraction yönteminin yüksek hacimli ve hızlı veri transferlerinde de tamamen kararlı olduğunu doğrulamaktadır.
+
+---
+
+## 4. BPSK NOMA Görsel/Fotoğraf (PNG) Transfer Doğrulaması
+
+Sistemde farklı formatta ve boyutlarda gerçek dosyaların (özellikle `.png` görselleri) iletilmesi başarıyla test edilmiş ve sıfır hata ile doğrulanmıştır.
+
+### 4.1 Karşılaşılan Problemler ve Çözümleri
+
+1. **Erken Simülasyon Kapanması (Premature EOF Termination):**
+   * **Problem:** İki dosyanın boyutu farklı olduğunda (`transmit_1.png` = ~295 KB, `transmit_2.png` = ~159 KB), kısa olan dosyanın File Source bloğu EOF (dosya sonu) durumuna ulaşıyordu. Bu durum GNU Radio zamanlayıcısı tarafından akış yönünde (downstream) `blocks.add_vcc` (Adder/Toplayıcı) bloğuna durma sinyali gönderilmesine sebep oluyor ve tüm simülasyonu anında durduruyordu. Sonuç olarak uzun olan dosya yarıda kesiliyor ve alıcıda her iki dosya da aynı boyutta kesik/bozuk (korrupt) olarak kaydediliyordu.
+   * **Çözüm:** `run_image_transfer.py` aracılığı ile iletim öncesinde kısa dosya binary sıfırlarla (null bytes) doldurularak boyutları eşitlenmiştir. Ek olarak, GNU Radio `stream_to_tagged_stream` bloğunun paketleme sınırında veri kaybı yaşanmaması için dolgu boyutu paket büyüklüğünün (77 byte) tam katına tamamlanmıştır (`302.610` byte). Böylece her iki dosya da simülasyonun tam olarak aynı sembolünde EOF durumuna ulaşmış ve erken durma problemi tamamen çözülmüştür.
+
+2. **Karakter Kodlama Hataları (Windows Terminal CP1252):**
+   * **Problem:** Windows komut satırlarında kullanılan yerel CP1252 kod sayfası nedeniyle Unicode emojileri (`🟢`, `🔴`) konsol çıktıları sırasında `UnicodeEncodeError` tetikliyor ve simülasyon yöneticisini çökertiyordu.
+   * **Çözüm:** Tüm emojiler standart ASCII karakter dizileriyle (`[OK]`, `[HATA]`, `->`) değiştirilmiş, konsol kararlılığı 100% sağlanmıştır.
+
+### 4.2 Görsel Transferi Metrikleri ve Hash Doğrulamaları
+
+Simülasyon hızı dinamik olarak **2.000.000 sembol/sn (2M)** düzeyine çıkartılarak stres testi yapılmıştır. Her iki görsel de alıcı tarafında sıfır bit hatasıyla birebir kurtarılmıştır.
+
+| Kullanıcı / Dosya | Orijinal Boyut (Bayt) | Alınan Boyut (Bayt) | Orijinal MD5 Hash | Alınan MD5 Hash | Durum |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **User 1:** `transmit_1.png` | 302,574 B | 302,574 B | `30a6c6c5598687b1c1d0f8623b320ce1` | `30a6c6c5598687b1c1d0f8623b320ce1` | 🟢 %100 GEÇTİ |
+| **User 2:** `transmit_2.png` | 163,032 B | 163,032 B | `07fb516f4ef8ee9d0f77fe7d6c6e7a2b` | `07fb516f4ef8ee9d0f77fe7d6c6e7a2b` | 🟢 %100 GEÇTİ |
+
+### 4.3 Değerlendirme ve Görsel Bütünlük
+* **Hatasız PNG Yapısı:** Alınan görseller (`bpsk_receive.png` ve `bpsk_receive_2.png`) üzerindeki binary dolgu (padding) alıcı tarafta `run_image_transfer.py` tarafından tam boyutlarında sıyrılmış (strip) ve orijinal boyutlarına getirilmiştir.
+* **Görsel Kalitesi:** MD5 hash değerlerinin %100 eşleşmesi sayesinde görsellerin tek bir biti dahi değişmemiştir. PNG dosyaları mükemmel bir şekilde açılabilmekte ve hiçbir görsel bozulma barındırmamaktadır.
+* Bu test, tasarlanan BPSK NOMA altyapısının sadece statik metinleri değil, bit-hassasiyeti yüksek görsel ve multimedya dosyalarını da NOMA tekniğiyle tamamen kayıpsız iletebildiğini kanıtlamıştır.
+

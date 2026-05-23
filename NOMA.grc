@@ -1,40 +1,6 @@
-options:
-  parameters:
-    author: "Arma\u011Fan Bi"
-    catch_exceptions: 'True'
-    category: '[GRC Hier Blocks]'
-    cmake_opt: ''
-    comment: ''
-    copyright: ''
-    description: ''
-    gen_cmake: 'On'
-    gen_linking: dynamic
-    generate_options: qt_gui
-    hier_block_src_path: '.:'
-    id: NOMA
-    max_nouts: '0'
-    output_language: python
-    placement: (0,0)
-    qt_qss_theme: ''
-    realtime_scheduling: ''
-    run: 'True'
-    run_command: '{python} -u {filename}'
-    run_options: prompt
-    sizing_mode: fixed
-    thread_safe_setters: ''
-    title: NOMA
-    window_size: (1000,1000)
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [16, 8.0]
-    rotation: 0
-    state: enabled
-
 blocks:
-- name: constel
-  id: variable_constellation
+- id: variable_constellation
+  name: constel
   parameters:
     comment: ''
     const_points: '[-1-1j, -1+1j, 1+1j, 1-1j]'
@@ -50,11 +16,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [376, 12.0]
+    coordinate:
+    - 376
+    - 12.0
     rotation: 0
     state: enabled
-- name: freq_offset
-  id: variable_qtgui_range
+- id: variable_qtgui_range
+  name: freq_offset
   parameters:
     comment: ''
     gui_hint: '[0, 1, 1, 1]'
@@ -71,11 +39,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [192, 2156.0]
+    coordinate:
+    - 192
+    - 2156.0
     rotation: 0
     state: enabled
-- name: hdr
-  id: variable
+- id: variable
+  name: hdr
   parameters:
     comment: ''
     value: digital.header_format_default(digital.packet_utils.default_access_code,
@@ -84,45 +54,51 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [544, 12.0]
+    coordinate:
+    - 544
+    - 12.0
     rotation: 0
     state: true
-- name: ldpc_dec
-  id: variable_ldpc_decoder_def
+- id: variable_ldpc_decoder_def
+  name: ldpc_dec
   parameters:
     comment: ''
     dim1: '4'
     dim2: '4'
     file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\n_1296_k_0648_ieee.alist
-    max_iter: '50'
+    max_iter: '10'
     ndim: '0'
     value: '"ok"'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [952, 12.0]
+    coordinate:
+    - 952
+    - 12.0
     rotation: 0
     state: enabled
-- name: ldpc_dec_2
-  id: variable_ldpc_decoder_def
+- id: variable_ldpc_decoder_def
+  name: ldpc_dec_2
   parameters:
     comment: ''
     dim1: '4'
     dim2: '4'
     file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\n_1296_k_0648_ieee.alist
-    max_iter: '50'
+    max_iter: '10'
     ndim: '0'
     value: '"ok"'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [952, 108.0]
+    coordinate:
+    - 952
+    - 108.0
     rotation: 0
     state: enabled
-- name: ldpc_enc
-  id: variable_ldpc_encoder_def
+- id: variable_ldpc_encoder_def
+  name: ldpc_enc
   parameters:
     comment: ''
     dim1: '1'
@@ -134,11 +110,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [752, 12.0]
+    coordinate:
+    - 752
+    - 12.0
     rotation: 0
     state: enabled
-- name: noise
-  id: variable_qtgui_range
+- id: variable_qtgui_range
+  name: noise
   parameters:
     comment: ''
     gui_hint: '[0, 0, 1, 1]'
@@ -155,11 +133,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [40, 2156.0]
+    coordinate:
+    - 40
+    - 2156.0
     rotation: 0
     state: enabled
-- name: payload_size
-  id: variable
+- id: variable
+  name: payload_size
   parameters:
     comment: ''
     value: '77'
@@ -167,11 +147,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [16, 132.0]
+    coordinate:
+    - 16
+    - 132.0
     rotation: 0
     state: enabled
-- name: postamble_size
-  id: variable
+- id: variable
+  name: postamble_size
   parameters:
     comment: ''
     value: '8'
@@ -179,11 +161,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [264, 132.0]
+    coordinate:
+    - 264
+    - 132.0
     rotation: 0
     state: true
-- name: preamble_size
-  id: variable
+- id: variable
+  name: preamble_size
   parameters:
     comment: ''
     value: '250'
@@ -191,11 +175,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [136, 132.0]
+    coordinate:
+    - 136
+    - 132.0
     rotation: 0
     state: enabled
-- name: preamble_syms
-  id: variable
+- id: variable
+  name: preamble_syms
   parameters:
     comment: ''
     value: '[complex(1 - 2 * ((b >> (7 - i)) & 1), 0) for b in [0xc0, 0xaf] * 4 for
@@ -204,11 +190,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2168, 2368.0]
+    coordinate:
+    - 2168
+    - 2368.0
     rotation: 0
     state: enabled
-- name: samp_rate
-  id: variable
+- id: variable
+  name: samp_rate
   parameters:
     comment: ''
     value: 200e3
@@ -216,11 +204,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [192, 12.0]
+    coordinate:
+    - 192
+    - 12.0
     rotation: 0
     state: enabled
-- name: sps
-  id: variable
+- id: variable
+  name: sps
   parameters:
     comment: ''
     value: '4'
@@ -228,11 +218,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [296, 12.0]
+    coordinate:
+    - 296
+    - 12.0
     rotation: 0
     state: enabled
-- name: time_offset
-  id: variable_qtgui_range
+- id: variable_qtgui_range
+  name: time_offset
   parameters:
     comment: ''
     gui_hint: '[0, 2, 1, 1]'
@@ -249,11 +241,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [336, 2156.0]
+    coordinate:
+    - 336
+    - 2156.0
     rotation: 0
     state: enabled
-- name: blocks_add_xx_0
-  id: blocks_add_xx
+- id: blocks_add_xx
+  name: blocks_add_xx_0
   parameters:
     affinity: ''
     alias: ''
@@ -267,17 +261,19 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [936, 1616.0]
+    coordinate:
+    - 936
+    - 1616.0
     rotation: 0
     state: enabled
-- name: blocks_file_sink_0
-  id: blocks_file_sink
+- id: blocks_file_sink
+  name: blocks_file_sink_0
   parameters:
     affinity: ''
     alias: ''
     append: 'False'
     comment: ''
-    file: bpsk_receive.png
+    file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\bpsk_receive.txt
     type: byte
     unbuffered: 'True'
     vlen: '1'
@@ -285,17 +281,19 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [600, 3012.0]
+    coordinate:
+    - 600
+    - 3012.0
     rotation: 0
     state: true
-- name: blocks_file_sink_0_0
-  id: blocks_file_sink
+- id: blocks_file_sink
+  name: blocks_file_sink_0_0
   parameters:
     affinity: ''
     alias: ''
     append: 'False'
     comment: ''
-    file: bpsk_receive_2.png
+    file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\bpsk_receive_2.txt
     type: byte
     unbuffered: 'True'
     vlen: '1'
@@ -303,17 +301,19 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [608, 4196.0]
+    coordinate:
+    - 608
+    - 4196.0
     rotation: 0
     state: true
-- name: blocks_file_source_0
-  id: blocks_file_source
+- id: blocks_file_source
+  name: blocks_file_source_0
   parameters:
     affinity: ''
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\transmit_1.png
+    file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\bpsk_transmit.txt
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -325,17 +325,19 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [16, 308.0]
+    coordinate:
+    - 16
+    - 308.0
     rotation: 0
     state: true
-- name: blocks_file_source_0_0
-  id: blocks_file_source
+- id: blocks_file_source
+  name: blocks_file_source_0_0
   parameters:
     affinity: ''
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\transmit_2.png
+    file: C:\Users\Armagan\Documents\GitHub\BitirmeProjesi\bpsk_transmit_2.txt
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
@@ -347,11 +349,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [24, 876.0]
+    coordinate:
+    - 24
+    - 876.0
     rotation: 0
     state: true
-- name: blocks_message_debug_0
-  id: blocks_message_debug
+- id: blocks_message_debug
+  name: blocks_message_debug_0
   parameters:
     affinity: ''
     alias: ''
@@ -362,11 +366,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [928, 2920.0]
+    coordinate:
+    - 928
+    - 2920.0
     rotation: 0
     state: enabled
-- name: blocks_message_debug_0_0
-  id: blocks_message_debug
+- id: blocks_message_debug
+  name: blocks_message_debug_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -377,11 +383,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [936, 4104.0]
+    coordinate:
+    - 936
+    - 4104.0
     rotation: 0
     state: enabled
-- name: blocks_multiply_const_vxx_0
-  id: blocks_multiply_const_vxx
+- id: blocks_multiply_const_vxx
+  name: blocks_multiply_const_vxx_0
   parameters:
     affinity: ''
     alias: ''
@@ -395,11 +403,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [504, 1684.0]
+    coordinate:
+    - 504
+    - 1684.0
     rotation: 0
     state: true
-- name: blocks_multiply_const_vxx_0_0
-  id: blocks_multiply_const_vxx
+- id: blocks_multiply_const_vxx
+  name: blocks_multiply_const_vxx_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -413,11 +423,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [512, 1476.0]
+    coordinate:
+    - 512
+    - 1476.0
     rotation: 0
     state: true
-- name: blocks_multiply_const_vxx_0_0_0
-  id: blocks_multiply_const_vxx
+- id: blocks_multiply_const_vxx
+  name: blocks_multiply_const_vxx_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -431,11 +443,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1384, 3284.0]
+    coordinate:
+    - 1384
+    - 3284.0
     rotation: 0
     state: true
-- name: blocks_repack_bits_bb_0
-  id: blocks_repack_bits_bb
+- id: blocks_repack_bits_bb
+  name: blocks_repack_bits_bb_0
   parameters:
     affinity: ''
     alias: ''
@@ -451,11 +465,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [736, 332.0]
+    coordinate:
+    - 736
+    - 332.0
     rotation: 0
     state: enabled
-- name: blocks_repack_bits_bb_0_0
-  id: blocks_repack_bits_bb
+- id: blocks_repack_bits_bb
+  name: blocks_repack_bits_bb_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -471,11 +487,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1872, 348.0]
+    coordinate:
+    - 1872
+    - 348.0
     rotation: 0
     state: enabled
-- name: blocks_repack_bits_bb_0_0_0
-  id: blocks_repack_bits_bb
+- id: blocks_repack_bits_bb
+  name: blocks_repack_bits_bb_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -491,11 +509,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1880, 916.0]
+    coordinate:
+    - 1880
+    - 916.0
     rotation: 0
     state: enabled
-- name: blocks_repack_bits_bb_0_1
-  id: blocks_repack_bits_bb
+- id: blocks_repack_bits_bb
+  name: blocks_repack_bits_bb_0_1
   parameters:
     affinity: ''
     alias: ''
@@ -511,11 +531,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [744, 900.0]
+    coordinate:
+    - 744
+    - 900.0
     rotation: 0
     state: enabled
-- name: blocks_repack_bits_bb_1
-  id: blocks_repack_bits_bb
+- id: blocks_repack_bits_bb
+  name: blocks_repack_bits_bb_1
   parameters:
     affinity: ''
     alias: ''
@@ -531,11 +553,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1376, 2804.0]
+    coordinate:
+    - 1376
+    - 2804.0
     rotation: 0
     state: enabled
-- name: blocks_repack_bits_bb_1_0
-  id: blocks_repack_bits_bb
+- id: blocks_repack_bits_bb
+  name: blocks_repack_bits_bb_1_0
   parameters:
     affinity: ''
     alias: ''
@@ -551,11 +575,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1872, 220.0]
+    coordinate:
+    - 1872
+    - 220.0
     rotation: 0
     state: enabled
-- name: blocks_repack_bits_bb_1_0_0
-  id: blocks_repack_bits_bb
+- id: blocks_repack_bits_bb
+  name: blocks_repack_bits_bb_1_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -571,11 +597,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1880, 788.0]
+    coordinate:
+    - 1880
+    - 788.0
     rotation: 0
     state: enabled
-- name: blocks_repack_bits_bb_1_1
-  id: blocks_repack_bits_bb
+- id: blocks_repack_bits_bb
+  name: blocks_repack_bits_bb_1_1
   parameters:
     affinity: ''
     alias: ''
@@ -591,11 +619,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1384, 3996.0]
+    coordinate:
+    - 1384
+    - 3996.0
     rotation: 0
     state: enabled
-- name: blocks_stream_to_tagged_stream_0_0_0
-  id: blocks_stream_to_tagged_stream
+- id: blocks_stream_to_tagged_stream
+  name: blocks_stream_to_tagged_stream_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -610,11 +640,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [216, 332.0]
+    coordinate:
+    - 216
+    - 332.0
     rotation: 0
     state: enabled
-- name: blocks_stream_to_tagged_stream_0_0_0_0
-  id: blocks_stream_to_tagged_stream
+- id: blocks_stream_to_tagged_stream
+  name: blocks_stream_to_tagged_stream_0_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -629,11 +661,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 468.0]
+    coordinate:
+    - 184
+    - 468.0
     rotation: 0
     state: enabled
-- name: blocks_stream_to_tagged_stream_0_0_0_0_0
-  id: blocks_stream_to_tagged_stream
+- id: blocks_stream_to_tagged_stream
+  name: blocks_stream_to_tagged_stream_0_0_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -648,11 +682,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [184, 732.0]
+    coordinate:
+    - 184
+    - 732.0
     rotation: 0
     state: enabled
-- name: blocks_stream_to_tagged_stream_0_0_0_0_0_0
-  id: blocks_stream_to_tagged_stream
+- id: blocks_stream_to_tagged_stream
+  name: blocks_stream_to_tagged_stream_0_0_0_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -667,11 +703,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [192, 1300.0]
+    coordinate:
+    - 192
+    - 1300.0
     rotation: 0
     state: enabled
-- name: blocks_stream_to_tagged_stream_0_0_0_0_1
-  id: blocks_stream_to_tagged_stream
+- id: blocks_stream_to_tagged_stream
+  name: blocks_stream_to_tagged_stream_0_0_0_0_1
   parameters:
     affinity: ''
     alias: ''
@@ -686,11 +724,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [192, 1028.0]
+    coordinate:
+    - 192
+    - 1028.0
     rotation: 0
     state: enabled
-- name: blocks_stream_to_tagged_stream_0_0_0_1
-  id: blocks_stream_to_tagged_stream
+- id: blocks_stream_to_tagged_stream
+  name: blocks_stream_to_tagged_stream_0_0_0_1
   parameters:
     affinity: ''
     alias: ''
@@ -705,11 +745,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [224, 900.0]
+    coordinate:
+    - 224
+    - 900.0
     rotation: 0
     state: enabled
-- name: blocks_tag_gate_0
-  id: blocks_tag_gate
+- id: blocks_tag_gate
+  name: blocks_tag_gate_0
   parameters:
     affinity: ''
     alias: ''
@@ -724,11 +766,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [704, 1764.0]
+    coordinate:
+    - 704
+    - 1764.0
     rotation: 0
     state: enabled
-- name: blocks_tag_gate_0_0
-  id: blocks_tag_gate
+- id: blocks_tag_gate
+  name: blocks_tag_gate_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -743,11 +787,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [712, 1548.0]
+    coordinate:
+    - 712
+    - 1548.0
     rotation: 0
     state: enabled
-- name: blocks_tagged_stream_multiply_length_0
-  id: blocks_tagged_stream_multiply_length
+- id: blocks_tagged_stream_multiply_length
+  name: blocks_tagged_stream_multiply_length_0
   parameters:
     affinity: ''
     alias: ''
@@ -762,11 +808,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1536, 344.0]
+    coordinate:
+    - 1536
+    - 344.0
     rotation: 0
     state: enabled
-- name: blocks_tagged_stream_multiply_length_0_0
-  id: blocks_tagged_stream_multiply_length
+- id: blocks_tagged_stream_multiply_length
+  name: blocks_tagged_stream_multiply_length_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -781,11 +829,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1544, 904.0]
+    coordinate:
+    - 1544
+    - 904.0
     rotation: 0
     state: enabled
-- name: blocks_tagged_stream_multiply_length_0_1
-  id: blocks_tagged_stream_multiply_length
+- id: blocks_tagged_stream_multiply_length
+  name: blocks_tagged_stream_multiply_length_0_1
   parameters:
     affinity: ''
     alias: ''
@@ -800,11 +850,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [704, 2800.0]
+    coordinate:
+    - 704
+    - 2800.0
     rotation: 0
     state: enabled
-- name: blocks_tagged_stream_multiply_length_0_1_0
-  id: blocks_tagged_stream_multiply_length
+- id: blocks_tagged_stream_multiply_length
+  name: blocks_tagged_stream_multiply_length_0_1_0
   parameters:
     affinity: ''
     alias: ''
@@ -819,11 +871,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [712, 3992.0]
+    coordinate:
+    - 712
+    - 3992.0
     rotation: 0
     state: enabled
-- name: blocks_tagged_stream_mux_0
-  id: blocks_tagged_stream_mux
+- id: blocks_tagged_stream_mux
+  name: blocks_tagged_stream_mux_0
   parameters:
     affinity: ''
     alias: ''
@@ -839,11 +893,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [456, 576.0]
+    coordinate:
+    - 456
+    - 576.0
     rotation: 0
     state: enabled
-- name: blocks_tagged_stream_mux_0_0
-  id: blocks_tagged_stream_mux
+- id: blocks_tagged_stream_mux
+  name: blocks_tagged_stream_mux_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -859,11 +915,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [464, 1136.0]
+    coordinate:
+    - 464
+    - 1136.0
     rotation: 0
     state: enabled
-- name: blocks_throttle2_0
-  id: blocks_throttle2
+- id: blocks_throttle2
+  name: blocks_throttle2_0
   parameters:
     affinity: ''
     alias: ''
@@ -880,11 +938,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [704, 1668.0]
+    coordinate:
+    - 704
+    - 1668.0
     rotation: 0
     state: enabled
-- name: blocks_throttle2_0_0
-  id: blocks_throttle2
+- id: blocks_throttle2
+  name: blocks_throttle2_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -901,11 +961,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [712, 1460.0]
+    coordinate:
+    - 712
+    - 1460.0
     rotation: 0
     state: enabled
-- name: blocks_vector_source_x_0
-  id: blocks_vector_source_x
+- id: blocks_vector_source_x
+  name: blocks_vector_source_x_0
   parameters:
     affinity: ''
     alias: ''
@@ -921,11 +983,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [24, 460.0]
+    coordinate:
+    - 24
+    - 460.0
     rotation: 0
     state: enabled
-- name: blocks_vector_source_x_0_0
-  id: blocks_vector_source_x
+- id: blocks_vector_source_x
+  name: blocks_vector_source_x_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -941,11 +1005,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [24, 724.0]
+    coordinate:
+    - 24
+    - 724.0
     rotation: 0
     state: enabled
-- name: blocks_vector_source_x_0_0_0
-  id: blocks_vector_source_x
+- id: blocks_vector_source_x
+  name: blocks_vector_source_x_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -961,11 +1027,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [32, 1292.0]
+    coordinate:
+    - 32
+    - 1292.0
     rotation: 0
     state: enabled
-- name: blocks_vector_source_x_0_1
-  id: blocks_vector_source_x
+- id: blocks_vector_source_x
+  name: blocks_vector_source_x_0_1
   parameters:
     affinity: ''
     alias: ''
@@ -981,11 +1049,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [32, 1020.0]
+    coordinate:
+    - 32
+    - 1020.0
     rotation: 0
     state: enabled
-- name: channels_channel_model_1
-  id: channels_channel_model
+- id: channels_channel_model
+  name: channels_channel_model_1
   parameters:
     affinity: ''
     alias: ''
@@ -1002,11 +1072,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [688, 2164.0]
+    coordinate:
+    - 688
+    - 2164.0
     rotation: 0
     state: enabled
-- name: digital_additive_scrambler_xx_0
-  id: digital_additive_scrambler_xx
+- id: digital_additive_scrambler_xx
+  name: digital_additive_scrambler_xx_0
   parameters:
     affinity: ''
     alias: ''
@@ -1024,11 +1096,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [984, 300.0]
+    coordinate:
+    - 984
+    - 300.0
     rotation: 0
     state: enabled
-- name: digital_additive_scrambler_xx_0_0
-  id: digital_additive_scrambler_xx
+- id: digital_additive_scrambler_xx
+  name: digital_additive_scrambler_xx_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1046,11 +1120,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1096, 2772.0]
+    coordinate:
+    - 1096
+    - 2772.0
     rotation: 0
     state: enabled
-- name: digital_additive_scrambler_xx_0_0_0
-  id: digital_additive_scrambler_xx
+- id: digital_additive_scrambler_xx
+  name: digital_additive_scrambler_xx_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1068,11 +1144,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1104, 3964.0]
+    coordinate:
+    - 1104
+    - 3964.0
     rotation: 0
     state: enabled
-- name: digital_additive_scrambler_xx_0_1
-  id: digital_additive_scrambler_xx
+- id: digital_additive_scrambler_xx
+  name: digital_additive_scrambler_xx_0_1
   parameters:
     affinity: ''
     alias: ''
@@ -1090,11 +1168,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [992, 868.0]
+    coordinate:
+    - 992
+    - 868.0
     rotation: 0
     state: enabled
-- name: digital_chunks_to_symbols_xx_0
-  id: digital_chunks_to_symbols_xx
+- id: digital_chunks_to_symbols_xx
+  name: digital_chunks_to_symbols_xx_0
   parameters:
     affinity: ''
     alias: ''
@@ -1110,11 +1190,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1128, 3272.0]
+    coordinate:
+    - 1128
+    - 3272.0
     rotation: 0
     state: enabled
-- name: digital_constellation_modulator_0
-  id: digital_constellation_modulator
+- id: digital_constellation_modulator
+  name: digital_constellation_modulator_0
   parameters:
     affinity: ''
     alias: ''
@@ -1132,11 +1214,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [256, 1660.0]
+    coordinate:
+    - 256
+    - 1660.0
     rotation: 0
     state: enabled
-- name: digital_constellation_modulator_0_0
-  id: digital_constellation_modulator
+- id: digital_constellation_modulator
+  name: digital_constellation_modulator_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1154,11 +1238,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [248, 1452.0]
+    coordinate:
+    - 248
+    - 1452.0
     rotation: 0
     state: enabled
-- name: digital_constellation_soft_decoder_cf_0
-  id: digital_constellation_soft_decoder_cf
+- id: digital_constellation_soft_decoder_cf
+  name: digital_constellation_soft_decoder_cf_0
   parameters:
     affinity: ''
     alias: ''
@@ -1171,11 +1257,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [256, 2676.0]
+    coordinate:
+    - 256
+    - 2676.0
     rotation: 0
     state: enabled
-- name: digital_constellation_soft_decoder_cf_0_0
-  id: digital_constellation_soft_decoder_cf
+- id: digital_constellation_soft_decoder_cf
+  name: digital_constellation_soft_decoder_cf_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1188,11 +1276,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [760, 3844.0]
+    coordinate:
+    - 760
+    - 3844.0
     rotation: 0
     state: enabled
-- name: digital_corr_est_cc_0
-  id: digital_corr_est_cc
+- id: digital_corr_est_cc
+  name: digital_corr_est_cc_0
   parameters:
     affinity: ''
     alias: ''
@@ -1208,11 +1298,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1336, 2220.0]
+    coordinate:
+    - 1336
+    - 2220.0
     rotation: 0
     state: enabled
-- name: digital_correlate_access_code_xx_ts_0
-  id: digital_correlate_access_code_xx_ts
+- id: digital_correlate_access_code_xx_ts
+  name: digital_correlate_access_code_xx_ts_0
   parameters:
     access_code: digital.packet_utils.default_access_code
     affinity: ''
@@ -1227,11 +1319,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [792, 2668.0]
+    coordinate:
+    - 792
+    - 2668.0
     rotation: 0
     state: enabled
-- name: digital_correlate_access_code_xx_ts_0_0
-  id: digital_correlate_access_code_xx_ts
+- id: digital_correlate_access_code_xx_ts
+  name: digital_correlate_access_code_xx_ts_0_0
   parameters:
     access_code: digital.packet_utils.default_access_code
     affinity: ''
@@ -1246,11 +1340,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1296, 3836.0]
+    coordinate:
+    - 1296
+    - 3836.0
     rotation: 0
     state: enabled
-- name: digital_costas_loop_cc_0
-  id: digital_costas_loop_cc
+- id: digital_costas_loop_cc
+  name: digital_costas_loop_cc_0
   parameters:
     affinity: ''
     alias: ''
@@ -1264,11 +1360,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [912, 2432.0]
+    coordinate:
+    - 912
+    - 2432.0
     rotation: 0
     state: enabled
-- name: digital_crc32_bb_0
-  id: digital_crc32_bb
+- id: digital_crc32_bb
+  name: digital_crc32_bb_0
   parameters:
     affinity: ''
     alias: ''
@@ -1282,11 +1380,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [448, 324.0]
+    coordinate:
+    - 448
+    - 324.0
     rotation: 0
     state: enabled
-- name: digital_crc32_bb_0_0
-  id: digital_crc32_bb
+- id: digital_crc32_bb
+  name: digital_crc32_bb_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1300,11 +1400,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [456, 892.0]
+    coordinate:
+    - 456
+    - 892.0
     rotation: 0
     state: enabled
-- name: digital_crc32_bb_1
-  id: digital_crc32_bb
+- id: digital_crc32_bb
+  name: digital_crc32_bb_1
   parameters:
     affinity: ''
     alias: ''
@@ -1318,11 +1420,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [280, 2932.0]
+    coordinate:
+    - 280
+    - 2932.0
     rotation: 0
     state: enabled
-- name: digital_crc32_bb_1_0
-  id: digital_crc32_bb
+- id: digital_crc32_bb
+  name: digital_crc32_bb_1_0
   parameters:
     affinity: ''
     alias: ''
@@ -1336,11 +1440,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [288, 4116.0]
+    coordinate:
+    - 288
+    - 4116.0
     rotation: 0
     state: enabled
-- name: digital_protocol_formatter_bb_0
-  id: digital_protocol_formatter_bb
+- id: digital_protocol_formatter_bb
+  name: digital_protocol_formatter_bb_0
   parameters:
     affinity: ''
     alias: ''
@@ -1353,11 +1459,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2112, 220.0]
+    coordinate:
+    - 2112
+    - 220.0
     rotation: 0
     state: enabled
-- name: digital_protocol_formatter_bb_0_0
-  id: digital_protocol_formatter_bb
+- id: digital_protocol_formatter_bb
+  name: digital_protocol_formatter_bb_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1370,11 +1478,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2120, 788.0]
+    coordinate:
+    - 2120
+    - 788.0
     rotation: 0
     state: enabled
-- name: digital_symbol_sync_xx_0
-  id: digital_symbol_sync_xx
+- id: digital_symbol_sync_xx
+  name: digital_symbol_sync_xx_0
   parameters:
     affinity: ''
     alias: ''
@@ -1397,11 +1507,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [512, 2452.0]
+    coordinate:
+    - 512
+    - 2452.0
     rotation: 0
     state: enabled
-- name: epy_block_0
-  id: epy_block
+- id: epy_block
+  name: epy_block_0
   parameters:
     _source_code: "\"\"\"\r\nEmbedded Python Block: Soft Differential Decoder\r\n\
       Giris: float32  (soft semboller, Constellation Soft Decoder'dan)\r\nCikis: float32\
@@ -1465,11 +1577,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [536, 2684.0]
+    coordinate:
+    - 536
+    - 2684.0
     rotation: 0
     state: enabled
-- name: epy_block_0_0
-  id: epy_block
+- id: epy_block
+  name: epy_block_0_0
   parameters:
     _source_code: "\"\"\"\r\nEmbedded Python Block: Soft Differential Decoder\r\n\
       Giris: float32  (soft semboller, Constellation Soft Decoder'dan)\r\nCikis: float32\
@@ -1533,113 +1647,110 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1040, 3852.0]
+    coordinate:
+    - 1040
+    - 3852.0
     rotation: 0
     state: enabled
-- name: epy_block_1
-  id: epy_block
+- id: epy_block
+  name: epy_block_1
   parameters:
     _source_code: "\"\"\"\nDecoupled BPSK NOMA SIC Aligner Block (Auto-Aligning &\
       \ DBPSK Compatible)\n--------------------------------------------------------------------------\n\
-      Giri\u015Fler:\n  0: in_rx  (Costas Loop'tan gelen, iki kullan\u0131c\u0131\
-      n\u0131n s\xFCperpoze oldu\u011Fu ham sinyal)\n  1: in_tx1 (LDPC'den \xE7\xF6\
-      z\xFCl\xFCp BPSK mod\xFCle edilen ve 0.894 genli\u011Fiyle \xE7arp\u0131lan\
-      \ User 1 sinyali)\n\n\xC7\u0131k\u0131\u015Flar:\n  0: out_rx2 (\xC7\u0131karma\
-      \ i\u015Fleminden sonra kalan User 2 sinyali)\n\"\"\"\n\nimport numpy as np\n\
-      from gnuradio import gr\nimport pmt\nimport scipy.signal\n\nclass blk(gr.basic_block):\n\
-      \    \"\"\"\n    Decoupled BPSK NOMA SIC Aligner Block\n    \n    Giri\u015F\
-      \ verilerini an\u0131nda t\xFCketerek dahili kuyruklara yazar, b\xF6ylece\n\
-      \    GNU Radio zamanlay\u0131c\u0131s\u0131n\u0131n kilitlenmesini (deadlock)\
-      \ %100 engeller.\n    \"\"\"\n    def __init__(self, sample_rate=200000.0, near_user_amplitude=0.864,\
-      \ search_window=128, payload_size=1296, payload_offset=64):\n        gr.basic_block.__init__(\n\
-      \            self,\n            name='Decoupled NOMA SIC Aligner',\n       \
-      \     in_sig=[np.complex64, np.complex64],\n            out_sig=[np.complex64]\n\
-      \        )\n        self.sample_rate = sample_rate\n        self.near_user_amplitude\
-      \ = near_user_amplitude\n        self.search_window = search_window\n      \
-      \  self.payload_size = payload_size\n        self.payload_offset = payload_offset\n\
-      \n        # Dahili veri tamponlar\u0131 (internal buffers)\n        self.buffer_rx\
-      \ = np.array([], dtype=np.complex64)\n        self.buffer_tx1 = np.array([],\
-      \ dtype=np.complex64)\n\n        # T\xFCketilen ve \xE7\u0131k\u0131\u015Fa\
-      \ yaz\u0131lan mutlak \xF6rnek saya\xE7lar\u0131\n        self.rx_processed_abs\
-      \ = 0\n        self.subtracted_until_abs = 0\n        self.next_packet_start_abs\
+      Girişler:\n  0: in_rx  (Costas Loop'tan gelen, iki kullanıcının süperpoze olduğu\
+      \ ham sinyal)\n  1: in_tx1 (LDPC'den çözülüp BPSK modüle edilen ve 0.894 genliğiyle\
+      \ çarpılan User 1 sinyali)\n\nÇıkışlar:\n  0: out_rx2 (Çıkarma işleminden sonra\
+      \ kalan User 2 sinyali)\n\"\"\"\n\nimport numpy as np\nfrom gnuradio import\
+      \ gr\nimport pmt\nimport scipy.signal\n\nclass blk(gr.basic_block):\n    \"\"\
+      \"\n    Decoupled BPSK NOMA SIC Aligner Block\n    \n    Giriş verilerini anında\
+      \ tüketerek dahili kuyruklara yazar, böylece\n    GNU Radio zamanlayıcısının\
+      \ kilitlenmesini (deadlock) %100 engeller.\n    \"\"\"\n    def __init__(self,\
+      \ sample_rate=200000.0, near_user_amplitude=0.864, search_window=128, payload_size=1296,\
+      \ payload_offset=64):\n        gr.basic_block.__init__(\n            self,\n\
+      \            name='Decoupled NOMA SIC Aligner',\n            in_sig=[np.complex64,\
+      \ np.complex64],\n            out_sig=[np.complex64]\n        )\n        self.sample_rate\
+      \ = sample_rate\n        self.near_user_amplitude = near_user_amplitude\n  \
+      \      self.search_window = search_window\n        self.payload_size = payload_size\n\
+      \        self.payload_offset = payload_offset\n\n        # Dahili veri tamponları\
+      \ (internal buffers)\n        self.buffer_rx = np.array([], dtype=np.complex64)\n\
+      \        self.buffer_tx1 = np.array([], dtype=np.complex64)\n\n        # Tüketilen\
+      \ ve çıkışa yazılan mutlak örnek sayaçları\n        self.rx_processed_abs =\
+      \ 0\n        self.subtracted_until_abs = 0\n        self.next_packet_start_abs\
       \ = 0\n        self.pkt_counter = 0\n\n    def forecast(self, noutput_items,\
-      \ ninputs):\n        # Zamanlay\u0131c\u0131 kilidini \xF6nlemek i\xE7in girdi\
-      \ gereksinimlerini 0 yap\u0131yoruz.\n        return [0] * ninputs\n\n    def\
-      \ general_work(self, input_items, output_items):\n        in_rx = input_items[0]\n\
-      \        in_tx1 = input_items[1]\n        out_rx2 = output_items[0]\n\n    \
-      \    # 1. Gelen RX Verilerini Tampona Ekleme\n        if len(in_rx) > 0:\n \
-      \           self.buffer_rx = np.concatenate((self.buffer_rx, in_rx))\n     \
-      \       self.consume(0, len(in_rx))\n\n        # 2. Gelen TX1 Verilerini Tampona\
-      \ Ekleme\n        if len(in_tx1) > 0:\n            self.buffer_tx1 = np.concatenate((self.buffer_tx1,\
-      \ in_tx1))\n            self.consume(1, len(in_tx1))\n\n        # 3. Tampon\
-      \ Kilitlenme ve A\u015F\u0131m Korumas\u0131 (Buffer Overflow & Deadlock Prevention)\n\
-      \        MAX_RX_BUFFER = 50000\n        if len(self.buffer_rx) > MAX_RX_BUFFER:\n\
-      \            excess = len(self.buffer_rx) - MAX_RX_BUFFER\n            self.subtracted_until_abs\
-      \ = max(self.subtracted_until_abs, self.rx_processed_abs + excess)\n\n     \
-      \   MAX_TX1_BUFFER = 5 * self.payload_size\n        if len(self.buffer_tx1)\
+      \ ninputs):\n        # Zamanlayıcı kilidini önlemek için girdi gereksinimlerini\
+      \ 0 yapıyoruz.\n        return [0] * ninputs\n\n    def general_work(self, input_items,\
+      \ output_items):\n        in_rx = input_items[0]\n        in_tx1 = input_items[1]\n\
+      \        out_rx2 = output_items[0]\n\n        # 1. Gelen RX Verilerini Tampona\
+      \ Ekleme\n        if len(in_rx) > 0:\n            self.buffer_rx = np.concatenate((self.buffer_rx,\
+      \ in_rx))\n            self.consume(0, len(in_rx))\n\n        # 2. Gelen TX1\
+      \ Verilerini Tampona Ekleme\n        if len(in_tx1) > 0:\n            self.buffer_tx1\
+      \ = np.concatenate((self.buffer_tx1, in_tx1))\n            self.consume(1, len(in_tx1))\n\
+      \n        # 3. Tampon Kilitlenme ve Aşım Koruması (Buffer Overflow & Deadlock\
+      \ Prevention)\n        MAX_RX_BUFFER = 500000\n        if len(self.buffer_rx)\
+      \ > MAX_RX_BUFFER:\n            excess = len(self.buffer_rx) - MAX_RX_BUFFER\n\
+      \            self.subtracted_until_abs = max(self.subtracted_until_abs, self.rx_processed_abs\
+      \ + excess)\n\n        MAX_TX1_BUFFER = 5 * self.payload_size\n        if len(self.buffer_tx1)\
       \ > MAX_TX1_BUFFER:\n            excess = len(self.buffer_tx1) - MAX_TX1_BUFFER\n\
       \            self.buffer_tx1 = self.buffer_tx1[excess:]\n\n        # 4. SIC\
-      \ \xC7\u0131karma ve Hizalama \u0130\u015Flemleri (Robust Tag-Free SIC)\n  \
-      \      while len(self.buffer_tx1) >= self.payload_size:\n            if self.pkt_counter\
-      \ == 0:\n                SEARCH_START = 1000\n                SEARCH_END = 3000\n\
-      \            else:\n                expected_payload_start_abs = self.next_packet_start_abs\
-      \ + 2048\n                start_rel = expected_payload_start_abs - self.rx_processed_abs\n\
+      \ Çıkarma ve Hizalama İşlemleri (Robust Tag-Free SIC)\n        while len(self.buffer_tx1)\
+      \ >= self.payload_size:\n            if self.pkt_counter == 0:\n           \
+      \     SEARCH_START = 1000\n                SEARCH_END = 3000\n            else:\n\
+      \                expected_payload_start_abs = self.next_packet_start_abs + 2048\n\
+      \                start_rel = expected_payload_start_abs - self.rx_processed_abs\n\
       \                SEARCH_START = start_rel - 128\n                SEARCH_END\
       \ = start_rel + 128\n\n            SEARCH_START = max(0, SEARCH_START)\n\n \
       \           if len(self.buffer_rx) < SEARCH_END + self.payload_size:\n     \
       \           break\n\n            rx_search_chunk = self.buffer_rx[SEARCH_START\
       \ : SEARCH_END + self.payload_size]\n            tx1_chunk = self.buffer_tx1[:self.payload_size]\n\
-      \n            # BPSK'dan DBPSK D\xF6n\xFC\u015F\xFCm\xFC (Diferansiyel Kodlama)\n\
-      \            tx1_chunk_norm = np.sign(tx1_chunk.real)\n            tx1_chunk_diff\
-      \ = np.cumprod(-tx1_chunk_norm)\n\n            # Kayma Kestirimi (Cross-Correlation)\n\
-      \            corr = scipy.signal.correlate(rx_search_chunk, tx1_chunk_diff,\
-      \ mode='valid')\n\n            if len(corr) > 0:\n                best_idx =\
-      \ np.argmax(np.abs(corr))\n                best_val = corr[best_idx]\n     \
-      \           payload_start_rel = SEARCH_START + best_idx\n                payload_start_abs\
-      \ = self.rx_processed_abs + payload_start_rel\n\n                # Genlik ve\
-      \ Faz Kestirimi\n                tx1_energy = np.sum(np.abs(tx1_chunk_diff)**2)\n\
+      \n            # BPSK'dan DBPSK Dönüşümü (Diferansiyel Kodlama)\n           \
+      \ tx1_chunk_norm = np.sign(tx1_chunk.real)\n            tx1_chunk_diff = np.cumprod(-tx1_chunk_norm)\n\
+      \n            # Kayma Kestirimi (Cross-Correlation)\n            corr = scipy.signal.correlate(rx_search_chunk,\
+      \ tx1_chunk_diff, mode='valid')\n\n            if len(corr) > 0:\n         \
+      \       best_idx = np.argmax(np.abs(corr))\n                best_val = corr[best_idx]\n\
+      \                payload_start_rel = SEARCH_START + best_idx\n             \
+      \   payload_start_abs = self.rx_processed_abs + payload_start_rel\n\n      \
+      \          # Genlik ve Faz Kestirimi\n                tx1_energy = np.sum(np.abs(tx1_chunk_diff)**2)\n\
       \                if tx1_energy > 1e-6:\n                    estimated_amp =\
       \ np.abs(best_val) / tx1_energy\n                else:\n                   \
       \ estimated_amp = self.near_user_amplitude\n\n                phase_offset =\
-      \ np.angle(best_val)\n\n                # Ge\xE7erli e\u015Fle\u015Fme kontrol\xFC\
-      \ (Korelasyon yeterince y\xFCksek mi?)\n                if estimated_amp >=\
-      \ 0.03:\n                    # Statik Genlik Kullanimi (Tum Durumlarda Matematiksel\
-      \ Olarak Tam Cikarma)\n                    amplitude_scale = self.near_user_amplitude\n\
-      \                    \n                    # Giri\u015Fim sinyalini sentezle\
-      \ ve \xE7\u0131kar\n                    interference_signal = tx1_chunk_diff\
-      \ * amplitude_scale * np.exp(1j * phase_offset)\n                    self.buffer_rx[payload_start_rel\
+      \ np.angle(best_val)\n\n                # Geçerli eşleşme kontrolü (Korelasyon\
+      \ yeterince yüksek mi?)\n                if estimated_amp >= 0.03:\n       \
+      \             # Statik Genlik Kullanimi (Tum Durumlarda Matematiksel Olarak\
+      \ Tam Cikarma)\n                    amplitude_scale = self.near_user_amplitude\n\
+      \                    \n                    # Girişim sinyalini sentezle ve çıkar\n\
+      \                    interference_signal = tx1_chunk_diff * amplitude_scale\
+      \ * np.exp(1j * phase_offset)\n                    self.buffer_rx[payload_start_rel\
       \ : payload_start_rel + self.payload_size] -= interference_signal\n\n      \
       \              self.pkt_counter += 1\n                    shift = payload_start_abs\
       \ - (self.next_packet_start_abs + 2048) if self.pkt_counter > 1 else payload_start_abs\
-      \ - 2048\n                    \n                    # Debug dosyam\u0131za yazal\u0131\
-      m\n                    with open(\"debug_sic.txt\", \"a\") as f_dbg:\n     \
-      \                   f_dbg.write(f\"[SIC Aligner] Packet #{self.pkt_counter}\
-      \ Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp (Dynamic):\
-      \ {amplitude_scale:.3f} (Est: {estimated_amp:.3f})\\n\")\n                 \
-      \   \n                    print(f\"[SIC Aligner] Packet #{self.pkt_counter}\
-      \ Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp (Dynamic):\
-      \ {amplitude_scale:.3f} (Est: {estimated_amp:.3f})\")\n\n                  \
-      \  # Bir sonraki paketin ba\u015Flang\u0131\xE7 indeksini g\xFCncelle\n    \
-      \                self.next_packet_start_abs = payload_start_abs - 2048 + 3408\n\
-      \                    self.subtracted_until_abs = max(self.subtracted_until_abs,\
-      \ payload_start_abs - 2048 + 3408)\n                    \n                 \
-      \   # TX1 tamponunu t\xFCket\n                    self.buffer_tx1 = self.buffer_tx1[self.payload_size:]\n\
-      \                    continue\n\n            # E\u015Fle\u015Fme ba\u015Far\u0131\
-      s\u0131z ise bu paketi tampondan atla ki kuyruk kilitlenmesin\n            with\
-      \ open(\"debug_sic.txt\", \"a\") as f_dbg:\n                f_dbg.write(f\"\
-      [SIC Aligner] Correlation too low or search failed. Skipping reconstructed packet\
-      \ (Est: {estimated_amp:.3f}).\\n\")\n            print(f\"[SIC Aligner] Correlation\
-      \ too low or search failed. Skipping reconstructed packet (Est: {estimated_amp:.3f}).\"\
-      )\n            self.pkt_counter += 1\n            self.next_packet_start_abs\
-      \ += 3408\n            self.buffer_tx1 = self.buffer_tx1[self.payload_size:]\n\
-      \n        # 5. \xC7\u0131k\u0131\u015Fa G\xFCvenli \xD6rnekleri Yazma (Streaming\
-      \ Output)\n        safe_to_output = self.subtracted_until_abs - self.rx_processed_abs\n\
-      \        safe_to_output = min(safe_to_output, len(self.buffer_rx))\n       \
-      \ safe_to_output = max(0, safe_to_output)\n\n        n_out = len(out_rx2)\n\
-      \        limit = min(safe_to_output, n_out)\n\n        if limit > 0:\n     \
-      \       out_rx2[:limit] = self.buffer_rx[:limit]\n            self.buffer_rx\
-      \ = self.buffer_rx[limit:]\n            self.rx_processed_abs += limit\n   \
-      \         return limit\n        else:\n            return 0\n"
+      \ - 2048\n                    \n                    # Debug dosyamıza yazalım\n\
+      \                    with open(\"debug_sic.txt\", \"a\") as f_dbg:\n       \
+      \                 f_dbg.write(f\"[SIC Aligner] Packet #{self.pkt_counter} Subtracted!\
+      \ Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp (Dynamic): {amplitude_scale:.3f}\
+      \ (Est: {estimated_amp:.3f})\\n\")\n                    \n                 \
+      \   print(f\"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift}\
+      \ symbols, Phase: {phase_offset:.3f} rad, Amp (Dynamic): {amplitude_scale:.3f}\
+      \ (Est: {estimated_amp:.3f})\")\n\n                    # Bir sonraki paketin\
+      \ başlangıç indeksini güncelle\n                    self.next_packet_start_abs\
+      \ = payload_start_abs - 2048 + 3408\n                    self.subtracted_until_abs\
+      \ = max(self.subtracted_until_abs, payload_start_abs - 2048 + 3408)\n      \
+      \              \n                    # TX1 tamponunu tüket\n               \
+      \     self.buffer_tx1 = self.buffer_tx1[self.payload_size:]\n              \
+      \      continue\n\n            # Eşleşme başarısız ise bu paketi tampondan atla\
+      \ ki kuyruk kilitlenmesin\n            with open(\"debug_sic.txt\", \"a\") as\
+      \ f_dbg:\n                f_dbg.write(f\"[SIC Aligner] Correlation too low or\
+      \ search failed. Skipping reconstructed packet (Est: {estimated_amp:.3f}).\\\
+      n\")\n            print(f\"[SIC Aligner] Correlation too low or search failed.\
+      \ Skipping reconstructed packet (Est: {estimated_amp:.3f}).\")\n           \
+      \ self.pkt_counter += 1\n            self.next_packet_start_abs += 3408\n  \
+      \          self.buffer_tx1 = self.buffer_tx1[self.payload_size:]\n\n       \
+      \ # 5. Çıkışa Güvenli Örnekleri Yazma (Streaming Output)\n        safe_to_output\
+      \ = self.subtracted_until_abs - self.rx_processed_abs\n        safe_to_output\
+      \ = min(safe_to_output, len(self.buffer_rx))\n        safe_to_output = max(0,\
+      \ safe_to_output)\n\n        n_out = len(out_rx2)\n        limit = min(safe_to_output,\
+      \ n_out)\n\n        if limit > 0:\n            out_rx2[:limit] = self.buffer_rx[:limit]\n\
+      \            self.buffer_rx = self.buffer_rx[limit:]\n            self.rx_processed_abs\
+      \ += limit\n            return limit\n        else:\n            return 0\n"
     affinity: ''
     alias: ''
     comment: ''
@@ -1651,22 +1762,23 @@ blocks:
     sample_rate: samp_rate
     search_window: '32'
   states:
-    _io_cache: "('Decoupled NOMA SIC Aligner', 'blk', [('sample_rate', '200000.0'),\
-      \ ('near_user_amplitude', '0.864'), ('search_window', '128'), ('payload_size',\
-      \ '1296'), ('payload_offset', '64')], [('0', 'complex', 1), ('1', 'complex',\
-      \ 1)], [('0', 'complex', 1)], '\\n    Decoupled BPSK NOMA SIC Aligner Block\\\
-      n    \\n    Giri\u015F verilerini an\u0131nda t\xFCketerek dahili kuyruklara\
-      \ yazar, b\xF6ylece\\n    GNU Radio zamanlay\u0131c\u0131s\u0131n\u0131n kilitlenmesini\
-      \ (deadlock) %100 engeller.\\n    ', ['near_user_amplitude', 'payload_offset',\
-      \ 'payload_size', 'sample_rate', 'search_window'])"
+    _io_cache: ('Decoupled NOMA SIC Aligner', 'blk', [('sample_rate', '200000.0'),
+      ('near_user_amplitude', '0.864'), ('search_window', '128'), ('payload_size',
+      '1296'), ('payload_offset', '64')], [('0', 'complex', 1), ('1', 'complex', 1)],
+      [('0', 'complex', 1)], '\n    Decoupled BPSK NOMA SIC Aligner Block\n    \n    Giriş
+      verilerini anında tüketerek dahili kuyruklara yazar, böylece\n    GNU Radio
+      zamanlayıcısının kilitlenmesini (deadlock) %100 engeller.\n    ', ['near_user_amplitude',
+      'payload_offset', 'payload_size', 'sample_rate', 'search_window'])
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [304, 3828.0]
+    coordinate:
+    - 304
+    - 3828.0
     rotation: 0
     state: enabled
-- name: fec_extended_decoder_0
-  id: fec_extended_decoder
+- id: fec_extended_decoder
+  name: fec_extended_decoder_0
   parameters:
     affinity: ''
     alias: ''
@@ -1682,17 +1794,20 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [384, 2772.0]
+    coordinate:
+    - 384
+    - 2772.0
     rotation: 0
     state: enabled
-- name: fec_extended_decoder_0_0
-  id: fec_extended_decoder
+- id: fec_extended_decoder
+  name: fec_extended_decoder_0_0
   parameters:
     affinity: ''
     alias: ''
     ann: None
     comment: ''
     decoder_list: ldpc_dec_2
+    decoder_obj_list: ldpc_dec_2
     maxoutbuf: '0'
     minoutbuf: '0'
     puncpat: '''11'''
@@ -1702,11 +1817,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [392, 3964.0]
+    coordinate:
+    - 392
+    - 3964.0
     rotation: 0
     state: enabled
-- name: fec_extended_encoder_0
-  id: fec_extended_encoder
+- id: fec_extended_encoder
+  name: fec_extended_encoder_0
   parameters:
     affinity: ''
     alias: ''
@@ -1720,11 +1837,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1224, 324.0]
+    coordinate:
+    - 1224
+    - 324.0
     rotation: 0
     state: enabled
-- name: fec_extended_encoder_0_0
-  id: fec_extended_encoder
+- id: fec_extended_encoder
+  name: fec_extended_encoder_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1738,11 +1857,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1232, 892.0]
+    coordinate:
+    - 1232
+    - 892.0
     rotation: 0
     state: enabled
-- name: fec_extended_encoder_0_0_0
-  id: fec_extended_encoder
+- id: fec_extended_encoder
+  name: fec_extended_encoder_0_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1756,11 +1877,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [784, 3252.0]
+    coordinate:
+    - 784
+    - 3252.0
     rotation: 0
     state: enabled
-- name: filter_fft_rrc_filter_0
-  id: filter_fft_rrc_filter
+- id: filter_fft_rrc_filter
+  name: filter_fft_rrc_filter_0
   parameters:
     affinity: ''
     alias: ''
@@ -1779,11 +1902,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [248, 2460.0]
+    coordinate:
+    - 248
+    - 2460.0
     rotation: 0
     state: enabled
-- name: note_0
-  id: note
+- id: note
+  name: note_0
   parameters:
     alias: ''
     comment: ''
@@ -1792,11 +1917,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [40, 2396.0]
+    coordinate:
+    - 40
+    - 2396.0
     rotation: 0
     state: enabled
-- name: note_1
-  id: note
+- id: note
+  name: note_1
   parameters:
     alias: ''
     comment: ''
@@ -1805,11 +1932,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [16, 220.0]
+    coordinate:
+    - 16
+    - 220.0
     rotation: 0
     state: enabled
-- name: note_1_0
-  id: note
+- id: note
+  name: note_1_0
   parameters:
     alias: ''
     comment: ''
@@ -1818,11 +1947,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1440, 724.0]
+    coordinate:
+    - 1440
+    - 724.0
     rotation: 0
     state: enabled
-- name: note_2
-  id: note
+- id: note
+  name: note_2
   parameters:
     alias: ''
     comment: ''
@@ -1831,11 +1962,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [40, 2092.0]
+    coordinate:
+    - 40
+    - 2092.0
     rotation: 0
     state: true
-- name: pdu_tagged_stream_to_pdu_0
-  id: pdu_tagged_stream_to_pdu
+- id: pdu_tagged_stream_to_pdu
+  name: pdu_tagged_stream_to_pdu_0
   parameters:
     affinity: ''
     alias: ''
@@ -1848,11 +1981,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [576, 2948.0]
+    coordinate:
+    - 576
+    - 2948.0
     rotation: 0
     state: enabled
-- name: pdu_tagged_stream_to_pdu_0_0
-  id: pdu_tagged_stream_to_pdu
+- id: pdu_tagged_stream_to_pdu
+  name: pdu_tagged_stream_to_pdu_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1865,11 +2000,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [584, 4132.0]
+    coordinate:
+    - 584
+    - 4132.0
     rotation: 0
     state: enabled
-- name: qtgui_time_sink_x_0_0
-  id: qtgui_time_sink_x
+- id: qtgui_time_sink_x
+  name: qtgui_time_sink_x_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -1962,11 +2099,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [920, 2228.0]
+    coordinate:
+    - 920
+    - 2228.0
     rotation: 0
     state: enabled
-- name: qtgui_time_sink_x_1_0
-  id: qtgui_time_sink_x
+- id: qtgui_time_sink_x
+  name: qtgui_time_sink_x_1_0
   parameters:
     affinity: ''
     alias: ''
@@ -2059,11 +2198,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1240, 2492.0]
+    coordinate:
+    - 1240
+    - 2492.0
     rotation: 0
     state: enabled
-- name: qtgui_time_sink_x_1_0_0
-  id: qtgui_time_sink_x
+- id: qtgui_time_sink_x
+  name: qtgui_time_sink_x_1_0_0
   parameters:
     affinity: ''
     alias: ''
@@ -2156,11 +2297,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [840, 3620.0]
+    coordinate:
+    - 840
+    - 3620.0
     rotation: 0
     state: enabled
-- name: virtual_sink_0
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_0
   parameters:
     alias: ''
     comment: ''
@@ -2169,11 +2312,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [712, 620.0]
+    coordinate:
+    - 712
+    - 620.0
     rotation: 0
     state: enabled
-- name: virtual_sink_0_0
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_0_0
   parameters:
     alias: ''
     comment: ''
@@ -2182,11 +2327,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2408, 228.0]
+    coordinate:
+    - 2408
+    - 228.0
     rotation: 0
     state: true
-- name: virtual_sink_0_0_0
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_0_0_0
   parameters:
     alias: ''
     comment: ''
@@ -2195,11 +2342,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2416, 796.0]
+    coordinate:
+    - 2416
+    - 796.0
     rotation: 0
     state: true
-- name: virtual_sink_0_1
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_0_1
   parameters:
     alias: ''
     comment: ''
@@ -2208,11 +2357,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [720, 1180.0]
+    coordinate:
+    - 720
+    - 1180.0
     rotation: 0
     state: enabled
-- name: virtual_sink_1
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_1
   parameters:
     alias: ''
     comment: ''
@@ -2221,11 +2372,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1104, 1628.0]
+    coordinate:
+    - 1104
+    - 1628.0
     rotation: 0
     state: enabled
-- name: virtual_sink_2
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_2
   parameters:
     alias: ''
     comment: ''
@@ -2234,11 +2387,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [920, 2140.0]
+    coordinate:
+    - 920
+    - 2140.0
     rotation: 0
     state: enabled
-- name: virtual_sink_3
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_3
   parameters:
     alias: ''
     comment: ''
@@ -2247,11 +2402,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1208, 2428.0]
+    coordinate:
+    - 1208
+    - 2428.0
     rotation: 0
     state: enabled
-- name: virtual_sink_3_0
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_3_0
   parameters:
     alias: ''
     comment: ''
@@ -2260,11 +2417,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1608, 2236.0]
+    coordinate:
+    - 1608
+    - 2236.0
     rotation: 0
     state: enabled
-- name: virtual_sink_4
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_4
   parameters:
     alias: ''
     comment: ''
@@ -2273,11 +2432,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1120, 2684.0]
+    coordinate:
+    - 1120
+    - 2684.0
     rotation: 0
     state: enabled
-- name: virtual_sink_4_0
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_4_0
   parameters:
     alias: ''
     comment: ''
@@ -2286,11 +2447,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1624, 3852.0]
+    coordinate:
+    - 1624
+    - 3852.0
     rotation: 0
     state: enabled
-- name: virtual_sink_5
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_5
   parameters:
     alias: ''
     comment: ''
@@ -2299,11 +2462,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2144, 356.0]
+    coordinate:
+    - 2144
+    - 356.0
     rotation: 0
     state: enabled
-- name: virtual_sink_5_0
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_5_0
   parameters:
     alias: ''
     comment: ''
@@ -2312,11 +2477,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [2152, 924.0]
+    coordinate:
+    - 2152
+    - 924.0
     rotation: 0
     state: enabled
-- name: virtual_sink_6
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_6
   parameters:
     alias: ''
     comment: ''
@@ -2325,11 +2492,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1632, 2812.0]
+    coordinate:
+    - 1632
+    - 2812.0
     rotation: 0
     state: enabled
-- name: virtual_sink_6_0
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_6_0
   parameters:
     alias: ''
     comment: ''
@@ -2338,11 +2507,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1376, 2908.0]
+    coordinate:
+    - 1376
+    - 2908.0
     rotation: 0
     state: enabled
-- name: virtual_sink_6_1
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_6_1
   parameters:
     alias: ''
     comment: ''
@@ -2351,11 +2522,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1640, 4004.0]
+    coordinate:
+    - 1640
+    - 4004.0
     rotation: 0
     state: enabled
-- name: virtual_sink_7
-  id: virtual_sink
+- id: virtual_sink
+  name: virtual_sink_7
   parameters:
     alias: ''
     comment: ''
@@ -2364,11 +2537,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1600, 3284.0]
+    coordinate:
+    - 1600
+    - 3284.0
     rotation: 0
     state: enabled
-- name: virtual_source_0
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_0
   parameters:
     alias: ''
     comment: ''
@@ -2377,11 +2552,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [40, 1684.0]
+    coordinate:
+    - 40
+    - 1684.0
     rotation: 0
     state: enabled
-- name: virtual_source_0_0
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_0_0
   parameters:
     alias: ''
     comment: ''
@@ -2390,11 +2567,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [40, 1476.0]
+    coordinate:
+    - 40
+    - 1476.0
     rotation: 0
     state: enabled
-- name: virtual_source_1
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_1
   parameters:
     alias: ''
     comment: ''
@@ -2403,11 +2582,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [40, 2508.0]
+    coordinate:
+    - 40
+    - 2508.0
     rotation: 0
     state: enabled
-- name: virtual_source_1_0_0
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_1_0_0
   parameters:
     alias: ''
     comment: ''
@@ -2416,11 +2597,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [56, 3820.0]
+    coordinate:
+    - 56
+    - 3820.0
     rotation: 0
     state: enabled
-- name: virtual_source_2
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_2
   parameters:
     alias: ''
     comment: ''
@@ -2429,11 +2612,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [48, 2684.0]
+    coordinate:
+    - 48
+    - 2684.0
     rotation: 0
     state: enabled
-- name: virtual_source_3
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_3
   parameters:
     alias: ''
     comment: ''
@@ -2442,11 +2627,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [48, 2796.0]
+    coordinate:
+    - 48
+    - 2796.0
     rotation: 0
     state: enabled
-- name: virtual_source_3_0
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_3_0
   parameters:
     alias: ''
     comment: ''
@@ -2455,11 +2642,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [56, 3988.0]
+    coordinate:
+    - 56
+    - 3988.0
     rotation: 0
     state: enabled
-- name: virtual_source_4
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_4
   parameters:
     alias: ''
     comment: ''
@@ -2468,11 +2657,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [512, 2196.0]
+    coordinate:
+    - 512
+    - 2196.0
     rotation: 0
     state: enabled
-- name: virtual_source_5
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_5
   parameters:
     alias: ''
     comment: ''
@@ -2481,11 +2672,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [24, 604.0]
+    coordinate:
+    - 24
+    - 604.0
     rotation: 0
     state: true
-- name: virtual_source_5_0
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_5_0
   parameters:
     alias: ''
     comment: ''
@@ -2494,11 +2687,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [32, 1164.0]
+    coordinate:
+    - 32
+    - 1164.0
     rotation: 0
     state: true
-- name: virtual_source_7
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_7
   parameters:
     alias: ''
     comment: ''
@@ -2507,11 +2702,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [208, 636.0]
+    coordinate:
+    - 208
+    - 636.0
     rotation: 0
     state: enabled
-- name: virtual_source_7_0
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_7_0
   parameters:
     alias: ''
     comment: ''
@@ -2520,11 +2717,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [216, 1196.0]
+    coordinate:
+    - 216
+    - 1196.0
     rotation: 0
     state: enabled
-- name: virtual_source_8
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_8
   parameters:
     alias: ''
     comment: ''
@@ -2533,11 +2732,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [48, 2948.0]
+    coordinate:
+    - 48
+    - 2948.0
     rotation: 0
     state: enabled
-- name: virtual_source_8_0
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_8_0
   parameters:
     alias: ''
     comment: ''
@@ -2546,11 +2747,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [56, 4132.0]
+    coordinate:
+    - 56
+    - 4132.0
     rotation: 0
     state: enabled
-- name: virtual_source_9
-  id: virtual_source
+- id: virtual_source
+  name: virtual_source_9
   parameters:
     alias: ''
     comment: ''
@@ -2559,107 +2762,411 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [56, 3884.0]
+    coordinate:
+    - 56
+    - 3884.0
     rotation: 0
     state: enabled
-
 connections:
-- [blocks_add_xx_0, '0', virtual_sink_1, '0']
-- [blocks_file_source_0, '0', blocks_stream_to_tagged_stream_0_0_0, '0']
-- [blocks_file_source_0_0, '0', blocks_stream_to_tagged_stream_0_0_0_1, '0']
-- [blocks_multiply_const_vxx_0, '0', blocks_tag_gate_0, '0']
-- [blocks_multiply_const_vxx_0, '0', blocks_throttle2_0, '0']
-- [blocks_multiply_const_vxx_0_0, '0', blocks_tag_gate_0_0, '0']
-- [blocks_multiply_const_vxx_0_0, '0', blocks_throttle2_0_0, '0']
-- [blocks_multiply_const_vxx_0_0_0, '0', virtual_sink_7, '0']
-- [blocks_repack_bits_bb_0, '0', digital_additive_scrambler_xx_0, '0']
-- [blocks_repack_bits_bb_0_0, '0', virtual_sink_5, '0']
-- [blocks_repack_bits_bb_0_0_0, '0', virtual_sink_5_0, '0']
-- [blocks_repack_bits_bb_0_1, '0', digital_additive_scrambler_xx_0_1, '0']
-- [blocks_repack_bits_bb_1, '0', virtual_sink_6, '0']
-- [blocks_repack_bits_bb_1_0, '0', digital_protocol_formatter_bb_0, '0']
-- [blocks_repack_bits_bb_1_0_0, '0', digital_protocol_formatter_bb_0_0, '0']
-- [blocks_repack_bits_bb_1_1, '0', virtual_sink_6_1, '0']
-- [blocks_stream_to_tagged_stream_0_0_0, '0', digital_crc32_bb_0, '0']
-- [blocks_stream_to_tagged_stream_0_0_0_0, '0', blocks_tagged_stream_mux_0, '0']
-- [blocks_stream_to_tagged_stream_0_0_0_0_0, '0', blocks_tagged_stream_mux_0, '3']
-- [blocks_stream_to_tagged_stream_0_0_0_0_0_0, '0', blocks_tagged_stream_mux_0_0,
-  '3']
-- [blocks_stream_to_tagged_stream_0_0_0_0_1, '0', blocks_tagged_stream_mux_0_0, '0']
-- [blocks_stream_to_tagged_stream_0_0_0_1, '0', digital_crc32_bb_0_0, '0']
-- [blocks_tag_gate_0, '0', blocks_add_xx_0, '1']
-- [blocks_tag_gate_0_0, '0', blocks_add_xx_0, '0']
-- [blocks_tagged_stream_multiply_length_0, '0', blocks_repack_bits_bb_0_0, '0']
-- [blocks_tagged_stream_multiply_length_0, '0', blocks_repack_bits_bb_1_0, '0']
-- [blocks_tagged_stream_multiply_length_0_0, '0', blocks_repack_bits_bb_0_0_0, '0']
-- [blocks_tagged_stream_multiply_length_0_0, '0', blocks_repack_bits_bb_1_0_0, '0']
-- [blocks_tagged_stream_multiply_length_0_1, '0', digital_additive_scrambler_xx_0_0,
-  '0']
-- [blocks_tagged_stream_multiply_length_0_1, '0', fec_extended_encoder_0_0_0, '0']
-- [blocks_tagged_stream_multiply_length_0_1_0, '0', digital_additive_scrambler_xx_0_0_0,
-  '0']
-- [blocks_tagged_stream_mux_0, '0', virtual_sink_0, '0']
-- [blocks_tagged_stream_mux_0_0, '0', virtual_sink_0_1, '0']
-- [blocks_vector_source_x_0, '0', blocks_stream_to_tagged_stream_0_0_0_0, '0']
-- [blocks_vector_source_x_0_0, '0', blocks_stream_to_tagged_stream_0_0_0_0_0, '0']
-- [blocks_vector_source_x_0_0_0, '0', blocks_stream_to_tagged_stream_0_0_0_0_0_0,
-  '0']
-- [blocks_vector_source_x_0_1, '0', blocks_stream_to_tagged_stream_0_0_0_0_1, '0']
-- [channels_channel_model_1, '0', qtgui_time_sink_x_0_0, '0']
-- [channels_channel_model_1, '0', virtual_sink_2, '0']
-- [digital_additive_scrambler_xx_0, '0', fec_extended_encoder_0, '0']
-- [digital_additive_scrambler_xx_0_0, '0', blocks_repack_bits_bb_1, '0']
-- [digital_additive_scrambler_xx_0_0, '0', virtual_sink_6_0, '0']
-- [digital_additive_scrambler_xx_0_0_0, '0', blocks_repack_bits_bb_1_1, '0']
-- [digital_additive_scrambler_xx_0_1, '0', fec_extended_encoder_0_0, '0']
-- [digital_chunks_to_symbols_xx_0, '0', blocks_multiply_const_vxx_0_0_0, '0']
-- [digital_constellation_modulator_0, '0', blocks_multiply_const_vxx_0, '0']
-- [digital_constellation_modulator_0_0, '0', blocks_multiply_const_vxx_0_0, '0']
-- [digital_constellation_soft_decoder_cf_0, '0', epy_block_0, '0']
-- [digital_constellation_soft_decoder_cf_0_0, '0', epy_block_0_0, '0']
-- [digital_corr_est_cc_0, '0', virtual_sink_3_0, '0']
-- [digital_correlate_access_code_xx_ts_0, '0', virtual_sink_4, '0']
-- [digital_correlate_access_code_xx_ts_0_0, '0', virtual_sink_4_0, '0']
-- [digital_costas_loop_cc_0, '0', digital_corr_est_cc_0, '0']
-- [digital_costas_loop_cc_0, '0', qtgui_time_sink_x_1_0, '0']
-- [digital_costas_loop_cc_0, '0', virtual_sink_3, '0']
-- [digital_crc32_bb_0, '0', blocks_repack_bits_bb_0, '0']
-- [digital_crc32_bb_0_0, '0', blocks_repack_bits_bb_0_1, '0']
-- [digital_crc32_bb_1, '0', blocks_file_sink_0, '0']
-- [digital_crc32_bb_1, '0', pdu_tagged_stream_to_pdu_0, '0']
-- [digital_crc32_bb_1_0, '0', blocks_file_sink_0_0, '0']
-- [digital_crc32_bb_1_0, '0', pdu_tagged_stream_to_pdu_0_0, '0']
-- [digital_protocol_formatter_bb_0, '0', virtual_sink_0_0, '0']
-- [digital_protocol_formatter_bb_0_0, '0', virtual_sink_0_0_0, '0']
-- [digital_symbol_sync_xx_0, '0', digital_costas_loop_cc_0, '0']
-- [epy_block_0, '0', digital_correlate_access_code_xx_ts_0, '0']
-- [epy_block_0_0, '0', digital_correlate_access_code_xx_ts_0_0, '0']
-- [epy_block_1, '0', digital_constellation_soft_decoder_cf_0_0, '0']
-- [epy_block_1, '0', qtgui_time_sink_x_1_0_0, '0']
-- [fec_extended_decoder_0, '0', blocks_tagged_stream_multiply_length_0_1, '0']
-- [fec_extended_decoder_0_0, '0', blocks_tagged_stream_multiply_length_0_1_0, '0']
-- [fec_extended_encoder_0, '0', blocks_tagged_stream_multiply_length_0, '0']
-- [fec_extended_encoder_0_0, '0', blocks_tagged_stream_multiply_length_0_0, '0']
-- [fec_extended_encoder_0_0_0, '0', digital_chunks_to_symbols_xx_0, '0']
-- [filter_fft_rrc_filter_0, '0', digital_symbol_sync_xx_0, '0']
-- [pdu_tagged_stream_to_pdu_0, pdus, blocks_message_debug_0, print]
-- [pdu_tagged_stream_to_pdu_0_0, pdus, blocks_message_debug_0_0, print]
-- [virtual_source_0, '0', digital_constellation_modulator_0, '0']
-- [virtual_source_0_0, '0', digital_constellation_modulator_0_0, '0']
-- [virtual_source_1, '0', filter_fft_rrc_filter_0, '0']
-- [virtual_source_1_0_0, '0', epy_block_1, '0']
-- [virtual_source_2, '0', digital_constellation_soft_decoder_cf_0, '0']
-- [virtual_source_3, '0', fec_extended_decoder_0, '0']
-- [virtual_source_3_0, '0', fec_extended_decoder_0_0, '0']
-- [virtual_source_4, '0', channels_channel_model_1, '0']
-- [virtual_source_5, '0', blocks_tagged_stream_mux_0, '1']
-- [virtual_source_5_0, '0', blocks_tagged_stream_mux_0_0, '1']
-- [virtual_source_7, '0', blocks_tagged_stream_mux_0, '2']
-- [virtual_source_7_0, '0', blocks_tagged_stream_mux_0_0, '2']
-- [virtual_source_8, '0', digital_crc32_bb_1, '0']
-- [virtual_source_8_0, '0', digital_crc32_bb_1_0, '0']
-- [virtual_source_9, '0', epy_block_1, '1']
-
+- - blocks_add_xx_0
+  - '0'
+  - virtual_sink_1
+  - '0'
+- - blocks_file_source_0
+  - '0'
+  - blocks_stream_to_tagged_stream_0_0_0
+  - '0'
+- - blocks_file_source_0_0
+  - '0'
+  - blocks_stream_to_tagged_stream_0_0_0_1
+  - '0'
+- - blocks_multiply_const_vxx_0
+  - '0'
+  - blocks_tag_gate_0
+  - '0'
+- - blocks_multiply_const_vxx_0
+  - '0'
+  - blocks_throttle2_0
+  - '0'
+- - blocks_multiply_const_vxx_0_0
+  - '0'
+  - blocks_tag_gate_0_0
+  - '0'
+- - blocks_multiply_const_vxx_0_0
+  - '0'
+  - blocks_throttle2_0_0
+  - '0'
+- - blocks_multiply_const_vxx_0_0_0
+  - '0'
+  - virtual_sink_7
+  - '0'
+- - blocks_repack_bits_bb_0
+  - '0'
+  - digital_additive_scrambler_xx_0
+  - '0'
+- - blocks_repack_bits_bb_0_0
+  - '0'
+  - virtual_sink_5
+  - '0'
+- - blocks_repack_bits_bb_0_0_0
+  - '0'
+  - virtual_sink_5_0
+  - '0'
+- - blocks_repack_bits_bb_0_1
+  - '0'
+  - digital_additive_scrambler_xx_0_1
+  - '0'
+- - blocks_repack_bits_bb_1
+  - '0'
+  - virtual_sink_6
+  - '0'
+- - blocks_repack_bits_bb_1_0
+  - '0'
+  - digital_protocol_formatter_bb_0
+  - '0'
+- - blocks_repack_bits_bb_1_0_0
+  - '0'
+  - digital_protocol_formatter_bb_0_0
+  - '0'
+- - blocks_repack_bits_bb_1_1
+  - '0'
+  - virtual_sink_6_1
+  - '0'
+- - blocks_stream_to_tagged_stream_0_0_0
+  - '0'
+  - digital_crc32_bb_0
+  - '0'
+- - blocks_stream_to_tagged_stream_0_0_0_0
+  - '0'
+  - blocks_tagged_stream_mux_0
+  - '0'
+- - blocks_stream_to_tagged_stream_0_0_0_0_0
+  - '0'
+  - blocks_tagged_stream_mux_0
+  - '3'
+- - blocks_stream_to_tagged_stream_0_0_0_0_0_0
+  - '0'
+  - blocks_tagged_stream_mux_0_0
+  - '3'
+- - blocks_stream_to_tagged_stream_0_0_0_0_1
+  - '0'
+  - blocks_tagged_stream_mux_0_0
+  - '0'
+- - blocks_stream_to_tagged_stream_0_0_0_1
+  - '0'
+  - digital_crc32_bb_0_0
+  - '0'
+- - blocks_tag_gate_0
+  - '0'
+  - blocks_add_xx_0
+  - '1'
+- - blocks_tag_gate_0_0
+  - '0'
+  - blocks_add_xx_0
+  - '0'
+- - blocks_tagged_stream_multiply_length_0
+  - '0'
+  - blocks_repack_bits_bb_0_0
+  - '0'
+- - blocks_tagged_stream_multiply_length_0
+  - '0'
+  - blocks_repack_bits_bb_1_0
+  - '0'
+- - blocks_tagged_stream_multiply_length_0_0
+  - '0'
+  - blocks_repack_bits_bb_0_0_0
+  - '0'
+- - blocks_tagged_stream_multiply_length_0_0
+  - '0'
+  - blocks_repack_bits_bb_1_0_0
+  - '0'
+- - blocks_tagged_stream_multiply_length_0_1
+  - '0'
+  - digital_additive_scrambler_xx_0_0
+  - '0'
+- - blocks_tagged_stream_multiply_length_0_1
+  - '0'
+  - fec_extended_encoder_0_0_0
+  - '0'
+- - blocks_tagged_stream_multiply_length_0_1_0
+  - '0'
+  - digital_additive_scrambler_xx_0_0_0
+  - '0'
+- - blocks_tagged_stream_mux_0
+  - '0'
+  - virtual_sink_0
+  - '0'
+- - blocks_tagged_stream_mux_0_0
+  - '0'
+  - virtual_sink_0_1
+  - '0'
+- - blocks_vector_source_x_0
+  - '0'
+  - blocks_stream_to_tagged_stream_0_0_0_0
+  - '0'
+- - blocks_vector_source_x_0_0
+  - '0'
+  - blocks_stream_to_tagged_stream_0_0_0_0_0
+  - '0'
+- - blocks_vector_source_x_0_0_0
+  - '0'
+  - blocks_stream_to_tagged_stream_0_0_0_0_0_0
+  - '0'
+- - blocks_vector_source_x_0_1
+  - '0'
+  - blocks_stream_to_tagged_stream_0_0_0_0_1
+  - '0'
+- - channels_channel_model_1
+  - '0'
+  - qtgui_time_sink_x_0_0
+  - '0'
+- - channels_channel_model_1
+  - '0'
+  - virtual_sink_2
+  - '0'
+- - digital_additive_scrambler_xx_0
+  - '0'
+  - fec_extended_encoder_0
+  - '0'
+- - digital_additive_scrambler_xx_0_0
+  - '0'
+  - blocks_repack_bits_bb_1
+  - '0'
+- - digital_additive_scrambler_xx_0_0
+  - '0'
+  - virtual_sink_6_0
+  - '0'
+- - digital_additive_scrambler_xx_0_0_0
+  - '0'
+  - blocks_repack_bits_bb_1_1
+  - '0'
+- - digital_additive_scrambler_xx_0_1
+  - '0'
+  - fec_extended_encoder_0_0
+  - '0'
+- - digital_chunks_to_symbols_xx_0
+  - '0'
+  - blocks_multiply_const_vxx_0_0_0
+  - '0'
+- - digital_constellation_modulator_0
+  - '0'
+  - blocks_multiply_const_vxx_0
+  - '0'
+- - digital_constellation_modulator_0_0
+  - '0'
+  - blocks_multiply_const_vxx_0_0
+  - '0'
+- - digital_constellation_soft_decoder_cf_0
+  - '0'
+  - epy_block_0
+  - '0'
+- - digital_constellation_soft_decoder_cf_0_0
+  - '0'
+  - epy_block_0_0
+  - '0'
+- - digital_corr_est_cc_0
+  - '0'
+  - virtual_sink_3_0
+  - '0'
+- - digital_correlate_access_code_xx_ts_0
+  - '0'
+  - virtual_sink_4
+  - '0'
+- - digital_correlate_access_code_xx_ts_0_0
+  - '0'
+  - virtual_sink_4_0
+  - '0'
+- - digital_costas_loop_cc_0
+  - '0'
+  - digital_corr_est_cc_0
+  - '0'
+- - digital_costas_loop_cc_0
+  - '0'
+  - qtgui_time_sink_x_1_0
+  - '0'
+- - digital_costas_loop_cc_0
+  - '0'
+  - virtual_sink_3
+  - '0'
+- - digital_crc32_bb_0
+  - '0'
+  - blocks_repack_bits_bb_0
+  - '0'
+- - digital_crc32_bb_0_0
+  - '0'
+  - blocks_repack_bits_bb_0_1
+  - '0'
+- - digital_crc32_bb_1
+  - '0'
+  - blocks_file_sink_0
+  - '0'
+- - digital_crc32_bb_1
+  - '0'
+  - pdu_tagged_stream_to_pdu_0
+  - '0'
+- - digital_crc32_bb_1_0
+  - '0'
+  - blocks_file_sink_0_0
+  - '0'
+- - digital_crc32_bb_1_0
+  - '0'
+  - pdu_tagged_stream_to_pdu_0_0
+  - '0'
+- - digital_protocol_formatter_bb_0
+  - '0'
+  - virtual_sink_0_0
+  - '0'
+- - digital_protocol_formatter_bb_0_0
+  - '0'
+  - virtual_sink_0_0_0
+  - '0'
+- - digital_symbol_sync_xx_0
+  - '0'
+  - digital_costas_loop_cc_0
+  - '0'
+- - epy_block_0
+  - '0'
+  - digital_correlate_access_code_xx_ts_0
+  - '0'
+- - epy_block_0_0
+  - '0'
+  - digital_correlate_access_code_xx_ts_0_0
+  - '0'
+- - epy_block_1
+  - '0'
+  - digital_constellation_soft_decoder_cf_0_0
+  - '0'
+- - epy_block_1
+  - '0'
+  - qtgui_time_sink_x_1_0_0
+  - '0'
+- - fec_extended_decoder_0
+  - '0'
+  - blocks_tagged_stream_multiply_length_0_1
+  - '0'
+- - fec_extended_decoder_0_0
+  - '0'
+  - blocks_tagged_stream_multiply_length_0_1_0
+  - '0'
+- - fec_extended_encoder_0
+  - '0'
+  - blocks_tagged_stream_multiply_length_0
+  - '0'
+- - fec_extended_encoder_0_0
+  - '0'
+  - blocks_tagged_stream_multiply_length_0_0
+  - '0'
+- - fec_extended_encoder_0_0_0
+  - '0'
+  - digital_chunks_to_symbols_xx_0
+  - '0'
+- - filter_fft_rrc_filter_0
+  - '0'
+  - digital_symbol_sync_xx_0
+  - '0'
+- - pdu_tagged_stream_to_pdu_0
+  - pdus
+  - blocks_message_debug_0
+  - print
+- - pdu_tagged_stream_to_pdu_0_0
+  - pdus
+  - blocks_message_debug_0_0
+  - print
+- - virtual_source_0
+  - '0'
+  - digital_constellation_modulator_0
+  - '0'
+- - virtual_source_0_0
+  - '0'
+  - digital_constellation_modulator_0_0
+  - '0'
+- - virtual_source_1
+  - '0'
+  - filter_fft_rrc_filter_0
+  - '0'
+- - virtual_source_1_0_0
+  - '0'
+  - epy_block_1
+  - '0'
+- - virtual_source_2
+  - '0'
+  - digital_constellation_soft_decoder_cf_0
+  - '0'
+- - virtual_source_3
+  - '0'
+  - fec_extended_decoder_0
+  - '0'
+- - virtual_source_3_0
+  - '0'
+  - fec_extended_decoder_0_0
+  - '0'
+- - virtual_source_4
+  - '0'
+  - channels_channel_model_1
+  - '0'
+- - virtual_source_5
+  - '0'
+  - blocks_tagged_stream_mux_0
+  - '1'
+- - virtual_source_5_0
+  - '0'
+  - blocks_tagged_stream_mux_0_0
+  - '1'
+- - virtual_source_7
+  - '0'
+  - blocks_tagged_stream_mux_0
+  - '2'
+- - virtual_source_7_0
+  - '0'
+  - blocks_tagged_stream_mux_0_0
+  - '2'
+- - virtual_source_8
+  - '0'
+  - digital_crc32_bb_1
+  - '0'
+- - virtual_source_8_0
+  - '0'
+  - digital_crc32_bb_1_0
+  - '0'
+- - virtual_source_9
+  - '0'
+  - epy_block_1
+  - '1'
 metadata:
   file_format: 1
   grc_version: 3.10.12.0
+options:
+  parameters:
+    author: Armağan Bi
+    catch_exceptions: 'True'
+    category: '[GRC Hier Blocks]'
+    cmake_opt: ''
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: NOMA
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: NOMA
+    window_size: (1000,1000)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate:
+    - 16
+    - 8.0
+    rotation: 0
+    state: enabled

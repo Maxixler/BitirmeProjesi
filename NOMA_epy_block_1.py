@@ -64,7 +64,7 @@ class blk(gr.basic_block):
             self.consume(1, len(in_tx1))
 
         # 3. Tampon Kilitlenme ve Aşım Koruması (Buffer Overflow & Deadlock Prevention)
-        MAX_RX_BUFFER = 50000
+        MAX_RX_BUFFER = 500000
         if len(self.buffer_rx) > MAX_RX_BUFFER:
             excess = len(self.buffer_rx) - MAX_RX_BUFFER
             self.subtracted_until_abs = max(self.subtracted_until_abs, self.rx_processed_abs + excess)
