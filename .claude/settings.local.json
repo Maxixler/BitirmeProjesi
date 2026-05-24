@@ -1,7 +1,54 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -c \"import gnuradio.grc; print\\('GNU Radio GRC available'\\)\")"
+      "Bash(python -c \"import gnuradio.grc; print\\('GNU Radio GRC available'\\)\")",
+      "Bash(unzip -l \"C:\\\\Users\\\\Administrator\\\\Downloads\\\\GNU_RADIO_TABANLI_GÜÇ_ETKİ_ALANLI_NOMA_SİSTEMİ_İLE_ARDIŞIK_GİRİŞİM_İPTALİ__SIC__UYGULAMASI-output.zip\")",
+      "Bash(python \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\yazilim\\\\BitirmeProjesi2\\\\convert_md_to_latex_v2.py\" \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\yazilim\\\\BitirmeProjesi2\\\\PROJECT_REPORT.md\" \"c:\\\\Users\\\\Administrator\\\\Desktop\\\\yazilim\\\\BitirmeProjesi2\\\\report.tex\")",
+      "Bash(winget install *)",
+      "Bash(where pandoc *)",
+      "Bash(ls -la \"/c/Users/Administrator/AppData/Local/Microsoft/WindowsApps\")",
+      "Read(//c/Users/Administrator/AppData/Local/Microsoft/WindowsApps/**)",
+      "Bash(dir /s /b pandoc.exe 2^)",
+      "Bash(where.exe winget *)",
+      "Bash(\"c:/Users/Administrator/AppData/Local/Microsoft/WinGet/Packages/JohnMacFarlane.Pandoc_Microsoft.Winget.Source_8wekyb3d8bbwe/pandoc-3.9.0.2/pandoc.exe\" -s PROJECT_REPORT.md -t latex -o report_ieee.tex -V documentclass:IEEEtran)",
+      "Bash(pdflatex --version)",
+      "Bash(powershell -Command \"Get-ItemProperty -Path 'HKLM:\\\\SOFTWARE\\\\MiKTeX.org\\\\MiKTeX' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty SetupDir\")",
+      "Bash(timeout 30 \"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe\" -interaction=nonstopmode -halt-on-error report_ieee.tex)",
+      "Bash(timeout 60 \"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe\" -interaction=nonstopmode -halt-on-error report_ieee.tex)",
+      "Bash(timeout 120 \"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe\" -interaction=nonstopmode -halt-on-error report_ieee.tex)",
+      "Bash(timeout 30 \"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe\" -interaction=nonstopmode -halt-on-error -draftmode report_ieee.tex)",
+      "Bash(\"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe\" -interaction=nonstopmode -halt-on-error report_ieee.tex)",
+      "Bash(taskkill /f /im pdflatex.exe)",
+      "Bash(timeout 10 \"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe\" -interaction=nonstopmode -halt-on-error -draftmode report_ieee.tex)",
+      "Bash(pdflatex -interaction=nonstopmode -halt-on-error -draftmode report_ieee.tex)",
+      "Bash(\"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/xelatex.exe\" --version)",
+      "Bash(\"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe\" -interaction=nonstopmode -halt-on-error ieee_test.tex)",
+      "Bash(\"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/xelatex.exe\" -interaction=nonstopmode -halt-on-error report_ieee.tex)",
+      "Bash(grep -n \"\\\\\\\\\\\\\\\\begin{document}\" report_ieee.tex)",
+      "Bash(tee xelatex.log)",
+      "Bash(\"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/mpm.exe\" --install=booktabs)",
+      "Bash(\"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/mpm.exe\" --update-db)",
+      "Bash(taskkill /f /im xelatex.exe)",
+      "Bash(\"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/miktex/bin/x64/initexmf.exe\" --update-fndb)",
+      "Bash(del *.aux *.log *.toc *.lof *.lot *.out)",
+      "Bash(rm -f *.aux *.log *.toc *.lof *.lot *.out)",
+      "Bash(where pdflatex.exe)",
+      "Bash(dir \"C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Programs\\\\MiKTeX\\\\miktex\\\\bin\\\\x64\\\\pdflatex.exe\")",
+      "Bash(python -c \"import sys; data=open\\('c:\\\\\\\\Users\\\\\\\\Administrator\\\\\\\\Desktop\\\\\\\\yazilim\\\\\\\\BitirmeProjesi2\\\\\\\\report_ieee\\\\\\\\report_ieee.tex'\\).read\\(\\); data=data.replace\\('\\\\\\\\subparagraph', '\\\\\\\\paragraph'\\); open\\('c:\\\\\\\\Users\\\\\\\\Administrator\\\\\\\\Desktop\\\\\\\\yazilim\\\\\\\\BitirmeProjesi2\\\\\\\\report_ieee\\\\\\\\report_ieee.tex','w'\\).write\\(data\\)\")",
+      "Bash(python -c \"import sys; data=open\\('c:\\\\\\\\Users\\\\\\\\Administrator\\\\\\\\Desktop\\\\\\\\yazilim\\\\\\\\BitirmeProjesi2\\\\\\\\report_ieee\\\\\\\\report_ieee.tex', 'r', encoding='utf-8'\\).read\\(\\); data=data.replace\\('\\\\\\\\subparagraph', '\\\\\\\\paragraph'\\); open\\('c:\\\\\\\\Users\\\\\\\\Administrator\\\\\\\\Desktop\\\\\\\\yazilim\\\\\\\\BitirmeProjesi2\\\\\\\\report_ieee\\\\\\\\report_ieee.tex','w', encoding='utf-8'\\).write\\(data\\)\")",
+      "Bash(python -c \"import sys; data=open\\('c:\\\\\\\\\\\\\\\\Users\\\\\\\\\\\\\\\\Administrator\\\\\\\\\\\\\\\\Desktop\\\\\\\\\\\\\\\\yazilim\\\\\\\\\\\\\\\\BitirmeProjesi2\\\\\\\\\\\\\\\\report_ieee\\\\\\\\\\\\\\\\report_ieee.tex', 'r', encoding='utf-8'\\).read\\(\\); data=data.replace\\('\\\\\\\\\\\\\\\\subparagraph', '\\\\\\\\\\\\\\\\paragraph'\\); open\\('c:\\\\\\\\\\\\\\\\Users\\\\\\\\\\\\\\\\Administrator\\\\\\\\\\\\\\\\Desktop\\\\\\\\\\\\\\\\yazilim\\\\\\\\\\\\\\\\BitirmeProjesi2\\\\\\\\\\\\\\\\report_ieee\\\\\\\\\\\\\\\\report_ieee.tex','w', encoding='utf-8'\\).write\\(data\\)\")",
+      "Bash(grep -i subparagraph \"/c/Users/Administrator/AppData/Local/Programs/MiKTeX/tex/latex/ieeetran/IEEEtran.cls\")",
+      "Read(//c/Users/Administrator/AppData/Local/Programs/MiKTeX/tex/latex/ieeetran/**)",
+      "Bash(python replace_longtable.py)",
+      "Bash(\"C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Programs\\\\MiKTeX\\\\miktex\\\\bin\\\\x64\\\\pdflatex.exe\" -interaction=nonstopmode report_ieee_fixed_latex2.tex)",
+      "Bash(\"C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Programs\\\\MiKTeX\\\\miktex\\\\bin\\\\x64\\\\pdflatex.exe\" -interaction=nonstopmode report_ieee_fixed_complete.tex)",
+      "Bash(python fix_longtable_final2.py report_ieee.tex report_ieee_fixed_final2.tex)",
+      "Bash(dir /s fix_longtable6.py)",
+      "Bash(tex --version)",
+      "Bash(choco --version)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Administrator\\Desktop\\yazilim\\BitirmeProjesi2"
     ]
   }
 }

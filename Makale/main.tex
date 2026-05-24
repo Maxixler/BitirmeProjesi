@@ -1,0 +1,105 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+
+% Türkçe karakter desteği
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{subfiles} % Dosyaları bölmek için
+\usepackage{todonotes}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% --- Renk Tanımlamaları ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.94}
+
+% --- Listings Ayarları ---
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4
+}
+\lstset{style=mystyle}
+
+% --- Türkçe Karakter Düzeltmeleri ---
+\addto\captionsturkish{%
+  \renewcommand{\figurename}{Şekil}%
+  \renewcommand{\tablename}{Tablo}%
+  \renewcommand{\abstractname}{Özet}%
+}
+
+\input{acronyms} % acronyms.tex dosyasının projende var olduğundan emin ol
+
+\begin{document}
+
+% --- Makale Başlığı ---
+% Şablonunuzdaki başlığı değiştirmek isterseniz aşağıdaki satırı yorumdan çıkarabilirsiniz:
+% \title{USRP E310 \& LoRaWAN Sinyal Analiz Projesi}
+\title{GNU Radio Tabanlı Güç Etki Alanlı NOMA Sistemi ile Ardışık Girişim İptali (SIC) Uygulaması}
+
+% --- Yazar Bilgileri ---
+\author{
+    \IEEEauthorblockN{Eren Kale}
+    \IEEEauthorblockA{\textit{Elektrik-Elektronik Mühendisliği} \\
+    \textit{Marmara Üniversitesi}\\
+    erenkale@marun.edu.tr}
+    \and
+    \IEEEauthorblockN{Armağan Bi}
+    \IEEEauthorblockA{\textit{Elektrik-Elektronik Mühendisliği} \\
+    \textit{Marmara Üniversitesi}\\
+    armaganbi@marun.edu.tr}
+}
+
+\maketitle
+
+% --- Özet (Abstract) ---
+\begin{abstract}
+Beşinci nesil (5G) ve sonrasındaki kablosuz haberleşme sistemlerinde spektral verimliliğin artırılması en kritik mühendislik hedeflerinden biri hâline gelmiştir. Bu bağlamda, Ortogonal Olmayan Çoklu Erişim (NOMA) tekniği, aynı zaman-frekans kaynağının birden fazla kullanıcı tarafından eş zamanlı paylaşılmasına olanak tanıyan bir fiziksel katman çözümü olarak öne çıkmaktadır. Bu çalışmada, Güç Etki Alanlı NOMA (PD-NOMA) mimarisi kullanılarak iki kullanıcılı bir inen hat (downlink) senaryosu için uçtan uca alıcı-verici sistemi tasarlanmış ve GNU Radio Companion (GRC) ortamında gerçeklenmiştir. Verici tarafında Süperpozisyon Kodlaması prensibi ile iki kullanıcının BPSK modüleli sinyalleri farklı güç katsayıları ($\alpha_1 = 0.894$, $\alpha_2 = 0.447$; sırasıyla \%80 ve \%20 güç tahsisi) ile birleştirilmiştir. Alıcı tarafında ise Ardışık Girişim İptali (SIC) algoritması uygulanarak zayıf kullanıcının sinyali güçlü kullanıcının sinyali çözülüp çıkarıldıktan sonra elde edilmiştir. Sistem, IEEE 802.11n standardına uygun LDPC kanal kodlaması ($n = 1296$, $k = 648$, $R = 1/2$) ve Diferansiyel BPSK (DBPSK) modülasyonu ile donatılmıştır. AWGN kanal modeli altında yapılan simülasyonlarda dosya transferinin doğruluğu kanıtlanmış olup, alıcıda kilitlenme (deadlock) ve sızıntı (bleeding) problemleri özel dairesel tamponlu Python blokları ile çözülmüştür.
+\end{abstract}
+
+% --- Anahtar Kelimeler (Keywords) ---
+\begin{IEEEkeywords}
+NOMA, Süperpozisyon Kodlaması, Ardışık Girişim İptali (SIC), GNU Radio, LDPC, DBPSK, SDR, Spektral Verimlilik.
+\end{IEEEkeywords}
+
+% --- Makale Bölümleri (Sections) ---
+\input{sections/1_giris}
+\input{sections/2_teorik_altyapi}
+\input{sections/3_sistem_tasarimi}
+\input{sections/4_simulation}
+\input{sections/5_sonuc}
+
+% --- Kaynakça ---
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

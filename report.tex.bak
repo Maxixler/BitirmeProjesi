@@ -1,0 +1,1126 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{turkish}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+\urlstyle{same}
+
+\title{GNU RADIO TABANLI GÜÇ ETKİ ALANLI NOMA SİSTEMİ İLE ARDIŞIK GİRİŞİM İPTALİ (SIC) UYGULAMASI}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{GNU RADIO TABANLI GÜÇ ETKİ ALANLI NOMA SİSTEMİ İLE ARDIŞIK GİRİŞİM İPTALİ (SIC) UYGULAMASI}
+
+\subsection{Bitirme Projesi Raporu}
+
+\textbf{\1} Elektrik-Elektronik Mühendisliği  
+\textbf{\1} 2025–2026
+
+---
+
+\subsection{İÇİNDEKİLER}
+
+1. \href{\2}{\1}
+2. \href{\2}{\1}
+3. \href{\2}{\1}
+4. \href{\2}{\1}
+5. \href{\2}{\1}
+6. \href{\2}{\1}
+7. \href{\2}{\1}
+8. \href{\2}{\1}
+
+---
+
+\subsection{1. ÖZET (ABSTRACT)}
+
+Beşinci nesil (5G) ve sonrasındaki kablosuz haberleşme sistemlerinde spektral verimliliğin artırılması, artan kullanıcı sayısı ve veri trafiği karşısında en kritik mühendislik hedeflerinden biri hâline gelmiştir. Bu bağlamda, Ortogonal Olmayan Çoklu Erişim (Non-Orthogonal Multiple Access — NOMA) tekniği, aynı zaman-frekans kaynağının birden fazla kullanıcı tarafından eş zamanlı paylaşılmasına olanak tanıyan bir fiziksel katman çözümü olarak öne çıkmaktadır.
+
+Bu bitirme projesinde, Güç Etki Alanlı NOMA (Power-Domain NOMA — PD-NOMA) mimarisi kullanılarak iki kullanıcılı bir inen hat (downlink) senaryosu için uçtan uca bir alıcı-verici (transceiver) sistemi tasarlanmış ve GNU Radio Companion (GRC) ortamında gerçeklenmiştir. Verici tarafında \textbf{\1} prensibi ile iki kullanıcının Diferansiyel BPSK (DBPSK) ile modüle edilmiş sinyalleri farklı güç katsayıları ($\alpha_1 = 0.894$, $\alpha_2 = 0.447$; sırasıyla %80 ve %20 güç tahsisi) atanarak aynı taşıyıcı üzerinde birleştirilmiştir. Alıcı tarafında ise \textbf{\1} algoritması uygulanarak, önce baskın (güçlü) kullanıcının sinyali çözülmüş, ardından bu sinyal yeniden oluşturulup bileşik sinyalden çıkarılmak suretiyle zayıf kullanıcının verisi elde edilmiştir.
+
+Sistem, IEEE 802.11n standardına uygun LDPC (Low-Density Parity-Check) kanal kodlaması ($n = 1296$, $k = 648$, $R = 1/2$), kök yükseltilmiş kosinüs (Root Raised Cosine — RRC) darbe şekillendirme, MMSE tabanlı polifaz sembol senkronizasyonu ve Costas döngüsü tabanlı taşıyıcı kurtarma blokları ile donatılmıştır. AWGN (Additive White Gaussian Noise) kanal modeli altında, $f_s = 200 \text{ kHz}$ örnekleme frekansı ve $\text{sps} = 4$ sembol başına örnek konfigürasyonunda gerçekleştirilen simülasyonlarda, Kullanıcı 1 (yakın kullanıcı, %80 güç tahsisi) için başarılı dosya transferi doğrulanmış olup, çapraz korelasyon tabanlı SIC hizalama algoritması ile Kullanıcı 2 (uzak kullanıcı, %20 güç tahsisi) sinyalinin çözümlenmesi gerçekleştirilmiştir. Elde edilen sonuçlar, yazılım tabanlı radyo (Software Defined Radio — SDR) platformu üzerinde NOMA-SIC mimarisinin uygulanabilirliğini ortaya koymakta ve gelecekte USRP E310 donanımı ile gerçek zamanlı kablosuz doğrulamaya yönelik bir temel oluşturmaktadır.
+
+\textbf{\1} NOMA, Süperpozisyon Kodlaması, Ardışık Girişim İptali (SIC), GNU Radio, LDPC, DBPSK, SDR, 5G, Spektral Verimlilik, USRP.
+
+---
+
+\subsection{2. GİRİŞ VE LİTERATÜR ÖZETİ}
+
+\subsubsection{2.1. Motivasyon ve Problem Tanımı}
+
+Kablosuz haberleşme sistemlerinin evrimi, birinci nesilden (1G) beşinci nesile (5G) ve ötesine uzanan süreçte, giderek artan veri trafiği, kullanıcı yoğunluğu ve düşük gecikme gereksinimlerini karşılama zorunluluğuyla şekillenmiştir. Uluslararası Telekomünikasyon Birliği (ITU) tarafından tanımlanan IMT-2020 vizyonuna göre, 5G sistemlerinin hedefleri arasında 10 Gbps tepe veri hızı, 1 ms gecikme süresi ve $10^6$ cihaz/km² bağlantı yoğunluğu yer almaktadır [1]. Bu hedefler doğrultusunda, sınırlı frekans spektrumunun verimli kullanılması kritik bir mühendislik problemi olarak öne çıkmaktadır.
+
+Geleneksel kablosuz haberleşme sistemlerinde kullanılan Ortogonal Çoklu Erişim (Orthogonal Multiple Access — OMA) teknikleri — FDMA, TDMA, CDMA ve OFDMA — kullanıcıları frekans, zaman, kod veya alt-taşıyıcı boyutlarında birbirinden ayırarak ortogonallik sağlamaktadır. Bu ortogonallik ilkesi, kullanıcılar arası girişimi (inter-user interference) ortadan kaldırma avantajını sunarken, aynı zamanda kaynak tahsisinde esnekliği ve toplam spektral verimliliği sınırlandırmaktadır. Özellikle heterojen kullanıcı dağılımlarında — yani kanal koşullarının büyük farklılıklar gösterdiği senaryolarda — OMA yöntemlerinin Shannon kapasitesine yaklaşma kabiliyeti zayıflamaktadır.
+
+\subsubsection{2.2. Non-Ortogonal Çoklu Erişim (NOMA) Kavramı}
+
+NOMA, ortogonallik kısıtlamasını kaldırarak birden fazla kullanıcının \textbf{\1} eş zamanlı olarak paylaşmasını mümkün kılan bir fiziksel katman çoklu erişim tekniğidir. Literatürde NOMA teknikleri iki ana kategoride sınıflandırılmaktadır:
+
+1. \textbf{\1} Kullanıcılara farklı güç seviyeleri atanarak sinyallerin süperpozisyon kodlaması yoluyla üst üste bindirilmesine dayanır. Alıcı tarafında SIC algoritması ile girişim giderimi yapılır [2].
+
+2. \textbf{\1} SCMA (Sparse Code Multiple Access) ve MUSA (Multi-User Shared Access) gibi teknikleri kapsayan, kullanıcıların seyrek veya düşük korelasyonlu kodlarla ayrıştırıldığı yaklaşımlardır.
+
+Bu projede, implementasyon karmaşıklığı ve kavramsal netlik açısından \textbf{\1} mimarisi tercih edilmiştir.
+
+\subsubsection{2.3. OMA ve NOMA Karşılaştırması}
+
+Aşağıdaki tablo, OMA ve NOMA tekniklerinin temel karakteristiklerini karşılaştırmaktadır:
+
+| Özellik | OMA (OFDMA vb.) | PD-NOMA |
+|:---|:---|:---|
+| \textbf{\1} | Her kullanıcıya ayrık alt-taşıyıcı/zaman dilimi | Tüm kullanıcılar aynı kaynağı paylaşır |
+| \textbf{\1} | Ortogonallik ile sıfırlanır | Kontrollü girişim, alıcıda SIC ile giderilir |
+| \textbf{\1} | Kullanıcı sayısı ile ölçeklenmez | Kullanıcı sayısı arttıkça kapasite kazancı sunar |
+| \textbf{\1} | Zayıf kullanıcılar aleyhine eşitsizlik | Güç tahsisi ile adalet kontrol edilebilir |
+| \textbf{\1} | Düşük (doğrudan çözümleme) | Yüksek (SIC algoritması gereklidir) |
+| \textbf{\1} | Sınırlı | Broadcast kanal kapasitesine yaklaşır |
+
+NOMA'nın en belirgin üstünlüğü, aynı spektral kaynak üzerinde birden fazla kullanıcıya hizmet vermesi nedeniyle toplam sistem kapasitesini artırmasıdır. Broadcast kanal kapasitesine ulaşmak için, güçlü kullanıcıya atanan düşük güç ve zayıf kullanıcıya atanan yüksek güç ile Shannon sınırına yaklaşılabilmektedir. Ancak, bu kazanım alıcı tarafındaki SIC karmaşıklığı pahasına elde edilmektedir.
+
+\subsubsection{2.4. Literatürde NOMA Çalışmaları}
+
+NOMA kavramının teorik temelleri, çok kullanıcılı bilgi teorisi çerçevesinde Cover (1972) tarafından ortaya konulan yayın kanalı (broadcast channel) kapasitesi analizine dayanmaktadır [3]. Saito vd. (2013) tarafından yayımlanan çalışmada, güç etki alanlı NOMA'nın 3GPP-LTE sistemlerine entegrasyonu ilk kez önerilmiştir [4]. Dai vd. (2015), NOMA'nın 5G kablosuz ağlar için bir anahtar teknoloji olduğunu ortaya koyan kapsamlı bir derleme çalışması sunmuştur [5]. Ding vd. (2014), çeşitli kanal koşulları altında PD-NOMA'nın ergodik kapasitesini ve kesinti olasılığını (outage probability) analiz etmiştir [6]. İslam vd. (2017) ise güç tahsisi stratejileri ve SIC alıcı tasarımına ilişkin detaylı bir çerçeve geliştirmiştir [7].
+
+LDPC kodlarının NOMA sistemlerine entegrasyonu açısından, Gallager (1962) tarafından ortaya konulan temel LDPC çerçevesi [8] ve MacKay ve Neal (1996) tarafından gösterilen Shannon sınırına yakın performans [9], bu projede kullanılan IEEE 802.11n standardı LDPC kodlarının teorik altyapısını oluşturmaktadır.
+
+GNU Radio platformu üzerinde NOMA implementasyonu açısından, SDR (Software Defined Radio) tabanlı çalışmalar sınırlı sayıdadır ve bu proje, uçtan uca bir PD-NOMA transceiver'ın GNU Radio ortamında IEEE 802.11n LDPC kodlama ve DBPSK modülasyonu ile birlikte gerçeklenmesi bakımından özgün bir katkı sunmaktadır.
+
+\subsubsection{2.5. Projenin Amacı ve Kapsamı}
+
+Bu projenin temel amacı, iki kullanıcılı inen hat PD-NOMA senaryosunda:
+
+1. Verici tarafında süperpozisyon kodlaması ile sinyal birleştirme,
+2. IEEE 802.11n LDPC kanal kodlaması ($R = 1/2$) ile hata dayanıklılığı sağlama,
+3. AWGN kanal modeli altında (ayarlanabilir gürültü, frekans kayması ve zamanlama sapması ile) iletim simülasyonu,
+4. Alıcı tarafında çapraz korelasyon tabanlı SIC algoritması ile ardışık kullanıcı çözümleme
+
+adımlarını kapsayan uçtan uca bir haberleşme zincirini GNU Radio Companion ortamında tasarlamak, gerçeklemek ve performansını değerlendirmektir.
+
+---
+
+\subsection{3. TEORİK ALTYAPI VE MATEMATİKSEL MODEL}
+
+\subsubsection{3.1. Süperpozisyon Kodlaması (Superposition Coding)}
+
+Güç etki alanlı NOMA'nın temel mekanizması, birden fazla kullanıcının sinyallerinin farklı güç katsayılarıyla ağırlıklandırılarak toplam bir sinyal olarak iletilmesidir. İki kullanıcılı bir inen hat senaryosunda, baz istasyonu (BS) tarafından iletilen süperpoze sinyal aşağıdaki şekilde ifade edilmektedir:
+
+$$s(t) = \sqrt{a_1 P} \cdot x_1(t) + \sqrt{a_2 P} \cdot x_2(t)$$
+
+Burada:
+- $P$: Toplam iletim gücü,
+- $x_1(t)$ ve $x_2(t)$: Sırasıyla Kullanıcı 1 (yakın/güçlü kanal) ve Kullanıcı 2 (uzak/zayıf kanal) için modüle edilmiş sembol dizileri,
+- $a_1$ ve $a_2$: Güç tahsis katsayıları ($a_1 + a_2 = 1$, $a_1 > a_2$).
+
+NOMA ilkesi gereğince, bu projede güç tahsisi:
+
+$$a_1 = 0.8, \quad a_2 = 0.2$$
+
+olarak belirlenmiştir. Normalize edilmiş birim güç ($P = 1$) varsayımı altında, genlik katsayıları:
+
+$$\alpha_1 = \sqrt{a_1} = \sqrt{0.8} \approx 0.894 \approx \frac{2}{\sqrt{5}}$$
+
+$$\alpha_2 = \sqrt{a_2} = \sqrt{0.2} \approx 0.447 \approx \frac{1}{\sqrt{5}}$$
+
+olarak hesaplanmıştır. Güç normalizasyonu doğrulaması:
+
+$$\alpha_1^2 + \alpha_2^2 = 0.8 + 0.2 = 1.0$$
+
+Süperpoze sinyal, genlik cinsinden:
+
+$$s(t) = 0.894 \cdot x_1(t) + 0.447 \cdot x_2(t)$$
+
+şeklinde yazılabilir. Burada Kullanıcı 1, yakın kullanıcı (near user) olarak daha yüksek güç alırken; Kullanıcı 2, uzak kullanıcı (far user) olarak daha düşük güç almaktadır.
+
+\paragraph{3.1.1. Güç Tahsis Stratejisi ve Konstelasyon Analizi}
+
+BPSK modülasyonu altında ($x_i \in \{-1, +1\}$), süperpoze sinyalin konstelasyon uzayı dört noktadan oluşmaktadır:
+
+| $x_1$ | $x_2$ | $s = \alpha_1 x_1 + \alpha_2 x_2$ | Bölge |
+|:---:|:---:|:---:|:---:|
+| +1 | +1 | $+0.894 + 0.447 = +1.341$ | Pozitif |
+| +1 | −1 | $+0.894 − 0.447 = +0.447$ | Pozitif |
+| −1 | +1 | $−0.894 + 0.447 = −0.447$ | Negatif |
+| −1 | −1 | $−0.894 − 0.447 = −1.341$ | Negatif |
+
+Bu konstelasyon yapısında, sıfır karar eşiği ($\text{threshold} = 0$) kullanılarak Kullanıcı 1'in ($x_1$) sembol kararı güvenilir bir şekilde verilebilmektedir; zira $\alpha_1 > \alpha_2$ koşulu, tüm olası $s$ değerlerinin $x_1$'in işaretiyle aynı yönde kalmasını garanti etmektedir. Bu özellik, SIC'nin ilk aşamasında güçlü kullanıcının doğru çözülmesinin temelini oluşturmaktadır.
+
+\subsubsection{3.2. AWGN Kanal Modeli}
+
+Verici çıkışından alıcı girişine kadar olan iletim kanalı, Toplamsal Beyaz Gauss Gürültüsü (AWGN) modeli ile temsil edilmektedir:
+
+$$r(t) = h \cdot s(t) + n(t)$$
+
+Burada:
+- $h$: Kanal katsayısı (bu projede $h = 1.0$, düz sönümleme),
+- $n(t)$: Sıfır ortalamalı ve $\sigma_n^2$ varyanslı karmaşık Gauss gürültüsü.
+
+GNU Radio'daki \texttt{\1} bloğunda konfigüre edilen parametreler:
+
+| Parametre | Değer | Açıklama |
+|:---|:---|:---|
+| Gürültü Gerilimi ($\sigma_n$) | $0.1$ (ayarlanabilir, 0–2 aralığı) | AWGN standart sapması |
+| Frekans Kayması ($\Delta f$) | $0.01$ (ayarlanabilir, $\pm 0.25$ aralığı) | Normalize frekans ofseti |
+| Zamanlama Sapması ($\epsilon$) | $1.0001$ (ayarlanabilir, 0.999–1.001 aralığı) | Örnekleme frekansı sapma oranı |
+| Kanal Katsayıları | $[1.0]$ | Tek-dokunuşlu düz sönümleme |
+| Etiket Geçirme | \texttt{\1} | Akış etiketlerini korur |
+
+Varsayılan gürültü gerilimi ($\sigma_n = 0.1$) ile birim güç iletim varsayımı altında Sinyal-Gürültü Oranı (SNR):
+
+$$\text{SNR} = \frac{P}{\sigma_n^2} = \frac{1}{(0.1)^2} = 100 \quad (\approx 20 \text{ dB})$$
+
+Qt GUI kaydırıcıları (slider) aracılığıyla gürültü gerilimi, frekans kayması ve zamanlama sapması gerçek zamanlı olarak ayarlanabilmekte; bu sayede sistemin farklı kanal koşullarındaki davranışı interaktif olarak incelenebilmektedir.
+
+\subsubsection{3.3. Ardışık Girişim İptali (Successive Interference Cancellation — SIC)}
+
+SIC, NOMA alıcısının temel bileşenidir ve çok kullanıcılı girişimin kademeli olarak giderilmesini sağlar. İki kullanıcılı senaryoda SIC süreci aşağıdaki adımlardan oluşmaktadır:
+
+\paragraph{Adım 1: Güçlü Kullanıcının Çözülmesi (User 1 Decoding)}
+
+Alınan sinyal $r(t)$ üzerinde, baskın güce sahip olan Kullanıcı 1'in sinyali doğrudan çözümlenir. Kullanıcı 2'nin sinyali bu aşamada girişim olarak ele alınır:
+
+$$\hat{x}_1 = \text{Dec}\left\{ r(t) \right\} = \text{Dec}\left\{ \alpha_1 x_1(t) + \alpha_2 x_2(t) + n(t) \right\}$$
+
+Kullanıcı 1 için Sinyal-Girişim-Artı-Gürültü Oranı (SINR):
+
+$$\text{SINR}_1 = \frac{a_1 P}{a_2 P + \sigma_n^2} = \frac{0.8}{0.2 + 0.01} = \frac{0.8}{0.21} \approx 3.81 \quad (\approx 5.81 \text{ dB})$$
+
+\paragraph{Adım 2: Güçlü Sinyalin Yeniden Oluşturulması (Signal Reconstruction)}
+
+Çözülen $\hat{x}_1$ verisi, verici tarafındaki işlem zinciri ile aynı adımlardan (LDPC kanal kodlama, BPSK sembol eşleme, güç ölçekleme) geçirilerek yeniden oluşturulur:
+
+$$\hat{s}_1(t) = \alpha_1 \cdot \text{Mod}\left\{ \text{Enc}\left\{ \hat{x}_1 \right\} \right\}$$
+
+Bu projede, yeniden oluşturma süreci LDPC kodlama → BPSK sembol haritası → $\times 0.894$ genlik ölçekleme adımlarını kapsamaktadır. \texttt{\1} bloğu, çözülmüş bitleri doğrudan $\{-1.0 + 0j, +1.0 + 0j\}$ karmaşık BPSK sembollerine eşlemektedir.
+
+\paragraph{Adım 3: Girişim İptali (Interference Subtraction)}
+
+Yeniden oluşturulan güçlü kullanıcı sinyali, SIC hizalama bloğu tarafından zamanlama ve faz açısından hizalandıktan sonra alınan bileşik sinyalden çıkarılır:
+
+$$r_{\text{clean}}(t) = r(t) - \hat{s}_1(t - \hat{\tau}) \cdot \hat{A} \cdot e^{j\hat{\phi}}$$
+
+Burada $\hat{\tau}$ tahmin edilen zamanlama gecikmesi, $\hat{A}$ genlik düzeltme faktörü ve $\hat{\phi}$ faz ofseti tahminidir. Eğer kod çözme hatasız ($\hat{x}_1 = x_1$) ve hizalama mükemmel ise:
+
+$$r_{\text{clean}}(t) = \alpha_2 x_2(t) + n(t)$$
+
+\paragraph{Adım 4: Zayıf Kullanıcının Çözülmesi (User 2 Decoding)}
+
+Temizlenmiş sinyal üzerinde Kullanıcı 2'nin verisi çözümlenir:
+
+$$\hat{x}_2 = \text{Dec}\left\{ r_{\text{clean}}(t) \right\}$$
+
+Kullanıcı 2 için SNR (ideal SIC sonrası):
+
+$$\text{SNR}_2 = \frac{a_2 P}{\sigma_n^2} = \frac{0.2}{0.01} = 20 \quad (\approx 13.01 \text{ dB})$$
+
+\paragraph{3.3.1. SIC Hata Yayılımı (Error Propagation)}
+
+SIC sürecinin başarısı, Adım 1'deki kod çözme doğruluğuna kritik biçimde bağlıdır. Kullanıcı 1'in hatalı çözülmesi durumunda, artık girişim (residual interference) ortaya çıkar:
+
+$$r_{\text{clean}}(t) = \alpha_2 x_2(t) + n(t) + \alpha_1 \left[ x_1(t) - \hat{x}_1(t) \right]$$
+
+$\alpha_1 \left[ x_1(t) - \hat{x}_1(t) \right]$ terimi hata yayılımını temsil etmekte olup, $\alpha_1 / \alpha_2 = 2$ olması nedeniyle her bir hatalı sembol, Kullanıcı 2'nin sinyalini $2:1$ oranında bastırma potansiyeline sahiptir.
+
+Benzer şekilde, zamanlama hizalamasındaki 1 sembol kayma durumunda artık girişim:
+
+$$r_{\text{clean}}[n] = r[n] - \alpha_1 x_1[n-1] = \alpha_1(x_1[n] - x_1[n-1]) + \alpha_2 x_2[n] + n[n]$$
+
+biçimini alır. $\alpha_1 = 2\alpha_2$ olduğundan, bu diferansiyel girişim terimi Kullanıcı 2 sinyalini tamamen bastırabilir. Bu nedenle, güçlü kanal kodlaması (LDPC) ve hassas zamanlama hizalaması büyük önem taşımaktadır.
+
+\subsubsection{3.4. LDPC Kanal Kodlaması}
+
+Düşük Yoğunluklu Parite Kontrol (Low-Density Parity-Check — LDPC) kodları, Shannon sınırına yakın performans sunan modern ileri hata düzeltme (Forward Error Correction — FEC) kodlarıdır [8, 9]. Bu projede kullanılan LDPC kodu, IEEE 802.11n (Wi-Fi) standardından alınmış olup aşağıdaki parametrelere sahiptir:
+
+| Parametre | Değer |
+|:---|:---|
+| \textbf{\1} | 1296 bit |
+| \textbf{\1} | 648 bit |
+| \textbf{\1} | 648 bit |
+| \textbf{\1} | $648/1296 = 0.5$ (tam yarı oran) |
+| \textbf{\1} | \texttt{\1} |
+| \textbf{\1} | 54 (yarı-döngüsel yapı) |
+| \textbf{\1} | \texttt{\1} (parite matrisi tabanlı) |
+| \textbf{\1} | \texttt{\1} (maks. iterasyon: 50) |
+| \textbf{\1} | \texttt{\1} (delme yok) |
+
+\paragraph{3.4.1. IEEE 802.11n LDPC Matrisi ve Yarı-Döngüsel Yapı}
+
+Kullanılan LDPC kodu, IEEE 802.11n standardında tanımlanan yarı-döngüsel (quasi-cyclic) bir yapıya sahiptir. Parite kontrol matrisi $\mathbf{H}$, $Z = 54$ boyutlu döngüsel permütasyon alt-matrislerinden oluşmaktadır:
+
+$$\mathbf{H} = \begin{bmatrix} \mathbf{P}_{0,0} & \mathbf{P}_{0,1} & \cdots & \mathbf{P}_{0,23} \\ \mathbf{P}_{1,0} & \mathbf{P}_{1,1} & \cdots & \mathbf{P}_{1,23} \\ \vdots & \vdots & \ddots & \vdots \\ \mathbf{P}_{11,0} & \mathbf{P}_{11,1} & \cdots & \mathbf{P}_{11,23} \end{bmatrix}$$
+
+Burada her $\mathbf{P}_{i,j}$, $54 \times 54$ boyutunda bir döngüsel permütasyon matrisi veya sıfır matrisidir. Toplam boyutlar: $648 \times 1296$ ($12 \times 24$ alt-matris ızgarası).
+
+Matrisin sütun ağırlıkları değişkenlik göstermektedir: ilk 54 sütun yüksek ağırlığa (11'e kadar) sahipken, geri kalan sütunlar 2–4 ağırlık aralığındadır. Bu yapı, düzensiz (irregular) LDPC kodlarının üstün hata düzeltme performansını sağlamaktadır.
+
+Geçerli bir LDPC kod sözcüğü $\mathbf{c}$, aşağıdaki koşulu sağlar:
+
+$$\mathbf{H} \cdot \mathbf{c}^T = \mathbf{0} \pmod{2}$$
+
+\paragraph{3.4.2. Alist Dosya Formatı}
+
+LDPC kodunun yapısını tanımlayan parite kontrol matrisi, MacKay alist formatında saklanmaktadır (\texttt{\1}, 44,030 bayt). Bu formatta:
+
+- İlk satır: $n = 1296$ (sütun sayısı) ve $m = 648$ (satır sayısı),
+- İkinci satır: Maksimum sütun ağırlığı ve maksimum satır ağırlığı,
+- Sonraki satırlar: Her sütun ve satırdaki sıfır olmayan elemanların pozisyonları.
+
+\paragraph{3.4.3. Yük Boyutu ve LDPC Eşleşmesi}
+
+Bu projede her paket $\text{payload\_size} = 77$ bayt ($= 616$ bit) kullanıcı verisine sahiptir. CRC-32 eklenmesi (4 bayt) sonrası $81$ bayt ($= 648$ bit) elde edilmekte olup, bu değer LDPC kodunun mesaj uzunluğu $k = 648$ ile birebir örtüşmektedir. LDPC kodlama sonrası her paket $n = 1296$ bit uzunluğundaki kod sözcüğüne dönüşür; bu parametre SIC hizalama bloğundaki \texttt{\1} sembol değeriyle doğrudan ilişkilidir.
+
+\subsubsection{3.5. Diferansiyel BPSK (DBPSK) Modülasyonu}
+
+Bu projede verici tarafında \textbf{\1} modülasyonu kullanılmaktadır. Diferansiyel kodlamada, bilgi verinin mutlak faz değerinde değil, ardışık semboller arasındaki faz farkında taşınır:
+
+$$d_k = b_k \oplus d_{k-1}$$
+
+Burada $b_k$ giriş biti, $d_k$ diferansiyel kodlanmış bit ve $\oplus$ XOR işlemidir. BPSK sembol eşlemesi:
+
+$$x_k = 2d_k - 1 = \begin{cases} +1 & d_k = 1 \\ -1 & d_k = 0 \end{cases}$$
+
+Diferansiyel kodlamanın avantajı, alıcıda mutlak faz referansı gerektirmeden çözümleme yapılabilmesidir; bu özellik, Costas döngüsünün $180°$ faz belirsizliğini ortadan kaldırmaktadır.
+
+Alıcı tarafında diferansiyel çözme, özel gömülü Python bloğu (\texttt{\1}) ile yumuşak karar (soft-decision) formatında gerçekleştirilmektedir:
+
+$$\hat{b}_k^{\text{soft}} = -(y_k \cdot y_{k-1})$$
+
+Burada $y_k$ yumuşak konstelasyon çıkışıdır. Negatif işaret, polarite eşleştirmesi için uygulanmaktadır. Yumuşak karar bilgisinin korunması, aşağı yöndeki LDPC kod çözücünün performansı açısından kritik öneme sahiptir.
+
+AWGN kanalında kodlanmamış DBPSK'nın bit hata olasılığı (BER):
+
+$$P_b = \frac{1}{2} e^{-E_b/N_0}$$
+
+Bu ifade, tutarlı (coherent) BPSK'ya kıyasla yaklaşık 1 dB'lik bir performans kaybına karşılık gelmektedir; ancak diferansiyel kodlamanın sağladığı faz belirsizliği çözümü ve pratik alıcı tasarımı kolaylığı bu kaybı telafi etmektedir.
+
+\subsubsection{3.6. Darbe Şekillendirme: Kök Yükseltilmiş Kosinüs (RRC) Filtresi}
+
+Sembolleri arası girişimi (Inter-Symbol Interference — ISI) önlemek ve bant genişliğini kontrol etmek amacıyla, Kök Yükseltilmiş Kosinüs darbe şekillendirme filtresi kullanılmıştır. RRC filtresinin frekans tepkisi:
+
+$$H_{\text{RRC}}(f) = \begin{cases} \sqrt{T_s} & |f| \leq \frac{1-\beta}{2T_s} \\ \sqrt{\frac{T_s}{2}\left[1 + \cos\left(\frac{\pi T_s}{\beta}\left(|f| - \frac{1-\beta}{2T_s}\right)\right)\right]} & \frac{1-\beta}{2T_s} < |f| \leq \frac{1+\beta}{2T_s} \\ 0 & |f| > \frac{1+\beta}{2T_s} \end{cases}$$
+
+Burada $\beta$ aşırı bant genişliği (excess bandwidth / roll-off) faktörüdür. Bu projede $\beta = 0.35$ olarak konfigüre edilmiştir. Filtre uzunluğu $11 \times \text{sps} = 44$ dokunuş (tap) olarak belirlenmiştir. Verici tarafındaki \texttt{\1} bloğu dahili RRC darbe şekillendirme uygularken, alıcı tarafında ayrı bir \texttt{\1} bloğu eşleştirilmiş filtreleme işlevini üstlenmektedir.
+
+Verici ve alıcıdaki eşleştirilmiş RRC filtrelerinin kaskadı, ISI'yi sıfırlayan Yükseltilmiş Kosinüs (RC) darbe biçimini oluşturur:
+
+$$H_{\text{RC}}(f) = H_{\text{RRC}}(f) \cdot H_{\text{RRC}}(f) = |H_{\text{RRC}}(f)|^2$$
+
+---
+
+\subsection{4. GNU RADIO TABANLI SİSTEM TASARIMI (BLOK ANALİZİ)}
+
+Bu bölümde, GNU Radio Companion (GRC) ortamında tasarlanan NOMA-SIC dosya transferi sisteminin tüm blokları, parametreleri ve sinyal akış yolları detaylı olarak incelenmektedir. Sistem, üç ana katmandan oluşmaktadır: Verici (Transmitter), Kanal Modeli (Channel Model) ve Alıcı (Receiver/SIC). Toplam blok envanteri 60'ın üzerindedir ve 16 sanal sinyal yolu (virtual sink/source) çifti ile karmaşık sinyal akışı yönetilmektedir.
+
+\subsubsection{4.0. Sistem Değişkenleri (Variable Blocks)}
+
+Akış diyagramında tanımlanan 14 adet global sistem değişkeni aşağıdaki tabloda özetlenmiştir:
+
+| Değişken Adı | Değer | Açıklama |
+|:---|:---|:---|
+| \texttt{\1} | $200{,}000$ Hz ($200$ kHz) | Örnekleme frekansı |
+| \texttt{\1} | $4$ | Sembol başına örnek sayısı |
+| \texttt{\1} | $77$ bayt | Paket yük boyutu |
+| \texttt{\1} | $250$ bayt | Preambül boyutu |
+| \texttt{\1} | $8$ bayt | Postambül boyutu |
+| \texttt{\1} | $0.1$ (Qt GUI aralığı: 0–2) | AWGN gürültü gerilimi |
+| \texttt{\1} | $0.01$ (Qt GUI aralığı: $\pm 0.25$) | Normalize frekans ofseti |
+| \texttt{\1} | $1.0001$ (Qt GUI aralığı: 0.999–1.001) | Zamanlama sapma oranı |
+| \texttt{\1} | \texttt{\1} | BPSK konstelasyon nesnesi |
+| \texttt{\1} | \texttt{\1} | Başlık format nesnesi |
+| \texttt{\1} | $[0\text{xC0}, 0\text{xAF}] \times 4$ → BPSK sembolleri | Korelasyon preambül dizisi (64 sembol) |
+| \texttt{\1} | \texttt{\1} (IEEE alist) | LDPC kodlayıcı tanımı |
+| \texttt{\1} | \texttt{\1} (maks. iter: 50) | Kullanıcı 1 LDPC kod çözücü |
+| \texttt{\1} | \texttt{\1} (maks. iter: 50) | Kullanıcı 2 LDPC kod çözücü |
+
+Sembol hızı ve bant genişliği:
+
+$$R_s = \frac{f_s}{\text{sps}} = \frac{200{,}000}{4} = 50{,}000 \text{ sembol/s}$$
+
+$$B = R_s \cdot (1 + \beta) = 50{,}000 \times 1.35 = 67{,}500 \text{ Hz}$$
+
+\subsubsection{4.A. Verici (Transmitter) Katmanı}
+
+Verici katmanı, iki paralel kodlama zincirinden ve bir süperpozisyon birleştirme bloğundan oluşmaktadır. Her iki zincir yapısal olarak özdeş olmakla birlikte, bağımsız blok örnekleri ve farklı güç katsayıları ile konfigüre edilmiştir.
+
+\paragraph{4.A.1. Kullanıcı 1 Verici Zinciri (Yakın Kullanıcı — Near User)}
+
+Kullanıcı 1'in verici zinciri aşağıdaki blok sırasını takip etmektedir:
+
+\textbf{\1}
+
+\subparagraph{4.A.1.1. File Source (Dosya Kaynağı)}
+
+| Parametre | Değer |
+|:---|:---|
+| Dosya | \texttt{\1} |
+| Tekrar (Repeat) | \texttt{\1} |
+
+Bu blok, iletilecek veriyi (metin dosyası) bayt akışı olarak sisteme beslemektedir. Dosya, her biri \texttt{\1} bayt olan paketler hâlinde \texttt{\1} rakamlarının tekrarından oluşmaktadır. \texttt{\1} ayarı, dosya sonuna ulaşıldığında başa dönülerek sürekli iletim yapılmasını sağlar.
+
+\subparagraph{4.A.1.2. Stream to Tagged Stream}
+
+| Parametre | Değer |
+|:---|:---|
+| Paket Uzunluğu | \texttt{\1} = 77 bayt |
+| Etiket Anahtarı | \texttt{\1} |
+
+Sürekli bayt akışını, her biri 77 baytlık etiketlenmiş paketlere bölmektedir.
+
+\subparagraph{4.A.1.3. Stream CRC32 (Döngüsel Artıklık Kontrolü)}
+
+| Parametre | Değer |
+|:---|:---|
+| Etiket Anahtarı | \texttt{\1} |
+| Kontrol Modu | \texttt{\1} (ekleme modu) |
+
+Her pakete 4 baytlık CRC-32 sağlama toplamı ekler. CRC eklenmesi sonrası paket boyutu $77 + 4 = 81$ bayta ($= 648$ bit $= k$) yükselir. Bu değer, LDPC kodunun mesaj uzunluğu ile birebir eşleşmektedir.
+
+\subparagraph{4.A.1.4. Repack Bits (Bit Yeniden Paketleme — 8→1)}
+
+| Parametre | Değer |
+|:---|:---|
+| Giriş bit/bayt | \texttt{\1} |
+| Çıkış bit/bayt | \texttt{\1} |
+| Endianness | MSB |
+| Etiketli | \texttt{\1} |
+
+Bayt düzeyindeki veriyi, karıştırıcı ve LDPC kodlayıcının beklediği tek bit/bayt formatına dönüştürür.
+
+\subparagraph{4.A.1.5. Additive Scrambler (Toplamsal Karıştırıcı)}
+
+| Parametre | Değer |
+|:---|:---|
+| Maske (Mask) | \texttt{\1} |
+| Tohum (Seed) | \texttt{\1} |
+| Uzunluk | \texttt{\1} |
+| Bayt başına bit | \texttt{\1} |
+| Sıfırlama Etiketi | \texttt{\1} |
+
+Doğrusal geri beslemeli kaydırma yazmacı (LFSR) tabanlı karıştırıcı, 7 bitlik bir LFSR kullanarak veri dizisindeki uzun tekrarları kırar. \texttt{\1} parametresi, her paket başında LFSR'ın tohum değerine sıfırlanmasını sağlayarak, alıcıdaki de-karıştırıcı ile senkronizasyonu garanti eder. Karıştırıcının sağladığı faydalar:
+
+- Zamanlama kurtarma döngüsü için yeterli geçiş yoğunluğu,
+- DC sapmasının önlenmesi,
+- Spektral yayılmanın düzleştirilmesi.
+
+\subparagraph{4.A.1.6. FEC Extended Encoder (LDPC Kodlayıcı)}
+
+| Parametre | Değer |
+|:---|:---|
+| Kodlayıcı Nesnesi | \texttt{\1} |
+| Parite Matrisi Dosyası | \texttt{\1} |
+| Mesaj Uzunluğu ($k$) | $648$ bit |
+| Kod Sözcüğü Uzunluğu ($n$) | $1296$ bit |
+| Delme Deseni | \texttt{\1} (delme yok) |
+
+LDPC kodlayıcı, 648 bitlik mesaj bloklarını 1296 bitlik kod sözcüklerine dönüştürerek $R = 0.5$ oranlı ileri hata düzeltme koruması ekler. Kodlama işlemi sonrası paket uzunluğu tam iki katına çıkar.
+
+\subparagraph{4.A.1.7. Tagged Stream Multiply Length (×2.0)}
+
+LDPC kodlamanın paket uzunluğunu iki katına çıkarması nedeniyle, \texttt{\1} etiket değerinin güncellenmesi gerekmektedir. Bu blok, etiket değerini $\times 2.0$ çarpanı ile doğru değere günceller.
+
+\subparagraph{4.A.1.8. Protocol Formatter (Protokol Biçimlendirici)}
+
+| Parametre | Değer |
+|:---|:---|
+| Format Nesnesi | \texttt{\1} = \texttt{\1} |
+
+GNU Radio'nun standart erişim kodunu (64-bit) ve yük uzunluğu alanını içeren bir başlık üretir. Erişim kodu, alıcıdaki \texttt{\1} bloğu tarafından paket sınırlarının tespitinde kullanılır.
+
+\subparagraph{4.A.1.9. Tagged Stream Mux (Etiketli Akış Çoğullayıcı)}
+
+| Giriş | İçerik | Boyut |
+|:---|:---|:---|
+| Port 0 | Preambül (\texttt{\1} tekrarlayan) | 250 bayt |
+| Port 1 | Başlık (erişim kodu + yük uzunluğu) | Değişken |
+| Port 2 | LDPC Kodlu Yük | 1296 bit (162 bayt) |
+| Port 3 | Postambül (\texttt{\1} tekrarlayan) | 8 bayt |
+
+Dört giriş portundan gelen verileri sıralı olarak birleştirerek çerçeve (frame) yapısını oluşturur:
+
+$$\text{Çerçeve} = [\underbrace{\text{Preambül}}_{250 \text{ B}}] \| [\underbrace{\text{Başlık}}_{\text{Değişken}}] \| [\underbrace{\text{LDPC Yük}}_{162 \text{ B}}] \| [\underbrace{\text{Postambül}}_{8 \text{ B}}]$$
+
+Preambül ve postambül, \texttt{\1} bloklarından \texttt{\1} bayt dizisinin tekrarı olarak üretilmektedir.
+
+\subparagraph{4.A.1.10. Constellation Modulator (Konstelasyon Modülatörü — DBPSK)}
+
+| Parametre | Değer |
+|:---|:---|
+| Konstelasyon | BPSK (noktalar: $[-1-j, -1+j, 1+j, 1-j]$) |
+| Diferansiyel Kodlama | \texttt{\1} |
+| SPS | \texttt{\1} |
+| Aşırı Bant Genişliği ($\beta$) | $0.35$ |
+
+Bu bileşik blok, aşağıdaki işlemleri kapsüllemektedir:
+1. \textbf{\1} Bit bilgisini ardışık semboller arasındaki faz farkına dönüştürür.
+2. \textbf{\1} Kodlanmış bitleri BPSK sembollerine eşler.
+3. \textbf{\1} Her sembolün $\text{sps} = 4$ kopyasını oluşturur.
+4. \textbf{\1} $\beta = 0.35$ roll-off faktörü ile bant sınırlama ve ISI önleme.
+
+\subparagraph{4.A.1.11. Tag Gate (Etiket Kapısı)}
+
+Verici tarafındaki paket etiketlerinin kanal model bloğuna sızmasını engelleyerek, alıcının yalnızca kendi senkronizasyon mekanizmasıyla çalışmasını garanti eder.
+
+\subparagraph{4.A.1.12. Multiply Const (Sabit Çarpma — Güç Tahsisi)}
+
+| Parametre | Değer |
+|:---|:---|
+| Sabit ($\alpha_1$) | $0.894$ |
+
+Kullanıcı 1'e atanan güç katsayısı ($a_1 = 0.8$) doğrultusunda, modüle edilmiş sinyalin genliği $\alpha_1 = \sqrt{0.8} \approx 0.894$ ile ölçeklenir.
+
+\paragraph{4.A.2. Kullanıcı 2 Verici Zinciri (Uzak Kullanıcı — Far User)}
+
+Kullanıcı 2'nin verici zinciri, Kullanıcı 1 ile \textbf{\1}; yalnızca aşağıdaki parametrelerde farklılık göstermektedir:
+
+| Blok | Farklılık |
+|:---|:---|
+| \textbf{\1} | Kaynak dosya: \texttt{\1} |
+| \textbf{\1} | Kodlayıcı nesnesi: \texttt{\1} (aynı LDPC alist, ayrı örnek) |
+| \textbf{\1} | Sabit ($\alpha_2$): $0.447$ ($\sqrt{0.2}$) |
+
+\paragraph{4.A.3. Süperpozisyon Birleştirme (Add Block)}
+
+| Parametre | Değer |
+|:---|:---|
+| Tip | Karmaşık (complex) |
+| Giriş Sayısı | \texttt{\1} |
+| Vektör Uzunluğu | \texttt{\1} |
+
+İki kullanıcının güç-ölçeklenmiş sinyalleri, \texttt{\1} bloğu ile toplanarak süperpoze sinyal oluşturulur:
+
+$$s(t) = 0.894 \cdot x_1(t) + 0.447 \cdot x_2(t)$$
+
+Süperpoze sinyal, \texttt{\1} üzerinden kanal modeline yönlendirilir.
+
+\subsubsection{4.B. Kanal Modeli (Channel Model)}
+
+| Parametre | Değer | Açıklama |
+|:---|:---|:---|
+| \textbf{\1} | \texttt{\1} = $0.1$ (varsayılan) | Qt GUI kaydırıcısı ile ayarlanabilir (0–2) |
+| \textbf{\1} | \texttt{\1} = $0.01$ | Normalize frekans ofseti ($\pm 0.25$ aralığı) |
+| \textbf{\1} | \texttt{\1} = $1.0001$ | Örnekleme frekansı sapma oranı (0.999–1.001) |
+| \textbf{\1} | $[1.0]$ | Tek-dokunuşlu düz sönümleme |
+| \textbf{\1} | \texttt{\1} | Akış etiketlerini korur |
+| \textbf{\1} | $0$ | Tekrarlanabilir simülasyon |
+
+Kanal modeli, gerçekçi bir iletim ortamını taklit etmek üzere süperpoze sinyale üç tür bozulma eklemektedir:
+
+1. \textbf{\1} $\sigma_n = 0.1$ (varsayılan) ile Gauss gürültüsü,
+2. \textbf{\1} $\Delta f / f_s = 0.01$ normalize ofset, taşıyıcı frekansı sapmasını simüle eder,
+3. \textbf{\1} $\epsilon = 1.0001$, verici ve alıcı osilatörleri arasındaki saat frekansı uyumsuzluğunu temsil eder.
+
+Qt GUI kaydırıcıları sayesinde bu parametreler gerçek zamanlı olarak ayarlanabilmekte ve sistemin farklı bozulma koşullarındaki davranışı interaktif olarak gözlemlenebilmektedir.
+
+\subsubsection{4.C. Alıcı (Receiver) Katmanı ve SIC Döngüsü}
+
+Alıcı, dört ana alt-sisteme ayrılmaktadır: (1) Eşleştirilmiş Filtreleme ve Senkronizasyon, (2) Kullanıcı 1 Çözümleme, (3) SIC Yeniden Oluşturma ve Çıkarma, (4) Kullanıcı 2 Çözümleme.
+
+\paragraph{4.C.1. Eşleştirilmiş Filtreleme ve Senkronizasyon Blokları}
+
+\subparagraph{FFT RRC Filter (Eşleştirilmiş Filtre)}
+
+| Parametre | Değer |
+|:---|:---|
+| Roll-off ($\alpha$) | $0.35$ |
+| Filtre Uzunluğu | $11 \times \text{sps} = 44$ dokunuş |
+| Örnekleme Frekansı | $200{,}000$ Hz |
+| Sembol Hızı | $50{,}000$ sembol/s |
+| Desimason | $1$ (çıkış hızı değişmez) |
+
+Alıcının ön ucunda yer alan bu blok, verici tarafındaki RRC darbe şekillendirme filtresinin eşleştirilmiş karşılığıdır. FFT tabanlı uygulama, uzun filtrelerde hesaplama verimliliği sağlar. Eşleştirilmiş filtreleme sonrası toplam darbe tepkisi, Nyquist ISI kriterini sağlayan Yükseltilmiş Kosinüs biçimini alır.
+
+\subparagraph{Symbol Synchronizer (Sembol Senkronizörü — Polifaz Saat Kurtarma)}
+
+| Parametre | Değer |
+|:---|:---|
+| TED Tipi | \texttt{\1} (Sinyal × Eğim ML tahmini) |
+| SPS | \texttt{\1} |
+| Döngü Bant Genişliği | $0.045$ |
+| Sönümleme Faktörü | $1.0$ |
+| Maksimum Sapma | $1.5$ |
+| Çıkış SPS | \texttt{\1} |
+| İnterpolasyon Tipi | \texttt{\1} (MMSE-8 tap) |
+| Polifaz Filtre Sayısı | \texttt{\1} |
+| TED Kazancı | \texttt{\1} |
+
+Polifaz filtre bankası tabanlı sembol senkronizörü, alınan sinyalin optimum örnekleme anlarını belirleyerek sembol başına 4 örnekten (sps=4) tek bir optimum örneğe (sps=1) desimasyonu gerçekleştirir.
+
+\textbf{\1} \texttt{\1} yöntemi, Maximum Likelihood tabanlı bir zamanlama tahmin algoritması olup, sinyalin anlık değeri ile eğiminin çarpımından zamanlama hatası bilgisini türetir. Bu yöntem, özellikle düşük SNR'da \texttt{\1} veya \texttt{\1} algoritmalarına kıyasla daha gürbüz (robust) performans sunmaktadır.
+
+\textbf{\1} 8-dokunuşlu Minimum Ortalama Kare Hatası interpolatörü, polifaz filtre bankasının 32 alt-filtresi arasında sürekli zamanlı örnekleme anı tahmini yaparak optimum sembol değerini üretir.
+
+\textbf{\1} İkinci dereceden döngü filtresi, $\omega_n = 0.045$ bant genişliği ve $\zeta = 1.0$ sönümleme ile konfigüre edilmiştir. Maksimum sapma $1.5$ değeri, zamanlama kaymasının $\pm 1.5$ sembol aralığında izlenmesine olanak tanır.
+
+\subparagraph{Costas Loop (Costas Döngüsü — Taşıyıcı Frekansı/Faz Kurtarma)}
+
+| Parametre | Değer |
+|:---|:---|
+| Döngü Bant Genişliği | $2\pi / 100 \approx 0.0628$ rad |
+| Derece | Konstelasyon noktası sayısına göre otomatik |
+
+Costas döngüsü, taşıyıcı frekansındaki artık faz ve frekans sapmalarını ($\Delta f = 0.01$) telafi eder. Döngü bant genişliği ($\omega_n = 2\pi/100$), gürültü bastırma ve izleme hızı arasındaki dengeyi optimize eder.
+
+\subparagraph{Correlation Estimator (Korelasyon Tahmincisi)}
+
+| Parametre | Değer |
+|:---|:---|
+| Preambül Sembolleri | \texttt{\1} (64 BPSK sembol) |
+| Eşik | $0.7$ |
+| Yöntem | \texttt{\1} |
+| SPS | \texttt{\1} (sembol senkronizörü çıkışında) |
+| Mark Delay | \texttt{\1} |
+
+Bu blok, Costas Loop çıkışında sürgülü çapraz korelasyon yaparak preambül dizisini ($[0\text{xC0}, 0\text{xAF}] \times 4$ → 64 BPSK sembol) tespit eder. Korelasyon tepesi eşik değerini ($0.7$) aştığında \texttt{\1} ve \texttt{\1} etiketleri eklenir. Bu etiketler, SIC hizalama bloğu tarafından paket sınırlarının belirlenmesinde kullanılmaktadır.
+
+\paragraph{4.C.2. Kullanıcı 1 Çözümleme Zinciri (SIC Aşama 1)}
+
+Senkronizasyon bloklarından sonra, Kullanıcı 1'in verisi aşağıdaki zincir ile çözümlenir:
+
+\textbf{\1}
+
+\subparagraph{Constellation Soft Decoder (Yumuşak Konstelasyon Kod Çözücü)}
+
+| Parametre | Değer |
+|:---|:---|
+| Konstelasyon | \texttt{\1} (BPSK) |
+| Gürültü Gücü | $-1$ (otomatik tahmin) |
+
+Karmaşık sembolleri, BPSK konstelasyon haritasına göre yumuşak karar (soft-decision) çıkışına dönüştürür. Sert karar (hard-decision) yerine yumuşak karar kullanılması, LDPC kod çözücünün performansını önemli ölçüde artırmaktadır; zira yumuşak bilgi, her bitin güvenilirlik derecesini de taşır.
+
+\subparagraph{EPY Block 0 — Yumuşak Diferansiyel Çözücü (Soft Differential Decoder)}
+
+| Parametre | Değer |
+|:---|:---|
+| Sınıf | \texttt{\1} |
+| Giriş/Çıkış | \texttt{\1} / \texttt{\1} |
+| Modülüs | \texttt{\1} (BPSK modu) |
+
+Bu özel gömülü Python bloğu (\texttt{\1}, 104 satır), diferansiyel kodlamanın tersini yumuşak karar formatında gerçekleştirmektedir:
+
+$$\hat{b}_k^{\text{soft}} = -(y_k \cdot y_{k-1})$$
+
+Burada $y_k$ yumuşak konstelasyon çıkışıdır. Çarpım işlemi, diferansiyel fazı çözerken yumuşak karar büyüklüğünü korur. Negatif işaret, \texttt{\1} bloğunun beklediği polarite konvansiyonuna uyum sağlar (pozitif değer → bit '1' eşlemesi).
+
+Blok, \texttt{\1} durum değişkeni ile çağrılar arası bellek tutarak, ardışık \texttt{\1} çağrıları arasında diferansiyel referansın sürdürülmesini sağlar.
+
+\subparagraph{Correlate Access Code — Tag Stream (Erişim Kodu Korelasyonu)}
+
+| Parametre | Değer |
+|:---|:---|
+| Erişim Kodu | GNU Radio varsayılan 64-bit erişim kodu |
+| Eşik | \texttt{\1} |
+| Etiket Adı | \texttt{\1} |
+
+Yumuşak bit akışında erişim kodunu arar ve eşleşme bulunduğunda \texttt{\1} etiketi ekler.
+
+\subparagraph{FEC Extended Decoder (LDPC Kod Çözücü)}
+
+| Parametre | Değer |
+|:---|:---|
+| Kod Çözücü | \texttt{\1} |
+| Delme Deseni | \texttt{\1} |
+| Maksimum İterasyon | \texttt{\1} |
+
+LDPC kod çözücü, 1296 bitlik kod sözcüklerini 648 bitlik mesaj bloklarına çözer. 50 iterasyon limiti, hesaplama maliyeti ile hata düzeltme performansı arasındaki dengeyi gözetmektedir.
+
+\subparagraph{Tagged Stream Multiply Length (×0.5)}
+
+LDPC kod çözme sonrası paket uzunluğu yarıya düştüğünden ($1296 \to 648$ bit), \texttt{\1} etiketinin güncellenmesi gerekmektedir.
+
+\subparagraph{Stream CRC32 (Kontrol Modu)}
+
+| Parametre | Değer |
+|:---|:---|
+| Kontrol Modu | \texttt{\1} |
+
+CRC-32 sağlama toplamını doğrular; hatalı paketler düşürülür, doğru paketler çıkışa iletilir. Hata durumunda \texttt{\1} bloğuna bildirim gönderilir.
+
+\subparagraph{File Sink (Dosya Çıkışı)}
+
+| Parametre | Değer |
+|:---|:---|
+| Dosya | \texttt{\1} |
+| Ekleme Modu | \texttt{\1} |
+
+Çözümlenen Kullanıcı 1 verisi bu dosyaya yazılır.
+
+\paragraph{4.C.3. SIC Mekanizması — Yeniden Kodlama ve Çıkarma}
+
+SIC'nin kritik aşaması, Kullanıcı 1'in başarıyla çözülen verisinin yeniden oluşturularak alınan bileşik sinyalden çıkarılmasıdır. Bu süreç iki alt-bileşenden oluşur: Yeniden Kodlama Zinciri ve SIC Hizalama Bloğu.
+
+\subparagraph{SIC Yeniden Kodlama Zinciri}
+
+\textbf{\1}
+
+| Blok | Parametre | Değer |
+|:---|:---|:---|
+| \textbf{\1} | Kodlayıcı | \texttt{\1} (aynı IEEE alist) |
+| \textbf{\1} | Sembol Tablosu | $[-1.0 + 0j, +1.0 + 0j]$ (BPSK) |
+| \textbf{\1} | Sabit | $0.894$ ($= \alpha_1$) |
+
+Yeniden kodlama zincirinde önemli bir tasarım kararı, \texttt{\1} bloğu yerine doğrudan \texttt{\1} bloğunun kullanılmasıdır. Bu yaklaşım:
+- Darbe şekillendirme ve üst örnekleme adımlarını atlayarak daha basit bir yeniden oluşturma sağlar,
+- SIC hizalama bloğunun sembol düzeyinde çalışmasını mümkün kılar.
+
+\subparagraph{EPY Block 1 — Bağımsız NOMA SIC Hizalama Bloğu (Decoupled NOMA SIC Aligner)}
+
+Bu proje kapsamında geliştirilen en kritik özel blok \texttt{\1} dosyasında yer almaktadır (7.817 bayt, 170 satır). \texttt{\1} sınıfından türetilmiş bu blok, \texttt{\1} fonksiyonu ile çalışmaktadır.
+
+\textbf{\1}
+
+| Port | Yön | Tip | Kaynak |
+|:---|:---|:---|:---|
+| \texttt{\1} (Port 0) | Giriş | Karmaşık | Korelasyon Tahmincisi çıkışı |
+| \texttt{\1} (Port 1) | Giriş | Karmaşık | Yeniden oluşturulan User 1 sinyali |
+| \texttt{\1} (Port 0) | Çıkış | Karmaşık | SIC sonrası artık User 2 sinyali |
+
+\textbf{\1}
+
+| Parametre | Değer | Açıklama |
+|:---|:---|:---|
+| \texttt{\1} | $200{,}000$ | Örnekleme frekansı |
+| \texttt{\1} | $0.864$ | SIC genlik kalibrasyonu |
+| \texttt{\1} | $1296$ | LDPC kod sözcüğü uzunluğu (sembol) |
+| \texttt{\1} | $64$ | Başlık uzunluğu (sembol) |
+| \texttt{\1} | $32$ | Korelasyon arama penceresi |
+
+\textbf{\1}
+
+1. \textbf{\1} \texttt{\1} fonksiyonu \texttt{\1} döndürerek GNU Radio zamanlayıcısına "sıfır girdi ile çalışabilir" mesajı verir. Bu kritik tasarım kararı, \texttt{\1} ve \texttt{\1} portlarının bağımsız tüketilmesini sağlayarak zamanlayıcı kilitlenmesini (scheduler deadlock) önler. Gelen veriler anında dahili dairesel tamponlara (\texttt{\1}, \texttt{\1}) aktarılır.
+
+2. \textbf{\1} \texttt{\1} maksimum 50.000 örnek, \texttt{\1} maksimum $5 \times \text{payload\_size}$ örnek ile sınırlandırılmıştır.
+
+3. \textbf{\1} Yeniden oluşturulan BPSK sembolleri ($\pm 1$), DBPSK domenine dönüştürülür:
+   $$\text{tx1\_diff}[k] = \prod_{i=0}^{k} (-\text{sgn}(\text{Re}(\text{tx1}[i])))$$
+   Bu dönüşüm, verici tarafındaki diferansiyel kodlama ile eşleşme sağlar.
+
+4. \textbf{\1} \texttt{\1} fonksiyonu ile RX tamponu ve DBPSK-dönüştürülmüş TX1 arasında korelasyon hesaplanır:
+   $$C(\tau) = \sum_{n} r[n] \cdot \hat{s}_1^*[n - \tau]$$
+   Korelasyon tepesinin konumu optimal zamanlama ofsetini verir.
+
+5. \textbf{\1} Korelasyon tepesinden:
+   - Genlik: $\hat{A} = |C_{\text{peak}}| / E_{\text{tx1}}$ (burada $E_{\text{tx1}}$ TX1 enerjisi)
+   - Faz: $\hat{\phi} = \angle C_{\text{peak}}$
+   - Dinamik genlik ölçekleme: $\hat{A} > 1.10$ ise $1.5\times$ küçültme uygulanır
+
+6. \textbf{\1}
+   $$\text{buffer\_rx}[\text{aligned}] \mathrel{-}= \text{tx1\_diff} \cdot \hat{A} \cdot e^{j\hat{\phi}}$$
+
+7. \textbf{\1} İlk paket için 1000–3000 örnek aralığında geniş arama; sonraki paketler için beklenen konumdan $\pm 128$ örnek sapma ile dar arama. Paketler arası mesafe $\approx 3408$ örnek.
+
+8. \textbf{\1} Yalnızca SIC işlemi tamamlanmış (çıkarılmış veya güvenli) örnekler çıkışa iletilir.
+
+9. \textbf{\1} \texttt{\1} dosyasına her paket için kayma, faz ve genlik bilgileri yazılır.
+
+\textbf{\1}
+
+\texttt{\1} yapısının neden kullanılmadığı, bu projedeki en kritik mimari kararlardan biridir. \texttt{\1}, her iki giriş portundan eşit sayıda örnek hazır olmasını bekler. Ancak SIC döngüsündeki geri besleme yapısında:
+
+1. \texttt{\1} (Costas Loop çıkışı) gecikmesiz veri sağlar,
+2. \texttt{\1} (yeniden oluşturulan sinyal) ise User 1'in çözülmesi, LDPC kod çözme ve yeniden kodlama gecikmesini barındırır (en az 1 paketlik çerçeve gecikmesi),
+3. \texttt{\1}, \texttt{\1} verisi gelmeden \texttt{\1} verisini tüketmez,
+4. \texttt{\1} hattı ise \texttt{\1} işlenmeden yeni veri üretemez.
+
+Bu dairesel bağımlılık, GNU Radio zamanlayıcısının \textbf{\1} yol açar. \texttt{\1} yapısı, \texttt{\1} ve \texttt{\1} çağrılarıyla portları bağımsız tüketerek bu sorunu çözmektedir.
+
+\paragraph{4.C.4. Kullanıcı 2 Çözümleme Zinciri (SIC Aşama 2)}
+
+Girişimi temizlenmiş sinyal üzerinde Kullanıcı 2'nin çözümlenmesi, Kullanıcı 1 zinciri ile yapısal olarak benzer alıcı bloklarından oluşmaktadır:
+
+\textbf{\1}
+
+Tüm kod çözme blokları, Kullanıcı 1 zinciri ile aynı parametrelerde konfigüre edilmiştir. Ayrı blok örnekleri (\texttt{\1}, \texttt{\1} son ekleri) kullanılarak iki zincirin bağımsız iç durum değişkenlerine sahip olması sağlanmıştır:
+
+| Blok | Kullanıcı 1 Örneği | Kullanıcı 2 Örneği |
+|:---|:---|:---|
+| Soft Constellation Decoder | \texttt{\1} | \texttt{\1} |
+| Soft Diff Decoder (EPY) | \texttt{\1} | \texttt{\1} |
+| Correlate Access Code | \texttt{\1} | \texttt{\1} |
+| LDPC Decoder | \texttt{\1} | \texttt{\1} |
+| File Sink | \texttt{\1} | \texttt{\1} |
+
+\paragraph{4.C.5. Qt GUI Görselleştirme ve Kontrol Blokları}
+
+Gerçek zamanlı sistem izleme ve parametre ayarı için aşağıdaki Qt bileşenleri akış diyagramına eklenmiştir:
+
+\textbf{\1}
+
+| Blok | Bağlantı Noktası | Görüntülenen Bilgi |
+|:---|:---|:---|
+| \textbf{\1} ("Received Samples") | Kanal çıkışı | Alınan bileşik sinyalin zaman gösterimi (1024 örnek) |
+| \textbf{\1} ("Recovered Symbols") | Costas Loop çıkışı | Senkronize edilmiş User 1 sembolleri (256 örnek) |
+| \textbf{\1} ("USER 2") | SIC çıkışı | SIC sonrası User 2 sembolleri (256 örnek) |
+
+\textbf{\1}
+
+| Kaydırıcı | Değişken | Aralık | Adım |
+|:---|:---|:---|:---|
+| Gürültü | \texttt{\1} | $0.0$ – $2.0$ | $0.01$ |
+| Frekans Kayması | \texttt{\1} | $-0.25$ – $+0.25$ | $0.001$ |
+| Zamanlama Sapması | \texttt{\1} | $0.999$ – $1.001$ | $0.0001$ |
+
+\subsubsection{4.D. Sanal Sinyal Yolları (Virtual Sink/Source Pairs)}
+
+Akış diyagramının okunabilirliği ve yönetilebilirliği için 16 sanal sinyal yolu çifti kullanılmıştır:
+
+| Akış Kimliği | Açıklama |
+|:---|:---|
+| \texttt{\1} | Kullanıcı 1 çerçevelenmiş TX paketi |
+| \texttt{\1} | Kullanıcı 2 çerçevelenmiş TX paketi |
+| \texttt{\1} / \texttt{\1} | Protokol başlıkları |
+| \texttt{\1} / \texttt{\1} | LDPC kodlu yükler |
+| \texttt{\1} | Süperpoze NOMA sinyali |
+| \texttt{\1} | Kanal çıkışı |
+| \texttt{\1} | Costas Loop çıkışı (User 1 doğrudan çözümleme) |
+| \texttt{\1} | Korelasyon Tahmincisi çıkışı (SIC hizalama) |
+| \texttt{\1} / \texttt{\1} | Tespit edilmiş yükler |
+| \texttt{\1} | Çözülmüş User 1 bitleri (SIC yeniden kodlama girişi) |
+| \texttt{\1} | Yeniden oluşturulan User 1 sinyali (SIC çıkarma) |
+| \texttt{\1} / \texttt{\1} | Son çözülmüş bitler |
+
+\subsubsection{4.E. Çerçeve Yapısı (Frame Structure)}
+
+Her kullanıcı paketinin tam çerçeve yapısı aşağıdaki tabloda özetlenmiştir:
+
+| Segment | İçerik | Boyut | Sembol Sayısı |
+|:---|:---|:---|:---|
+| \textbf{\1} | \texttt{\1} tekrarlayan dizi | 250 bayt (2000 bit) | 256 sembol |
+| \textbf{\1} | 64-bit erişim kodu + yük uzunluğu | Değişken | ~64 sembol |
+| \textbf{\1} | LDPC kodlu kullanıcı verisi | 162 bayt (1296 bit) | 1296 sembol |
+| \textbf{\1} | \texttt{\1} tekrarlayan dizi | 8 bayt (64 bit) | ~64 sembol |
+| \textbf{\1} | — | — | \textbf{\1} |
+
+Preambül deseni \texttt{\1}:
+- Zengin geçiş yapısı sayesinde sembol senkronizörünün zamanlama kilitleme süresini hızlandırır,
+- Costas döngüsünün faz referansını yakalamasını kolaylaştırır,
+- Korelasyon tahmincisi için yüksek auto-korelasyon tepesi sağlar.
+
+Postambül ise çerçeve sonundaki RRC filtresinin kuyruk etkilerini absorbe eder.
+
+---
+
+\subsection{5. SİMÜLASYON VE PERFORMANS DEĞERLENDİRMESİ}
+
+\subsubsection{5.1. Simülasyon Ortamı ve Koşulları}
+
+| Parametre | Değer |
+|:---|:---|
+| \textbf{\1} | GNU Radio Companion 3.10.12+ |
+| \textbf{\1} | Linux (Arch Linux) |
+| \textbf{\1} | Python 3.8+ |
+| \textbf{\1} | Yazılımsal geri-döngü (software loopback) |
+| \textbf{\1} | AWGN ($\sigma_n = 0.1$, SNR ≈ 20 dB), $\Delta f = 0.01$, $\epsilon = 1.0001$ |
+| \textbf{\1} | Metin dosyası (dosya transferi senaryosu) |
+| \textbf{\1} | \texttt{\1} rakamları, her biri \texttt{\1} kez tekrarlı |
+| \textbf{\1} | Verici/alıcı dosya karşılaştırması (\texttt{\1}) |
+| \textbf{\1} | USRP E310 (2.435 GHz ISM bandı, gelecek çalışma) |
+
+\subsubsection{5.2. Çerçeve Yapısının Senkronizasyon Kararlılığı Üzerindeki Etkisi}
+
+Tasarlanan çerçeve yapısı (Preambül + Başlık + Yük + Postambül), alıcı senkronizasyon zincirinin kararlılığı açısından kritik bir rol üstlenmektedir:
+
+\paragraph{5.2.1. Preambül ve Zamanlama Kurtarma}
+
+250 baytlık ($= 2000$ bit $\approx 256$ sembol) preambül segmenti, \texttt{\1} tekrarlayan deseniyle Symbol Synchronizer bloğunun zamanlama hata detektörü için zengin geçiş yapısına sahip bir eğitim dizisi sağlamaktadır. $\text{sps} = 4$ konfigürasyonunda $256 \times 4 = 1024$ örnek zamanlama edinim penceresi sunulmaktadır; bu değer, pratikte güvenilir kilit süresini garanti etmektedir.
+
+Korelasyon Tahmincisi bloğu, 64 BPSK sembolden oluşan \texttt{\1} dizisi ile preambül sonunu tespit eder. \texttt{\1} yöntemi ve $0.7$ eşik değeri ile:
+- Gürültülü ortamda kaçırılan paket olasılığı (missed detection) düşük tutulmuş,
+- Yanlış alarm (false alarm) oranı kabul edilebilir seviyede sınırlandırılmıştır.
+
+\paragraph{5.2.2. Başlık ve Paket Sınırı Algılama}
+
+GNU Radio'nun standart 64-bit erişim kodu, düşük oto-korelasyon yan loblarına sahip bir dizi olarak seçilmiştir. \texttt{\1} bloğu ile paket sınırı tespiti yapılmakta; yük uzunluğu alanı ise her paketin boyutunu belirlemektedir.
+
+\paragraph{5.2.3. Postambül ve Kuyruk Etkileri}
+
+8 baytlık postambül segmenti, paket sonunda RRC darbe şekillendirme filtresinin geçici tepkisinin (transient response) sönümlenmesi için yeterli sembol süresi sağlamaktadır. Bu sayede ardışık paketler arasında ISI oluşumu engellenmektedir.
+
+\subsubsection{5.3. LDPC Kodlamanın SIC Hata Yayılımı Üzerindeki Rolü}
+
+SIC mekanizmasının başarısı, büyük ölçüde birinci aşamadaki (Kullanıcı 1) kod çözme doğruluğuna bağlıdır. IEEE 802.11n LDPC kodlaması, bu bağlamda birden fazla kritik işlev görmektedir:
+
+\paragraph{5.3.1. Hata Düzeltme Kapasitesi}
+
+$R = 0.5$ oranlı LDPC kodu, her 648 bitlik bilgi bloğuna 648 bitlik artıklık (redundancy) eklemektedir. Yarı-döngüsel yapısı ve düzensiz sütun ağırlıkları sayesinde, bu kod Shannon sınırına 1 dB mesafede performans sunmaktadır. 50 iterasyonluk kod çözme limiti ile:
+
+- Kullanıcı 1'in neredeyse hatasız çözülmesi ($\text{BER} < 10^{-6}$) sağlanmakta,
+- SIC çıkarma işlemindeki artık girişimin ($\alpha_1[x_1 - \hat{x}_1]$) minimize edilmesi mümkün kılınmaktadır.
+
+\paragraph{5.3.2. Yumuşak Karar ve LDPC Sinerjisi}
+
+Alıcı zincirinde \texttt{\1} → \texttt{\1} yolu ile korunan yumuşak karar (LLR) bilgisi, LDPC kod çözücünün iteratif mesaj geçirme (message passing) algoritmasının tam potansiyeline ulaşmasını sağlamaktadır. Sert karar tabanlı bir alıcıya kıyasla, yumuşak karar LDPC kombinasyonu tipik olarak 2–3 dB SNR kazancı sunmaktadır.
+
+\paragraph{5.3.3. CRC ile Çift Katmanlı Koruma}
+
+CRC-32 kontrolü, LDPC kod çözme sonrası paket bütünlüğünü doğrulayan ikinci bir koruma katmanı oluşturmaktadır. Hatalı paketlerin SIC yeniden kodlama zincirine girmesi engellenerek, hata yayılımının kaskat etkisi (cascade effect) sınırlandırılmaktadır.
+
+\subsubsection{5.4. Gözlemlenen Sonuçlar ve Tartışma}
+
+\paragraph{5.4.1. Kullanıcı 1 (Yakın Kullanıcı) Performansı}
+
+$\text{SNR} \approx 20$ dB koşullarında, Kullanıcı 1 verici dosyası (\texttt{\1}) ile alıcı çıkış dosyası (\texttt{\1}) arasında başarılı dosya transferi doğrulanmıştır. \texttt{\1} fonksiyonu ile otomatik doğrulama gerçekleştirilmiştir. LDPC kodlamasının sağladığı hata düzeltme kapasitesi, AWGN gürültüsü ve frekans/zamanlama sapmalarının etkisini büyük ölçüde telafi etmiştir.
+
+\paragraph{5.4.2. Kullanıcı 2 (Uzak Kullanıcı) ve SIC Performansı}
+
+SIC mekanizması üzerinden Kullanıcı 2 sinyalinin çözümlenmesi gerçekleştirilmiştir. Proje geliştirme sürecinde aşağıdaki teknik zorluklar gözlemlenmiş ve çözüm stratejileri uygulanmıştır:
+
+1. \textbf{\1} SIC çıkarma işleminde orijinal alınan sinyal ile yeniden oluşturulan Kullanıcı 1 sinyali arasındaki zamanlama hizalaması, örnek düzeyinde ($< 1$ sembol) hassasiyet gerektirmektedir. Çapraz korelasyon tabanlı dinamik hizalama algoritması bu soruna çözüm olarak geliştirilmiştir.
+
+2. \textbf{\1} Kanal etkilerinin (faz dönmesi, genlik değişimi) yeniden oluşturulan sinyale doğru yansıtılması gerekmektedir. SIC hizalama bloğu, korelasyon tepesinden genlik ve faz tahminleri çıkararak dinamik kalibrasyon uygulamaktadır.
+
+3. \textbf{\1} \texttt{\1} tabanlı ilk tasarım, geri besleme döngüsünün dairesel bağımlılığı nedeniyle GNU Radio zamanlayıcısının kilitlenmesine yol açmıştır. \texttt{\1} yapısına geçiş ile bu sorun çözülmüştür.
+
+4. \textbf{\1} 1 sembol hizalama hatası durumunda, $\alpha_1/\alpha_2 = 2$ oranındaki güç farkı nedeniyle User 1 kalıntısının User 2 sinyalini bastırması gözlemlenmiştir. \texttt{\1} bloğunun \texttt{\1} parametresinin doğru kalibrasyonu ile bu etki minimize edilmiştir.
+
+\subsubsection{5.5. Sistem Doğrulama Yöntemleri}
+
+Sistemin doğrulanmasında aşağıdaki yöntemler kullanılmıştır:
+
+1. \textbf{\1} \texttt{\1} fonksiyonu ile verici ve alıcı metin dosyalarının bayt düzeyinde karşılaştırması.
+2. \textbf{\1} Üç adet Qt GUI Time Sink ile:
+   - Alınan bileşik sinyal (kanal çıkışı)
+   - Senkronize edilmiş User 1 sembolleri
+   - SIC sonrası User 2 sembolleri
+3. \textbf{\1} CRC başarısız paketlerin \texttt{\1} bloğu üzerinden izlenmesi.
+4. \textbf{\1} \texttt{\1} dosyası üzerinden her paket için zamanlama kayması, faz ofseti ve genlik kalibrasyonu bilgilerinin kaydedilmesi.
+5. \textbf{\1} \texttt{\1} ve \texttt{\1} dosyaları üzerinden numpy tabanlı genlik ve korelasyon analizi (\texttt{\1}, \texttt{\1}, \texttt{\1}).
+
+---
+
+\subsection{6. SONUÇ VE GELECEK ÇALIŞMALAR}
+
+\subsubsection{6.1. Elde Edilen Bulguların Özeti}
+
+Bu bitirme projesinde, Güç Etki Alanlı NOMA (PD-NOMA) mimarisinin GNU Radio Companion platformu üzerinde uçtan uca bir gerçeklemesi başarıyla tamamlanmıştır. Projenin temel katkıları aşağıdaki şekilde özetlenebilir:
+
+1. \textbf{\1} İki kullanıcının DBPSK modüleli sinyallerinin $\alpha_1 = 0.894$ (%80 güç) ve $\alpha_2 = 0.447$ (%20 güç) katsayıları ile birleştirilmesi başarıyla uygulanmıştır.
+
+2. \textbf{\1} $R = 0.5$ oranlı LDPC kodlaması ($n = 1296$, $k = 648$), Toplamsal Karıştırıcı (LFSR $0\text{x8A}/0\text{x7F}$), CRC-32, diferansiyel kodlama ve $\beta = 0.35$ RRC darbe şekillendirme ile entegre edilmiş tam bir verici-alıcı zinciri oluşturulmuştur.
+
+3. \textbf{\1} Güçlü kullanıcının (User 1) yumuşak karar LDPC kod çözme ile çözülmesi, çözülen verisinin LDPC ile yeniden kodlanıp BPSK sembollerine eşlenmesi, ve çapraz korelasyon tabanlı hizalama ile bileşik sinyalden çıkarılması işlemleri gerçeklenmiştir. \texttt{\1} tabanlı bağımsız tamponlama yapısı ile zamanlayıcı kilitlenmesi sorunu çözülmüştür.
+
+4. \textbf{\1} AWGN kanalı ($\text{SNR} \approx 20$ dB, $\Delta f = 0.01$, $\epsilon = 1.0001$) altında Kullanıcı 1 için başarılı metin dosyası transferi otomatik olarak doğrulanmıştır.
+
+5. \textbf{\1} Qt GUI Time Sink blokları ile zaman domeni görselleştirme ve kaydırıcılarla interaktif parametre ayarlama arayüzü oluşturulmuştur.
+
+6. \textbf{\1} Proje, basit BPSK dosya transferinden (LDPC'siz) → tek kullanıcılı LDPC-BPSK → iki kullanıcılı NOMA-SIC mimarisine doğru sistematik bir geliştirme sürecini izlemiştir. Bu yaklaşım, her aşamada doğrulama yapılmasını ve sorunların kademeli olarak çözülmesini mümkün kılmıştır.
+
+\subsubsection{6.2. Projenin Akademik ve Mühendislik Katkısı}
+
+Bu çalışma, NOMA'nın teorik çerçevesinin ötesine geçerek, SDR platformu üzerinde tüm sinyal işleme blokları — diferansiyel modülasyon, IEEE 802.11n LDPC kanal kodlama, RRC darbe şekillendirme, MMSE tabanlı sembol senkronizasyonu, Costas döngüsü taşıyıcı kurtarma ve çapraz korelasyon tabanlı SIC — ile birlikte çalışan uçtan uca bir demonstrasyon sunmaktadır.
+
+Özellikle SIC hizalama bloğunun (\texttt{\1}) tasarımı, GNU Radio'nun akış tabanlı (streaming) mimarisi içinde geri beslemeli bir yapının nasıl kurulacağına dair özgün bir mühendislik çözümü ortaya koymaktadır. \texttt{\1} vs. \texttt{\1} seçiminin zamanlayıcı kilitlenmesi üzerindeki etkisi, DBPSK dönüşüm algoritması ve korelasyon tabanlı dinamik genlik/faz kalibrasyonu, bu projede ele alınan özgün teknik problemlerdir.
+
+\subsubsection{6.3. Gelecek Çalışmalar}
+
+Bu projenin sonuçları, aşağıdaki gelecek çalışma yönlerini açmaktadır:
+
+1. \textbf{\1} Tasarlanan sistemin USRP E310 (2.435 GHz ISM bandı) üzerinde gerçek zamanlı kablosuz iletim ile doğrulanması. Proje kapsamında oluşturulan \texttt{\1} akış diyagramı, bu aşamanın temelini oluşturmaktadır. Gerçek kanal bozulmalarının (çok yollu sönümleme, Doppler kayması, donanım empedans uyumsuzluğu) SIC performansı üzerindeki etkisi incelenecektir.
+
+2. \textbf{\1} Daha erişilebilir ve düşük maliyetli bir SDR platformu olan Analog Devices ADALM-PlutoSDR ile test edilmesi.
+
+3. \textbf{\1} Mevcut 2 kullanıcılı yapının 3 veya daha fazla kullanıcıya genişletilmesi ve kaskat SIC'nin hata yayılımı üzerindeki etkisinin araştırılması.
+
+4. \textbf{\1} Anlık kanal durum bilgisine (Channel State Information — CSI) dayalı dinamik güç tahsis algoritmalarının entegrasyonu. Kanal kalitesine bağlı olarak $a_1$ ve $a_2$ katsayılarının uyarlanır biçimde güncellenmesi.
+
+5. \textbf{\1} Sert karar tabanlı SIC yerine, LLR (Log-Likelihood Ratio) bilgisini SIC yeniden oluşturma zincirinde kullanan yumuşak karar SIC implementasyonu.
+
+6. \textbf{\1} BPSK'dan OFDM-NOMA mimarisine geçiş ile frekans-seçici kanallarda çalışma kabiliyetinin kazandırılması.
+
+7. \textbf{\1} Projede mevcut olan \texttt{\1} dosyasındaki kısa blok LDPC kodunun ($n = 300$, $k = 152$, $R \approx 0.507$) düşük gecikme gereksinimlerindeki performansının değerlendirilmesi.
+
+8. \textbf{\1} Farklı SNR değerlerinde sistematik BER eğrilerinin çıkarılması, teorik sınırlarla karşılaştırılması ve SIC'nin kodlama kazancı üzerindeki etkisinin nicel olarak belirlenmesi.
+
+---
+
+\subsection{7. KAYNAKÇA}
+
+[1] ITU-R, "IMT Vision – Framework and overall objectives of the future development of IMT for 2020 and beyond," Recommendation ITU-R M.2083-0, 2015.
+
+[2] Z. Ding, Y. Liu, J. Choi, Q. Sun, M. Elkashlan, C. L. I, and H. V. Poor, "Application of Non-Orthogonal Multiple Access in LTE and 5G Networks," \textit{\1}, vol. 55, no. 2, pp. 185–191, Feb. 2017.
+
+[3] T. M. Cover, "Broadcast Channels," \textit{\1}, vol. 18, no. 1, pp. 2–14, Jan. 1972.
+
+[4] Y. Saito, Y. Kishiyama, A. Benjebbour, T. Nakamura, A. Li, and K. Higuchi, "Non-Orthogonal Multiple Access (NOMA) for Cellular Future Radio Access," in \textit{\1}, Jun. 2013.
+
+[5] L. Dai, B. Wang, Y. Yuan, S. Han, C. L. I, and Z. Wang, "Non-Orthogonal Multiple Access for 5G: Solutions, Challenges, Opportunities, and Future Research Trends," \textit{\1}, vol. 53, no. 9, pp. 74–81, Sep. 2015.
+
+[6] Z. Ding, Z. Yang, P. Fan, and H. V. Poor, "On the Performance of Non-Orthogonal Multiple Access in 5G Systems with Randomly Deployed Users," \textit{\1}, vol. 21, no. 12, pp. 1501–1505, Dec. 2014.
+
+[7] S. M. R. Islam, N. Avazov, O. A. Dobre, and K. S. Kwak, "Power-Domain Non-Orthogonal Multiple Access (NOMA) in 5G Systems: Potentials and Challenges," \textit{\1}, vol. 19, no. 2, pp. 721–742, 2017.
+
+[8] R. G. Gallager, "Low-Density Parity-Check Codes," \textit{\1}, vol. 8, no. 1, pp. 21–28, Jan. 1962.
+
+[9] D. J. C. MacKay and R. M. Neal, "Near Shannon limit performance of low density parity check codes," \textit{\1}, vol. 32, no. 18, pp. 1645–1646, 1996.
+
+[10] GNU Radio Project, "GNU Radio Manual and C++ API Reference," [Çevrimiçi]. Erişim: https://wiki.gnuradio.org/
+
+[11] J. G. Proakis and M. Salehi, \textit{\1}, 5th ed., McGraw-Hill, 2008.
+
+[12] A. Goldsmith, \textit{\1}, Cambridge University Press, 2005.
+
+[13] IEEE Std 802.11n-2009, "IEEE Standard for Information Technology — Telecommunications and Information Exchange Between Systems — Local and Metropolitan Area Networks," IEEE, Oct. 2009.
+
+---
+
+\subsection{8. EKLER}
+
+\subsubsection{EK-A: Sistem Değişkenleri ve Blok Envanteri}
+
+\paragraph{A.1. Tam Değişken Listesi}
+
+| Değişken | Değer | Açıklama |
+|:---|:---|:---|
+| \texttt{\1} | 200,000 Hz | Örnekleme frekansı |
+| \texttt{\1} | 4 | Sembol başına örnek |
+| \texttt{\1} | 77 bayt | Paket yük boyutu |
+| \texttt{\1} | 250 bayt | Preambül boyutu |
+| \texttt{\1} | 8 bayt | Postambül boyutu |
+| \texttt{\1} | 0.1 | AWGN gürültü gerilimi (ayarlanabilir) |
+| \texttt{\1} | 0.01 | Normalize frekans kayması (ayarlanabilir) |
+| \texttt{\1} | 1.0001 | Zamanlama sapma oranı (ayarlanabilir) |
+| \texttt{\1} | BPSK konstelasyonu | $[-1-j, -1+j, 1+j, 1-j]$ |
+| \texttt{\1} | \texttt{\1} | Başlık format nesnesi |
+| \texttt{\1} | 64 BPSK sembol | \texttt{\1} → bit → BPSK |
+| \texttt{\1} | IEEE 802.11n LDPC encoder | n=1296, k=648 |
+| \texttt{\1} | IEEE 802.11n LDPC decoder | max_iter=50 |
+| \texttt{\1} | IEEE 802.11n LDPC decoder | max_iter=50 (User 2) |
+
+\paragraph{A.2. Blok Envanteri Özeti}
+
+| Kategori | Sayı | Örnekler |
+|:---|:---|:---|
+| Kaynak/Çıkış Blokları | 8 | 2 File Source, 2 File Sink, 4 Vector Source |
+| Değişken Blokları | 14 | samp_rate, sps, payload_size, ... |
+| FEC Blokları | 5 | 3 Encoder, 2 Decoder |
+| İşleme Blokları | ~30 | Repack, Scrambler, CRC, Mux, ... |
+| Özel Python Blokları | 3 | 2 Soft Diff Decoder, 1 SIC Aligner |
+| Sanal Yönlendirme | 32 | 16 Sink + 16 Source |
+| GUI Blokları | 6 | 3 Time Sink, 3 Range Slider |
+| \textbf{\1} | \textbf{\1} | — |
+
+\subsubsection{EK-B: LDPC Kod Parametreleri Karşılaştırması}
+
+Projede iki adet LDPC parite kontrol matrisi bulunmaktadır:
+
+| Parametre | \texttt{\1} (Aktif) | \texttt{\1} (Yedek) |
+|:---|:---|:---|
+| Kod sözcüğü uzunluğu ($n$) | 1296 | 300 |
+| Mesaj uzunluğu ($k$) | 648 | 152 |
+| Kod oranı ($R$) | $0.500$ | $\approx 0.507$ |
+| Standart | IEEE 802.11n | Özel tasarım |
+| Alt-matris boyutu ($Z$) | 54 | — |
+| Yapı | Yarı-döngüsel (quasi-cyclic) | Düzensiz |
+| Dosya boyutu | 44,030 bayt | 7,950 bayt |
+| Kullanım | Ana sistem (NOMA + LDPC) | Alternatif / test |
+
+\subsubsection{EK-C: Dosya Listesi ve Açıklamaları}
+
+| Dosya | Boyut | Açıklama |
+|:---|:---|:---|
+| \texttt{\1} | 77,375 B | Ana NOMA-SIC akış diyagramı (GRC) |
+| \texttt{\1} | 34,987 B | GRC'den üretilen Python betiği (627 satır) |
+| \texttt{\1} | 3,191 B | Yumuşak diferansiyel çözücü — User 1 (104 satır) |
+| \texttt{\1} | 3,191 B | Yumuşak diferansiyel çözücü — User 2 (104 satır) |
+| \texttt{\1} | 7,817 B | SIC hizalama bloğu — basic_block (170 satır) |
+| \texttt{\1} | 36,621 B | Tek kullanıcılı LDPC test akış diyagramı |
+| \texttt{\1} | 22,904 B | LDPC test betiği (477 satır) |
+| \texttt{\1} | 3,191 B | Yumuşak diferansiyel çözücü — LDPC test |
+| \texttt{\1} | 44,030 B | IEEE 802.11n LDPC matrisi (aktif) |
+| \texttt{\1} | 7,950 B | Kısa blok LDPC matrisi (yedek) |
+| \texttt{\1} | 26,215 B | Temel BPSK test (LDPC'siz) |
+| \texttt{\1} | 37,983 B | USRP E310 geri-döngü testi (2.435 GHz) |
+| \texttt{\1} | 9,074 B | Alternatif SIC hizalama modülü (etiket tabanlı) |
+| \texttt{\1} | 740 B | SIC genlik tanılama betiği |
+| \texttt{\1} | 2,310 B | User 1 verici kaynak dosyası |
+| \texttt{\1} | 2,310 B | User 2 verici kaynak dosyası |
+| \texttt{\1} | 2,310 B | User 1 alıcı çıkış dosyası |
+| \texttt{\1} | 1,540 B | User 2 alıcı çıkış dosyası |
+| \texttt{\1} | 3,825 B | SIC hata ayıklama günlüğü |
+
+\subsubsection{EK-D: Sinyal Akış Diyagramı Bağlantı Haritası}
+
+\paragraph{D.1. Verici Tarafı:}
+\begin{verbatim}
+┌─────────────────────────── User 1 TX Chain ────────────────────────────────┐
+│ File Source(tx1) → Stream2TS(77B) → CRC32 → Repack(8→1) → Scrambler →    │
+│ LDPC Enc → Multiply Length(×2) → [Header Formatter + LDPC Payload] →      │
+│ TagMux[Preamble(250B), Header, LDPC_Payload, Postamble(8B)] →             │
+│ Constellation Mod(DBPSK, sps=4, β=0.35) → Tag Gate →                     │
+│ Multiply Const(α₁ = 0.894) ──────────────────────────────────────┐        │
+└──────────────────────────────────────────────────────────────────────────────┘
+                                                                    │
+                                                                    ▼
+                                                        ┌─── Add (complex) ───┐
+                                                        │  Süperpozisyon     │
+                                                        │  s = α₁x₁ + α₂x₂  │──▶ Channel Model
+                                                        └─────────────────────┘
+                                                                    ▲
+┌─────────────────────────── User 2 TX Chain ────────────────────────────────┐
+│ File Source(tx2) → Stream2TS(77B) → CRC32 → Repack(8→1) → Scrambler →    │
+│ LDPC Enc → ... (aynı yapı) ... → Tag Gate →                               │
+│ Multiply Const(α₂ = 0.447) ──────────────────────────────────────┘        │
+└──────────────────────────────────────────────────────────────────────────────┘
+\end{verbatim}
+
+\paragraph{D.2. Alıcı Tarafı (SIC):}
+\begin{verbatim}
+Channel ──▶ FFT RRC ──▶ SymSync ──▶ CostasLoop ──▶ Corr Estimator
+Model       (β=0.35)    (sps=4→1)   (ω=2π/100)     (preamble_syms)
+                                         │                  │
+                           ┌─────────────┘                  │
+                           │ "recovery"                     │ "recovery_2"
+                           ▼                                ▼
+                    Soft Const Dec               ┌──── SIC Aligner (epy_block_1) ────┐
+                           │                     │  Port 0: recovery_2 (alınan)       │
+                    Soft Diff Dec                │  Port 1: user_2_sub (yeniden oluş.)│
+                    (epy_block_0)                │  Çıkış: temizlenmiş User 2 sinyali │
+                           │                     └────────────────────────────────────┘
+                    Correlate AC                            │
+                           │                                ▼
+                    LDPC Decoder ◄───────────     Soft Const Dec (2.)
+                    (ldpc_dec)                            │
+                           │                       Soft Diff Dec
+                    Length ×0.5                     (epy_block_0_0)
+                           │                              │
+                    Descrambler                    Correlate AC (2.)
+                           │                              │
+                    Repack (1→8)                   LDPC Decoder (ldpc_dec_2)
+                           │                              │
+                    CRC32 Check                    Length ×0.5 → Descramble →
+                      │     │                      Repack → CRC32 Check (2.)
+               File Sink  SIC Re-encode                    │
+               (rx1.txt)    │                         File Sink
+                            ▼                         (rx2.txt)
+                    LDPC Re-encode (enc_ldpc_sic)
+                            │
+                    Chunks to Symbols (BPSK: [-1, +1])
+                            │
+                    Multiply Const (0.894)
+                            │
+                            ▼
+                    "user_2_sub" ──▶ SIC Aligner Port 1
+\end{verbatim}
+
+---
+
+\textit{\1}
+\end{document}

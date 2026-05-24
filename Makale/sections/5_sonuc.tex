@@ -1,0 +1,22 @@
+\section{Sonuç ve Gelecek Çalışmalar}
+
+\subsection{Elde Edilen Bulguların Özeti}
+Bu çalışmada, Güç Etki Alanlı NOMA (PD-NOMA) downlink transceiver mimarisinin GNU Radio Companion platformu üzerinde uçtan uca dosya transferi yapabilen kararlı bir prototipi başarıyla geliştirilmiştir. Projenin temel katkıları aşağıdaki şekilde özetlenebilir:
+\begin{itemize}
+    \item \textbf{Süperpozisyon Kodlaması ve İletim Zinciri:} İki kullanıcının DBPSK modüleli sinyalleri $\alpha_1 = 0.894$ (\%80 güç) ve $\alpha_2 = 0.447$ (\%20 güç) katsayıları ile başarıyla birleştirilmiştir. İletim zincirinde IEEE 802.11n standardına uygun LDPC kodlaması ($R=1/2$, $n=1296$), LFSR tabanlı karıştırıcı, CRC-32 ve $\beta=0.35$ RRC darbe şekillendirme filtreleri entegre edilmiştir.
+    \item \textbf{Alıcı ve SIC Mekanizması:} Güçlü kullanıcının (User 1) yumuşak karar LLR değerleri korunarak kodunun çözülmesi, bu verinin yeniden kodlanıp sembollere eşlenerek composite sinyalden çıkarılması işlemleri gerçekleştirilmiştir. Geliştirilen \textit{basic\_block} tabanlı dairesel tamponlama yapısı ile GNU Radio zamanlayıcısının dairesel bağımlılık kaynaklı kilitlenmesi (scheduler deadlock) sorunu aşılmıştır.
+    \item \textbf{Performans Doğrulaması:} AWGN kanalı ($\text{SNR} \approx 20$ dB, normalize frekans kayması $\Delta f = 0.01$, zamanlama sapması $\epsilon = 1.0001$) altında her iki kullanıcı için başarılı metin dosyası transferi gerçekleştirilmiş ve verilerin bütünlüğü bayt düzeyinde otomatik olarak doğrulanmıştır.
+\end{itemize}
+
+\subsection{Projenin Akademik ve Mühendislik Katkısı}
+Bu çalışma, NOMA'nın teorik sınırlarının ötesine geçerek, yazılım tabanlı radyo (SDR) platformlarında çalışabilen uçtan uca pratik bir demonstrasyon sunmaktadır. Özellikle dairesel akış geri beslemelerine sahip alıcı yapılarında zamanlayıcı kilitlenmesini çözen dairesel tamponlama mantığı, çapraz korelasyon tabanlı dinamik genlik/faz kalibrasyonu ve 1-sembollük sızıntı sapmasının giderilmesi projenin getirdiği özgün mühendislik çözümleridir.
+
+\subsection{Gelecek Çalışmalar}
+Proje sonuçları, gelecekte aşağıdaki yönlerde genişletilebilir:
+\begin{enumerate}
+    \item \textbf{USRP E310 Donanım Entegrasyonu:} Tasarlanan simülasyon modelinin, projedeki \texttt{Bpsk\_file\_transfer\_loopback.grc} akış diyagramı temel alınarak USRP E310 SDR donanımları üzerinden gerçek zamanlı 2.435 GHz bandında test edilmesi ve gerçek kanal sönümlemelerinin SIC performansına etkisinin incelenmesi.
+    \item \textbf{PlutoSDR Entegrasyonu:} Analog Devices ADALM-PlutoSDR gibi düşük maliyetli SDR platformları kullanılarak laboratuvar ortamı kablosuz testlerinin yapılması.
+    \item \textbf{Çok Kullanıcılı Genişletme:} İki kullanıcılı yapının üç veya daha fazla kullanıcıya genişletilerek kaskat SIC (kademeli girişim çıkarma) işleminin hata yayılımı üzerindeki etkilerinin analiz edilmesi.
+    \item \textbf{Uyarlanır Güç Tahsisi:} Kullanıcıların anlık kanal durum bilgilerine (CSI) göre $\alpha_1$ ve $\alpha_2$ güç katsayılarının dinamik olarak optimize edilmesi.
+    \item \textbf{OFDM-NOMA Entegrasyonu:} BPSK tabanlı tek taşıyıcılı sistemden çok taşıyıcılı OFDM-NOMA mimarisine geçiş yapılarak frekans-seçici kanallarda çalışabilme kabiliyetinin kazandırılması.
+\end{enumerate}

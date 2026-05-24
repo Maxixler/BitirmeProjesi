@@ -1,0 +1,14 @@
+ChkTeX v1.7.8 - Copyright 1995-96 Jens T. Berger Thielemann.
+Compiled with PCRE regex support.
+70 errors printed; No warnings printed; 409 user suppressed warnings; No line suppressed warnings.
+See the manual for how to suppress some or all of these warnings/errors.
+The manual is available at https://www.nongnu.org/chktex/ChkTeX.pdf
+Latexmk: ====Undefined refs and citations with line #s in .tex file:
+  ! LaTeX Error: Unicode character − (U+2212)
+  ! LaTeX Error: Unicode character − (U+2212)
+  ! LaTeX Error: Unicode character − (U+2212)
+  ! LaTeX Error: Unicode character − (U+2212)
+  ! LaTeX Error: Unicode character − (U+2212)
+  ! LaTeX Error: Unicode character − (U+2212)
+  ! LaTeX Error: Unicode character − (U+2212)
+ And 560 more --- see log file 'output.log'

@@ -1,0 +1,47 @@
+\section{Giriş ve Literatür Özeti}
+
+\subsection{Motivasyon ve Problem Tanımı}
+Kablosuz haberleşme sistemlerinin evrimi, birinci nesilden (1G) beşinci nesile (5G) ve ötesine uzanan süreçte, giderek artan veri trafiği, kullanıcı yoğunluğu ve düşük gecikme gereksinimlerini karşılama zorunluluğuyla şekillenmiştir. Uluslararası Telekomünikasyon Birliği (ITU) tarafından tanımlanan IMT-2020 vizyonuna göre, 5G sistemlerinin hedefleri arasında 10 Gbps tepe veri hızı, 1 ms gecikme süresi ve $10^6$ cihaz/$\text{km}^2$ bağlantı yoğunluğu yer almaktadır \cite{itu2015imt}. Bu hedefler doğrultusunda, sınırlı frekans spektrumunun verimli kullanılması kritik bir mühendislik problemi olarak öne çıkmaktadır.
+
+Geleneksel kablosuz haberleşme sistemlerinde kullanılan Ortogonal Çoklu Erişim (Orthogonal Multiple Access - OMA) teknikleri (FDMA, TDMA, CDMA ve OFDMA), kullanıcıları frekans, zaman, kod veya alt-taşıyıcı boyutlarında birbirinden ayırarak ortogonallik sağlamaktadır. Bu ortogonallik ilkesi, kullanıcılar arası girişimi (inter-user interference) ortadan kaldırma avantajını sunarken, aynı zamanda kaynak tahsisinde esnekliği ve toplam spektral verimliliği sınırlandırmaktadır. Özellikle heterojen kullanıcı dağılımlarında, yani kanal koşullarının büyük farklılıklar gösterdiği senaryolarda, OMA yöntemlerinin Shannon kapasitesine yaklaşma kabiliyeti zayıflamaktadır.
+
+\subsection{Non-Ortogonal Çoklu Erişim (NOMA) Kavramı}
+NOMA, ortogonallik kısıtlamasını kaldırarak birden fazla kullanıcının \textbf{aynı zaman-frekans kaynağını} eş zamanlı olarak paylaşmasını mümkün kılan bir fiziksel katman çoklu erişim tekniğidir. Literatürde NOMA teknikleri iki ana kategoride sınıflandırılmaktadır:
+\begin{enumerate}
+    \item \textbf{Güç Etki Alanlı NOMA (Power-Domain NOMA - PD-NOMA):} Kullanıcılara farklı güç seviyeleri atanarak sinyallerin süperpozisyon kodlaması yoluyla üst üste bindirilmesine dayanır. Alıcı tarafında ardışık girişim iptali (Successive Interference Cancellation - SIC) algoritması ile girişim giderimi yapılır \cite{ding2017application}.
+    \item \textbf{Kod Etki Alanlı NOMA (Code-Domain NOMA):} SCMA (Sparse Code Multiple Access) ve MUSA (Multi-User Shared Access) gibi teknikleri kapsayan, kullanıcıların seyrek veya düşük korelasyonlu kodlarla ayrıştırıldığı yaklaşımlardır.
+\end{enumerate}
+Bu projede, implementasyon karmaşıklığı ve kavramsal netlik açısından PD-NOMA mimarisi tercih edilmiştir.
+
+\subsection{OMA ve NOMA Karşılaştırması}
+NOMA'nın en belirgin üstünlüğü, aynı spektral kaynak üzerinde birden fazla kullanıcıya hizmet vermesi nedeniyle toplam sistem kapasitesini artırmasıdır. Yayın (broadcast) kanal kapasitesine ulaşmak için, güçlü kullanıcıya atanan düşük güç ve zayıf kullanıcıya atanan yüksek güç ile Shannon sınırına yaklaşılabilmektedir. Ancak, bu kazanım alıcı tarafındaki SIC karmaşıklığı pahasına elde edilmektedir.
+
+Tablo~\ref{tab:oma_noma_comp} OMA ve NOMA tekniklerinin temel karakteristiklerini karşılaştırmaktadır.
+
+\begin{table}[htbp]
+\caption{OMA ve PD-NOMA Tekniklerinin Temel Karakteristikleri}
+\label{tab:oma_noma_comp}
+\centering
+\begin{tabular}{p{2.3cm}p{2.6cm}p{2.7cm}}
+\toprule
+\textbf{Özellik} & \textbf{OMA (OFDMA vb.)} & \textbf{PD-NOMA} \\
+\midrule
+\textbf{Kaynak Tahsisi} & Her kullanıcıya ayrık alt-taşıyıcı/zaman dilimi & Tüm kullanıcılar aynı kaynağı paylaşır \\
+\textbf{Kullanıcılar Arası Girişim} & Ortogonallik ile sıfırlanır & Kontrollü girişim, alıcıda SIC ile giderilir \\
+\textbf{Spektral Verimlilik} & Kullanıcı sayısı ile ölçeklenmez & Kullanıcı sayısı arttıkça kapasite kazancı sunar \\
+\textbf{Kullanıcı Adaleti} & Zayıf kullanıcılar aleyhine eşitsizlik & Güç tahsisi ile adalet kontrol edilebilir \\
+\textbf{Alıcı Karmaşıklığı} & Düşük (doğrudan çözümleme) & Yüksek (SIC algoritması gereklidir) \\
+\textbf{Kapasite Sınırı} & Sınırlı & Yayın (broadcast) kanal kapasitesine yaklaşır \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Literatürde NOMA Çalışmaları}
+NOMA kavramının teorik temelleri, çok kullanıcılı bilgi teorisi çerçevesinde Cover (1972) tarafından ortaya konulan yayın kanalı kapasitesi analizine dayanmaktadır \cite{cover1972broadcast}. Saito vd. (2013) tarafından yayımlanan çalışmada, güç etki alanlı NOMA'nın 3GPP-LTE sistemlerine entegrasyonu ilk kez önerilmiştir \cite{saito2013non}. Dai vd. (2015), NOMA'nın 5G kablosuz ağlar için bir anahtar teknoloji olduğunu ortaya koyan kapsamlı bir derleme çalışması sunmuştur \cite{dai2015non}. Ding vd. (2014), çeşitli kanal koşulları altında PD-NOMA'nın ergodik kapasitesini ve kesinti olasılığını (outage probability) analiz etmiştir \cite{ding2014performance}. İslam vd. (2017) ise güç tahsisi stratejileri ve SIC alıcı tasarımına ilişkin detaylı bir çerçeve geliştirmiştir \cite{islam2017power}.
+
+LDPC kodlarının NOMA sistemlerine entegrasyonu açısından, Gallager (1962) tarafından ortaya konulan temel LDPC çerçevesi \cite{gallager1962low} ve MacKay ve Neal (1996) tarafından gösterilen Shannon sınırına yakın performans \cite{mackay1996near}, bu projede kullanılan IEEE 802.11n standardı LDPC kodlarının teorik altyapısını oluşturmaktadır \cite{ieee200980211n}.
+
+GNU Radio platformu üzerinde NOMA implementasyonu açısından, SDR (Software Defined Radio) tabanlı çalışmalar sınırlı sayıdadır. Bu çalışma, uçtan uca bir PD-NOMA transceiver'ın GNU Radio ortamında IEEE 802.11n LDPC kodlama ve DBPSK modülasyonu ile birlikte gerçeklenmesi bakımından özgün bir katkı sunmaktadır.
+
+\subsection{Projenin Amacı ve Kapsamı}
+Bu projenin temel amacı, iki kullanıcılı inen hat PD-NOMA senaryosunda verici tarafında süperpozisyon kodlaması ile sinyal birleştirme, IEEE 802.11n LDPC kanal kodlaması ile hata dayanıklılığı sağlama, AWGN kanal modeli altında iletim simülasyonu ve alıcı tarafında çapraz korelasyon tabanlı SIC algoritması ile ardışık kullanıcı çözümleme adımlarını kapsayan uçtan uca bir haberleşme zincirini GNU Radio Companion ortamında tasarlamak, gerçeklemek ve performansını değerlendirmektir.

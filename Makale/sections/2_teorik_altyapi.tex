@@ -1,0 +1,140 @@
+\section{Teorik Altyapı ve Matematiksel Model}
+
+\subsection{Süperpozisyon Kodlaması}
+Güç etki alanlı NOMA'nın temel mekanizması, birden fazla kullanıcının sinyallerinin farklı güç katsayılarıyla ağırlıklandırılarak toplam bir sinyal olarak iletilmesidir. İki kullanıcılı bir inen hat (downlink) senaryosunda, baz istasyonu (BS) tarafından iletilen süperpoze sinyal aşağıdaki şekilde ifade edilmektedir:
+\begin{equation}
+s(t) = \sqrt{a_1 P} \cdot x_1(t) + \sqrt{a_2 P} \cdot x_2(t)
+\end{equation}
+Burada, $P$ toplam iletim gücünü, $x_1(t)$ ve $x_2(t)$ sırasıyla Kullanıcı 1 (Uzak Kullanıcı) ve Kullanıcı 2 (Yakın Kullanıcı) için modüle edilmiş sembol dizilerini, $a_1$ ve $a_2$ ise güç tahsis katsayılarını ($a_1 + a_2 = 1$ ve $a_1 > a_2$) temsil etmektedir.
+
+Uzak kullanıcının kanal sönümlemesi daha fazla olduğu için sinyal kalitesini korumak adına gücün büyük kısmı bu kullanıcıya tahsis edilir. Bu projede güç tahsisi $a_1 = 0.8$ ve $a_2 = 0.2$ olarak belirlenmiştir. Normalize edilmiş birim güç ($P = 1$) varsayımı altında, genlik katsayıları şu şekilde hesaplanır:
+\begin{equation}
+\alpha_1 = \sqrt{a_1} = \sqrt{0.8} \approx 0.894 \approx \frac{2}{\sqrt{5}}
+\end{equation}
+\begin{equation}
+\alpha_2 = \sqrt{a_2} = \sqrt{0.2} \approx 0.447 \approx \frac{1}{\sqrt{5}}
+\end{equation}
+Bu katsayılar $\alpha_1^2 + \alpha_2^2 = 1.0$ güç korunumunu sağlamaktadır. Böylece süperpoze sinyal genlik cinsinden:
+\begin{equation}
+s(t) = 0.894 \cdot x_1(t) + 0.447 \cdot x_2(t)
+\end{equation}
+biçimini alır.
+
+BPSK modülasyonu altında ($x_i \in \{-1, +1\}$), süperpoze sinyalin konstelasyon uzayı dört noktadan oluşmaktadır (Tablo~\ref{tab:constellation_analysis}).
+
+\begin{table}[htbp]
+\caption{BPSK Altında Süperpoze Konstelasyon Analizi}
+\label{tab:constellation_analysis}
+\centering
+\begin{tabular}{cccc}
+\toprule
+$x_1$ & $x_2$ & $s = \alpha_1 x_1 + \alpha_2 x_2$ & Karar Bölgesi (User 1) \\
+\midrule
++1 & +1 & $+0.894 + 0.447 = +1.341$ & Pozitif ($>0$) \\
++1 & -1 & $+0.894 - 0.447 = +0.447$ & Pozitif ($>0$) \\
+-1 & +1 & $-0.894 + 0.447 = -0.447$ & Negatif ($<0$) \\
+-1 & -1 & $-0.894 - 0.447 = -1.341$ & Negatif ($<0$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Görüleceği üzere $\alpha_1 > \alpha_2$ koşulu sağlandığı için, birleşik sinyal $s(t)$'nin işareti tamamen baskın olan $x_1(t)$ sembolü tarafından belirlenmektedir. Bu durum, alıcıda herhangi bir girişim giderimi yapmadan doğrudan sıfır eşik değeriyle $x_1(t)$ sinyalinin çözülebilmesini mümkün kılar.
+
+\subsection{AWGN Kanal Modeli}
+Verici çıkışından alıcı girişine kadar olan iletim kanalı, Toplamsal Beyaz Gauss Gürültüsü (AWGN) modeli ile temsil edilmektedir:
+\begin{equation}
+r(t) = h \cdot s(t) + n(t)
+\end{equation}
+Burada $h$ kanal katsayısını (bu çalışmada düz sönümleme için $h = 1.0$), $n(t)$ ise sıfır ortalamalı ve $\sigma_n^2$ varyanslı karmaşık Gauss gürültüsünü temsil eder. GNU Radio'daki \texttt{Channel Model} bloğunda konfigüre edilen gürültü gerilimi varsayılan olarak $\sigma_n = 0.1$ seçilmiştir. Bu değer $P=1$ iletim gücü altında $\text{SNR} = \frac{P}{\sigma_n^2} = 100 \approx 20\text{ dB}$ değerine karşılık gelir. Kanal modelinde ayrıca normalize frekans kayması ($\Delta f = 0.01$) ve zamanlama sapması ($\epsilon = 1.0001$) bozulmaları da simüle edilmektedir.
+
+\subsection{Ardışık Girişim İptali (SIC)}
+SIC, NOMA alıcısının temel bileşenidir ve çok kullanıcılı girişimin kademeli olarak giderilmesini sağlar. İki kullanıcılı senaryoda alıcıya ulaşan sinyal:
+\begin{equation}
+r(t) = \alpha_1 x_1(t) + \alpha_2 x_2(t) + n(t)
+\end{equation}
+şeklindedir. SIC süreci şu dört adımdan oluşur:
+\begin{enumerate}
+    \item \textbf{Güçlü Kullanıcının Çözülmesi:} Alınan sinyal $r(t)$ üzerinde, baskın güce sahip olan Kullanıcı 1'in sinyali doğrudan çözümlenir. Kullanıcı 2'nin sinyali bu aşamada girişim olarak ele alınır:
+    \begin{equation}
+    \hat{x}_1 = \text{Dec}\left\{ r(t) \right\} = \text{Dec}\left\{ \alpha_1 x_1(t) + \alpha_2 x_2(t) + n(t) \right\}
+    \end{equation}
+    Kullanıcı 1 için Sinyal-Girişim-Artı-Gürültü Oranı (SINR):
+    \begin{equation}
+    \text{SINR}_1 = \frac{a_1 P}{a_2 P + \sigma_n^2} = \frac{0.8}{0.2 + \sigma_n^2}
+    \end{equation}
+    \item \textbf{Güçlü Sinyalin Yeniden Sentezlenmesi:} Çözülen $\hat{x}_1$ verisi, verici tarafındaki işlem zinciriyle aynı adımlardan geçirilerek yeniden oluşturulur:
+    \begin{equation}
+    \hat{s}_1(t) = \alpha_1 \cdot \text{Mod}\left\{ \text{Enc}\left\{ \hat{x}_1 \right\} \right\}
+    \end{equation}
+    \item \textbf{Girişim İptali:} Yeniden oluşturulan güçlü kullanıcı sinyali, zamanlama ($\hat{\tau}$) ve faz ($\hat{\phi}$) kaymaları tahmin edilerek alınan ham sinyalden çıkarılır:
+    \begin{equation}
+    r_{\text{clean}}(t) = r(t) - \hat{s}_1(t - \hat{\tau}) \cdot \hat{A} \cdot e^{j\hat{\phi}}
+    \end{equation}
+    Burada $\hat{A}$ genlik düzeltme faktörüdür. Kod çözme hatasız ($\hat{x}_1 = x_1$) ve hizalama mükemmel ise girişim terimi tamamen sıfırlanır:
+    \begin{equation}
+    r_{\text{clean}}(t) = \alpha_2 x_2(t) + n(t)
+    \end{equation}
+    \item \textbf{Zayıf Kullanıcının Çözülmesi:} Temizlenmiş sinyal üzerinden yakın kullanıcının (User 2) sinyali çözümlenir:
+    \begin{equation}
+    \hat{x}_2 = \text{Dec}\left\{ r_{\text{clean}}(t) \right\}
+    \end{equation}
+    Kullanıcı 2 için elde edilen Sinyal-Gürültü Oranı (SNR) ideal durumda:
+    \begin{equation}
+    \text{SNR}_2 = \frac{a_2 P}{\sigma_n^2} = \frac{0.2}{\sigma_n^2}
+    \end{equation}
+\end{enumerate}
+
+\subsubsection{SIC Hata Yayılımı}
+SIC sürecinin başarısı, Adım 1'deki kod çözme doğruluğuna kritik biçimde bağlıdır. Kullanıcı 1'in hatalı çözülmesi durumunda artık girişim (residual interference) ortaya çıkar:
+\begin{equation}
+r_{\text{clean}}(t) = \alpha_2 x_2(t) + n(t) + \alpha_1 \left[ x_1(t) - \hat{x}_1(t) \right]
+\end{equation}
+$\alpha_1 \left[ x_1(t) - \hat{x}_1(t) \right]$ terimi hata yayılımını temsil etmekte olup, $\alpha_1 / \alpha_2 = 2$ olması nedeniyle her bir hatalı sembol, Kullanıcı 2'nin sinyalini $2:1$ oranında bastırma potansiyeline sahiptir.
+
+Benzer şekilde, zamanlama hizalamasındaki 1 sembol kayma durumunda artık girişim:
+\begin{equation}
+r_{\text{clean}}[n] = \alpha_1(x_1[n] - x_1[n-1]) + \alpha_2 x_2[n] + n[n]
+\end{equation}
+biçimini alır. $\alpha_1 = 2\alpha_2$ olduğundan, bu diferansiyel girişim terimi Kullanıcı 2 sinyalini tamamen bastırabilir. Bu nedenle, güçlü kanal kodlaması (LDPC) ve hassas zamanlama hizalaması büyük önem taşımaktadır.
+
+\subsection{LDPC Kanal Kodlaması}
+Düşük Yoğunluklu Parite Kontrol (LDPC) kodları, Shannon sınırına yakın performans sunan modern ileri hata düzeltme (Forward Error Correction - FEC) kodlarıdır \cite{gallager1962low, mackay1996near}. Bu projede kullanılan LDPC kodu, IEEE 802.11n (Wi-Fi) standardından alınmış olup aşağıdaki parametrelere sahiptir:
+\begin{itemize}
+    \item Kod sözcüğü uzunluğu ($n$): $1296$ bit
+    \item Mesaj uzunluğu ($k$): $648$ bit
+    \item Parite bitleri ($n - k$): $648$ bit
+    \item Kod oranı ($R = k/n$): $0.5$ (yarı oran)
+    \item Parite kontrol matrisi: \texttt{n\_1296\_k\_0648\_ieee.alist}
+    \item Alt-matris boyutu ($Z$): $54$ (yarı-döngüsel yapı)
+\end{itemize}
+
+Matrisin yarı-döngüsel (quasi-cyclic) yapısında parite kontrol matrisi $\mathbf{H}$, $Z = 54$ boyutlu döngüsel permütasyon alt-matrislerinden oluşmaktadır:
+\begin{equation}
+\mathbf{H} = \begin{bmatrix} \mathbf{P}_{0,0} & \mathbf{P}_{0,1} & \cdots & \mathbf{P}_{0,23} \\ \mathbf{P}_{1,0} & \mathbf{P}_{1,1} & \cdots & \mathbf{P}_{1,23} \\ \vdots & \vdots & \ddots & \vdots \\ \mathbf{P}_{11,0} & \mathbf{P}_{11,1} & \cdots & \mathbf{P}_{11,23} \end{bmatrix}
+\end{equation}
+
+Bu projede her paket $\text{payload\_size} = 77$ bayt ($= 616$ bit) kullanıcı verisine sahiptir. CRC-32 eklenmesi (4 bayt) sonrası $81$ bayt ($= 648$ bit) elde edilmekte olup, bu değer LDPC kodunun mesaj uzunluğu $k = 648$ ile birebir örtüşmektedir. LDPC kodlama sonrası her paket $n = 1296$ bit uzunluğundaki kod sözcüğüne dönüşür.
+
+\subsection{Diferansiyel BPSK (DBPSK) Modülasyonu}
+Diferansiyel kodlamada, bilgi verinin mutlak faz değerinde değil, ardışık semboller arasındaki faz farkında taşınır:
+\begin{equation}
+d_k = b_k \oplus d_{k-1}
+\end{equation}
+Burada $b_k$ giriş biti, $d_k$ diferansiyel kodlanmış bit ve $\oplus$ XOR işlemidir. BPSK sembol eşlemesi:
+\begin{equation}
+x_k = 2d_k - 1 = \begin{cases} +1 & d_k = 1 \\ -1 & d_k = 0 \end{cases}
+\end{equation}
+Diferansiyel kodlamanın avantajı, alıcıda mutlak faz referansı gerektirmeden çözümleme yapılabilmesidir; bu özellik, Costas döngüsünün $180^\circ$ faz belirsizliğini ortadan kaldırmaktadır.
+
+Alıcı tarafında diferansiyel çözme, yumuşak karar (soft-decision) formatında gerçekleştirilmektedir:
+\begin{equation}
+\hat{b}_k^{\text{soft}} = -(y_k \cdot y_{k-1})
+\end{equation}
+Burada $y_k$ yumuşak konstelasyon çıkışıdır. Yumuşak karar bilgisinin korunması, aşağı yöndeki LDPC kod çözücünün performansı açısından kritik öneme sahiptir.
+
+\subsection{Darbe Şekillendirme: Kök Yükseltilmiş Kosinüs (RRC) Filtresi}
+Semboller arası girişimi (ISI) önlemek ve bant genişliğini kontrol etmek amacıyla, Kök Yükseltilmiş Kosinüs (RRC) darbe şekillendirme filtresi kullanılmıştır. RRC filtresinin frekans tepkisi:
+\begin{equation}
+H_{\text{RRC}}(f) = \begin{cases} \sqrt{T_s} & |f| \leq \frac{1-\beta}{2T_s} \\ \sqrt{\frac{T_s}{2}\left[1 + \cos\left(\frac{\pi T_s}{\beta}\left(|f| - \frac{1-\beta}{2T_s}\right)\right)\right]} & \frac{1-\beta}{2T_s} < |f| \leq \frac{1+\beta}{2T_s} \\ 0 & |f| > \frac{1+\beta}{2T_s} \end{cases}
+\end{equation}
+Burada $\beta$ aşırı bant genişliği (roll-off) faktörüdür. Bu projede $\beta = 0.35$ olarak konfigüre edilmiştir. Filtre uzunluğu $11 \times \text{sps} = 44$ dokunuş (tap) olarak belirlenmiştir.

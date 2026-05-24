@@ -1,0 +1,114 @@
+\section{GNU Radio Tabanlı Sistem Tasarımı}
+Bu bölümde, GNU Radio Companion (GRC) ortamında tasarlanan NOMA-SIC dosya transferi sisteminin tüm blokları, parametreleri ve sinyal akış yolları detaylı olarak incelenmektedir. Sistem, üç ana katmandan oluşmaktadır: Verici (Transmitter), Kanal Modeli (Channel Model) ve Alıcı (Receiver/SIC). Toplam blok envanteri 60'ın üzerindedir ve 16 sanal sinyal yolu (virtual sink/source) çifti ile karmaşık sinyal akışı yönetilmektedir.
+
+\subsection{Sistem Değişkenleri}
+Akış diyagramında tanımlanan global sistem değişkenleri Tablo~\ref{tab:system_variables}'de özetlenmiştir.
+
+\begin{table}[htbp]
+\caption{Global Sistem Değişkenleri}
+\label{tab:system_variables}
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Değişken} & \textbf{Değer} & \textbf{Açıklama} \\
+\midrule
+\texttt{samp\_rate} & $200$ kHz & Örnekleme frekansı \\
+\texttt{sps} & $4$ & Sembol başına örnek sayısı \\
+\texttt{payload\_size} & $77$ bayt & Paket yük boyutu \\
+\texttt{preamble\_size} & $250$ bayt & Preambül boyutu \\
+\texttt{postamble\_size} & $8$ bayt & Postambül boyutu \\
+\texttt{noise} & $0.1$ ($0$--$2$) & AWGN gürültü gerilimi \\
+\texttt{freq\_offset} & $0.01$ ($\pm 0.25$) & Normalize frekans ofseti \\
+\texttt{time\_offset} & $1.0001$ & Zamanlama sapma oranı \\
+\texttt{constel} & BPSK & BPSK konstelasyon nesnesi \\
+\texttt{preamble\_syms} & 64 sembol & BPSK preambül dizisi \\
+\texttt{ldpc\_enc} & $R=1/2$ alist & LDPC kodlayıcı tanımı \\
+\texttt{ldpc\_dec} & max\_iter: 50 & Kullanıcı 1 LDPC kod çözücü \\
+\texttt{ldpc\_dec\_2} & max\_iter: 50 & Kullanıcı 2 LDPC kod çözücü \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Sembol hızı ve bant genişliği şu şekilde hesaplanır:
+\begin{equation}
+R_s = \frac{f_s}{\text{sps}} = \frac{200{,}000}{4} = 50{,}000 \text{ sembol/s}
+\end{equation}
+\begin{equation}
+B = R_s \cdot (1 + \beta) = 50{,}000 \times 1.35 = 67{,}500 \text{ Hz}
+\end{equation}
+
+\subsection{Verici (Transmitter) Katmanı}
+Verici katmanı, iki paralel kodlama zincirinden ve bir süperpozisyon birleştirme bloğundan oluşmaktadır.
+
+\subsubsection{Kullanıcı 1 Verici Zinciri}
+Kullanıcı 1'in verici zinciri aşağıdaki blok sırasını takip etmektedir:
+\begin{itemize}
+    \item \textbf{File Source:} \texttt{bpsk\_transmit.txt} dosyasındaki verileri bayt akışı olarak sisteme besler. \texttt{Repeat = True} ile sürekli iletim sağlanır.
+    \item \textbf{Stream to Tagged Stream:} Akışı $77$ baytlık etiketlenmiş paketlere böler.
+    \item \textbf{Stream CRC32:} Paketlere 4 baytlık CRC-32 ekleyerek boyutu $81$ bayta ($648$ bit $= k$) yükseltir.
+    \item \textbf{Repack Bits (8$\to$1):} Bayt düzeyindeki verileri tek bit/bayt formatına dönüştürür.
+    \item \textbf{Additive Scrambler:} LFSR tabanlı karıştırıcı (\texttt{Mask=0x8A}, \texttt{Seed=0x7F}, \texttt{Length=7}) veri dizisindeki uzun tekrarları kırarak DC sapmasını önler ve alıcı ile senkronizasyonu garanti eder.
+    \item \textbf{FEC Extended Encoder:} 648 bitlik mesajı 1296 bitlik kod sözcüğüne ($n=1296$) dönüştürerek $R=0.5$ oranlı LDPC hata düzeltmesi sağlar.
+    \item \textbf{Tagged Stream Multiply Length (x2):} Paket etiketini $1296$'ya günceller.
+    \item \textbf{Protocol Formatter \& Tagged Stream Mux:} 250 baytlık preambül, başlık, LDPC yükü ve 8 baytlık postambülü birleştirerek çerçeve yapısını kurar.
+    \item \textbf{Constellation Modulator (DBPSK):} Bitleri diferansiyel olarak kodlar, BPSK sembollerine eşler, $\text{sps}=4$ ve $\beta=0.35$ RRC filtresinden geçirir.
+    \item \textbf{Tag Gate:} Akış etiketlerinin kanal modeline sızmasını önlemek için tüm etiketleri siler.
+    \item \textbf{Multiply Const:} Genlik katsayısı $\alpha_1 = 0.894$ ile çarpılarak \%80 güç tahsisi yapılır.
+\end{itemize}
+
+\subsubsection{Kullanıcı 2 Verici Zinciri ve Birleştirme}
+Kullanıcı 2'nin verici zinciri Kullanıcı 1 ile aynı yapıdadır, ancak dosya kaynağı olarak \texttt{bpsk\_transmit\_2.txt} kullanır ve genlik katsayısı $\alpha_2 = 0.447$ (\%20 güç tahsisi) ile çarpılır. İki kullanıcının sinyalleri \texttt{Add} bloğu ile toplanarak süperpoze NOMA sinyali $s(t) = 0.894 \cdot x_1(t) + 0.447 \cdot x_2(t)$ oluşturulur.
+
+\subsection{Kanal Modeli (Channel Model)}
+Süperpoze sinyal kanal modelinden geçirilir. Kanal modeli, gürültü gerilimi ($\sigma_n = 0.1$), normalize frekans kayması ($\Delta f = 0.01$) ve zamanlama sapması ($\epsilon = 1.0001$) bozulmalarını uygulayarak gerçekçi bir RF ortamı simüle eder.
+
+\subsection{Alıcı (Receiver) Katmanı ve SIC Döngüsü}
+Alıcı ön-ucunda eşleştirilmiş filtreleme (\texttt{FFT RRC Filter}), sembol zamanlama kurtarma (\texttt{Symbol Synchronizer} - \texttt{SIGNAL\_TIMES\_SLOPE\_ML} TED ve 8-taps MMSE interpolatörü) ve taşıyıcı faz kilitlenmesi (\texttt{Costas Loop}) gerçekleştirilir. \texttt{Correlation Estimator} preambül üzerinden paket sınırlarını tespit eder.
+
+\subsubsection{Kullanıcı 1 Çözümleme ve Yeniden Kodlama}
+\texttt{Constellation Soft Decoder} karmaşık sembolleri BPSK LLR yumuşak kararlarına dönüştürür. Geliştirilen \texttt{Soft Diff Decoder} (EPY Block 0) yumuşak kararları koruyarak diferansiyel kod çözümü yapar. Paket sınırları belirlendikten sonra \texttt{LDPC Decoder} 50 iterasyonla User 1 verisini çözer ve CRC-32 kontrolünden geçen paketler \texttt{bpsk\_receive.txt} dosyasına yazılır.
+
+Çözülen Kullanıcı 1 bitleri, \texttt{LDPC Encoder} ile tekrar 1296 bite kodlanır, BPSK sembol uzayına ($\{-1, +1\}$) eşlenir ve $\alpha_1 = 0.894$ ile çarpılarak yeniden sentezlenir.
+
+\subsubsection{SIC Çıkarma ve Kullanıcı 2 Çözümleme}
+Yeniden sentezlenen User 1 sinyali, \texttt{Decoupled NOMA SIC Aligner} (EPY Block 1) vasıtasıyla alınan sinyalle çapraz korelasyon üzerinden hizalanarak composite sinyalden çıkarılır. Girişimi temizlenmiş sinyal, Kullanıcı 2 alıcı zincirine beslenerek çözümlenir ve \texttt{bpsk\_receive\_2.txt} dosyasına yazılır.
+
+\subsection{Sanal Yönlendirme Haritası (Virtual Routing)}
+Sinyal yollarını modüler hale getirmek için tanımlanan sanal yönlendirme noktaları Tablo~\ref{tab:virtual_routing} 'de özetlenmiştir.
+
+\begin{table}[htbp]
+\caption{Sanal Yönlendirme Portları ve Akış Haritası}
+\label{tab:virtual_routing}
+\centering
+\begin{tabular}{lllp{2.8cm}}
+\toprule
+\textbf{Çıkış (Sink)} & \textbf{Giriş (Source)} & \textbf{Tip} & \textbf{Açıklama} \\
+\midrule
+\texttt{transmit} & \texttt{transmit} & Complex & Süperpozisyon sonrası verici çıkışı \\
+\texttt{channel} & \texttt{channel} & Complex & Kanal modelinin gürültülü çıkış sinyali \\
+\texttt{recovery} & \texttt{recovery} & Complex & Costas Loop çıkışı (User 1 çözücü girişi) \\
+\texttt{recovery\_2} & \texttt{recovery\_2} & Complex & Correlation Estimator çıkışı (SIC hizalama ham girişi) \\
+\texttt{user\_2} & \texttt{user\_2} & Byte & User 1 çözücü çıkışındaki temiz bit akışı \\
+\texttt{user\_2\_sub} & \texttt{user\_2\_sub} & Complex & Yeniden sentezlenmiş User 1 sinyali \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Çerçeve Yapısı (Frame Structure)}
+Sistemdeki paket iletiminin kararlılığı, çerçevelerin zaman alanında düzenli yapılandırılmasıyla sağlanmaktadır. Paket çerçeve yapısı Tablo~\ref{tab:frame_structure} 'de sunulmuştur.
+
+\begin{table}[htbp]
+\caption{Paket Çerçeve Yapısı}
+\label{tab:frame_structure}
+\centering
+\begin{tabular}{llll}
+\toprule
+\textbf{Segment} & \textbf{İçerik} & \textbf{Boyut} & \textbf{Sembol Sayısı} \\
+\midrule
+Preambül & \texttt{[0xC0, 0xAF]} tekrarlı & $250$ B & $256$ sembol \\
+Başlık (Header) & Erişim kodu + yük uzunluğu & Değişken & $\approx 64$ sembol \\
+Yük (Payload) & LDPC kodlu kullanıcı verisi & $162$ B & $1296$ sembol \\
+Postambül & \texttt{[0xC0, 0xAF]} tekrarlı & $8$ B & $\approx 64$ sembol \\
+\bottomrule
+\end{tabular}
+\end{table}

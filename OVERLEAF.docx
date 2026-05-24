@@ -1,0 +1,989 @@
+\documentclass[12pt,a4paper]{article}
+
+% --- Dil ve Karakter Kodlaması ---
+\usepackage[turkish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+% --- Matematiksel Paketler ---
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathrsfs}
+
+% --- Sayfa Yapısı ve Kenar Boşlukları ---
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    left=30mm,
+    right=25mm,
+    top=25mm,
+    bottom=25mm
+}
+
+% --- Görsel ve Tablo Paketleri ---
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc}
+
+% --- Hiperlink Ayarları ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={GNU Radio Tabanlı PD-NOMA ve SIC Uygulaması},
+    pdfpagemode=FullScreen,
+}
+
+% --- Kod Listeleme (Listings) Ayarları ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.96,0.96,0.94}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue}\bfseries,
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\scriptsize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=4
+}
+\lstset{style=mystyle}
+
+% --- Sayfa Başlığı ve Altlığı ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize GNU Radio Tabanlı PD-NOMA Tasarımı}
+\fancyhead[R]{\footnotesize Bölüm \thesection}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+% ==============================================================================
+% BAŞLIK SAYFASI
+% ==============================================================================
+\begin{titlepage}
+    \begin{center}
+        \vspace*{1.5cm}
+        
+        \Huge
+        \textbf{GNU RADIO TABANLI GÜÇ ETKİ ALANLI NOMA SİSTEMİ SİSTEMİ İLE ARDIŞIK GİRİŞİM İPTALİ (SIC) UYGULAMASI} \\
+        
+        \vspace{1.5cm}
+        
+        \Large
+        \textbf{MÜHENDİSLİK FAKÜLTESİ}\\
+        \large
+        ELEKTRİK-ELEKTRONİK MÜHENDİSLİĞİ BÖLÜMÜ \\
+        
+        \vspace{2.5cm}
+        
+        \Large
+        \textbf{BİTİRME PROJESİ RAPORU} \\
+        
+        \vspace{2.0cm}
+        
+        \large
+        \textbf{Akademik Yıl:} 2025--2026 \\
+        
+        \vfill
+        
+        \large
+        \begin{tabular}{ll}
+            \textbf{Hazırlayan:} & [Öğrenci Adı Soyadı] \\
+            \textbf{Öğrenci No:} & [Öğrenci Numarası] \\
+            \textbf{Danışman:}   & [Akademik Danışman Unvanı Adı Soyadı]
+        \end{tabular}
+        
+        \vspace{1.5cm}
+        
+        \today
+        
+    \end{center}
+\end{titlepage}
+
+\newpage
+
+% ==============================================================================
+% ÖZET VE ABSTRACT
+% ==============================================================================
+\section*{ÖZET}
+\addcontentsline{toc}{section}{ÖZET}
+
+Beşinci nesil (5G) ve sonrasındaki kablosuz haberleşme sistemlerinde spektral verimliliğin artırılması, artan kullanıcı sayısı ve veri trafiği karşısında en kritik mühendislik hedeflerinden biri hâline gelmiştir. Bu bağlamda, Ortogonal Olmayan Çoklu Erişim (Non-Orthogonal Multiple Access — NOMA) tekniği, aynı zaman-frekans kaynağının birden fazla kullanıcı tarafından eş zamanlı paylaşılmasına olanak tanıyan bir fiziksel katman çözümü olarak öne çıkmaktadır.
+
+Bu bitirme projesinde, Güç Etki Alanlı NOMA (Power-Domain NOMA — PD-NOMA) mimarisi kullanılarak iki kullanıcılı bir inen hat (downlink) senaryosu için uçtan uca bir alıcı-verici (transceiver) sistemi tasarlanmış ve GNU Radio Companion (GRC) ortamında gerçeklenmiştir. Verici tarafında Süperpozisyon Kodlaması (Superposition Coding) prensibi ile iki kullanıcının Diferansiyel BPSK (DBPSK) ile modüle edilmiş sinyalleri farklı güç katsayıları ($\alpha_1 = 0.894$, $\alpha_2 = 0.447$; sırasıyla \%80 ve \%20 güç tahsisi) atanarak aynı taşıyıcı üzerinde birleştirilmiştir. Alıcı tarafında ise Ardışık Girişim İptali (Successive Interference Cancellation — SIC) algoritması uygulanarak, önce baskın (güçlü) kullanıcının sinyali çözülmüş, ardından bu sinyal yeniden oluşturulup bileşik sinyalden çıkarılmak suretiyle zayıf kullanıcının verisi elde edilmiştir.
+
+Sistem, IEEE 802.11n standardına uygun LDPC (Low-Density Parity-Check) kanal kodlaması ($n = 1296$, $k = 648$, $R = 1/2$), kök yükseltilmiş kosinüs (Root Raised Cosine — RRC) darbe şekillendirme, MMSE tabanlı polifaz sembol senkronizasyonu ve Costas döngüsü tabanlı taşıyıcı kurtarma blokları ile donatılmıştır. AWGN (Additive White Gaussian Noise) kanal modeli altında, $f_s = 200 \text{ kHz}$ örnekleme frekansı ve $\text{sps} = 4$ sembol başına örnek konfigürasyonunda gerçekleştirilen simülasyonlarda, Kullanıcı 1 (yakın/güçlü kullanıcı, \%80 güç tahsisi) için başarılı dosya transferi doğrulanmış olup, çapraz korelasyon tabanlı SIC hizalama algoritması ile Kullanıcı 2 (uzak/zayıf kullanıcı, \%20 güç tahsisi) sinyalinin çözümlenmesi gerçekleştirilmiştir. Geliştirilen \textit{basic\_block} tabanlı özel Python blokları sayesinde alıcıda kilitlenme (deadlock) ve sinyal sızıntısı (signal bleeding) problemleri çözülmüştür. Elde edilen sonuçlar, yazılım tabanlı radyo (Software Defined Radio — SDR) platformu üzerinde NOMA-SIC mimarisinin uygulanabilirliğini ortaya koymaktadır.
+
+\noindent \textbf{Anahtar Kelimeler:} NOMA, Süperpozisyon Kodlaması, Ardışık Girişim İptali (SIC), GNU Radio, LDPC, DBPSK, SDR, Spektral Verimlilik.
+
+\newpage
+
+\section*{ABSTRACT}
+\addcontentsline{toc}{section}{ABSTRACT}
+
+In fifth-generation (5G) and beyond wireless communication systems, increasing spectral efficiency has become one of the most critical engineering goals in the face of rising user numbers and data traffic. In this context, Non-Orthogonal Multiple Access (NOMA) stands out as a physical layer solution that allows the same time-frequency resources to be shared simultaneously by multiple users.
+
+In this graduation project, an end-to-end transceiver system has been designed and implemented in the GNU Radio Companion (GRC) environment for a two-user downlink scenario using the Power-Domain NOMA (PD-NOMA) architecture. On the transmitter side, the Differential BPSK (DBPSK) modulated signals of two users are superimposed on the same carrier using Superposition Coding with different power coefficients ($\alpha_1 = 0.894$, $\alpha_2 = 0.447$; representing 80\% and 20\% power allocations, respectively). On the receiver side, a Successive Interference Cancellation (SIC) algorithm is implemented, where the dominant (strong) user's signal is decoded first, reconstructed, and then subtracted from the composite signal to retrieve the weak user's data.
+
+The system is equipped with IEEE 802.11n standard compliant LDPC (Low-Density Parity-Check) channel coding ($n = 1296$, $k = 648$, $R = 1/2$), root raised cosine (RRC) pulse shaping, MMSE-based polyphase symbol synchronization, and Costas loop-based carrier recovery. Simulations conducted under an AWGN (Additive White Gaussian Noise) channel model with a sampling frequency of $f_s = 200 \text{ kHz}$ and $\text{sps} = 4$ confirm successful file transfer for User 1 (strong user, 80\% power). The User 2 signal (weak user, 20\% power) is successfully resolved using a cross-correlation-based SIC alignment algorithm. The developed \textit{basic\_block} based custom Python blocks successfully resolve the scheduler deadlock and signal bleeding issues. The results demonstrate the feasibility of the NOMA-SIC architecture on Software Defined Radio (SDR) platforms.
+
+\noindent \textbf{Keywords:} NOMA, Superposition Coding, Successive Interference Cancellation (SIC), GNU Radio, LDPC, DBPSK, SDR, Spectral Efficiency.
+
+\newpage
+
+% ==============================================================================
+% İÇİNDEKİLER
+% ==============================================================================
+\tableofcontents
+\newpage
+
+% ==============================================================================
+% GİRİŞ VE LİTERATÜR ÖZETİ
+% ==============================================================================
+\section{GİRİŞ VE LİTERATÜR ÖZETİ}
+
+\subsection{Motivasyon ve Problem Tanımı}
+Kablosuz haberleşme sistemlerinin evrimi, birinci nesilden (1G) beşinci nesile (5G) ve ötesine uzanan süreçte, giderek artan veri trafiği, kullanıcı yoğunluğu ve düşük gecikme gereksinimlerini karşılama zorunluluğuyla şekillenmiştir. Uluslararası Telekomünikasyon Birliği (ITU) tarafından tanımlanan IMT-2020 vizyonuna göre, 5G sistemlerinin hedefleri arasında 10 Gbps tepe veri hızı, 1 ms gecikme süresi ve $10^6$ cihaz/$\text{km}^2$ bağlantı yoğunluğu yer almaktadır \cite{itu_vision}. Bu hedefler doğrultusunda, sınırlı frekans spektrumunun verimli kullanılması kritik bir mühendislik problemi olarak öne çıkmaktadır.
+
+Geleneksel kablosuz haberleşme sistemlerinde kullanılan Ortogonal Çoklu Erişim (Orthogonal Multiple Access — OMA) teknikleri — FDMA, TDMA, CDMA ve OFDMA — kullanıcıları frekans, zaman, kod veya alt-taşıyıcı boyutlarında birbirinden ayırarak ortogonallik sağlamaktadır. Bu ortogonallik ilkesi, kullanıcılar arası girişimi (inter-user interference) ortadan kaldırma avantajını sunarken, aynı zamanda kaynak tahsisinde esnekliği ve toplam spektral verimliliği sınırlandırmaktadır. Özellikle heterojen kullanıcı dağılımlarında — yani kanal koşullarının büyük farklılıklar gösterdiği senaryolarda — OMA yöntemlerinin Shannon kapasitesine yaklaşma kabiliyeti zayıflamaktadır.
+
+\subsection{Non-Ortogonal Çoklu Erişim (NOMA) Kavramı}
+NOMA, ortogonallik kısıtlamasını kaldırarak birden fazla kullanıcının \textbf{aynı zaman-frekans kaynağını} eş zamanlı olarak paylaşmasını mümkün kılan bir fiziksel katman çoklu erişim tekniğidir. Literatürde NOMA teknikleri iki ana kategoride sınıflandırılmaktadır:
+\begin{enumerate}
+    \item \textbf{Güç Etki Alanlı NOMA (Power-Domain NOMA — PD-NOMA):} Kullanıcılara farklı güç seviyeleri atanarak sinyallerin süperpozisyon kodlaması yoluyla üst üste bindirilmesine dayanır. Alıcı tarafında SIC algoritması ile girişim giderimi yapılır \cite{ding2017application}.
+    \item \textbf{Kod Etki Alanlı NOMA (Code-Domain NOMA):} SCMA (Sparse Code Multiple Access) ve MUSA (Multi-User Shared Access) gibi teknikleri kapsayan, kullanıcıların seyrek veya düşük korelasyonlu kodlarla ayrıştırıldığı yaklaşımlardır.
+\end{enumerate}
+Bu projede, implementasyon karmaşıklığı ve kavramsal netlik açısından \textbf{PD-NOMA} mimarisi tercih edilmiştir.
+
+\subsection{OMA ve NOMA Karşılaştırması}
+Şekil \ref{fig:oma_noma_comparison}'de OMA ve NOMA tekniklerinin kaynak paylaşım modelleri görselleştirilmiştir.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={transform shape}]
+    % OMA (FDMA/TDMA)
+    \draw[thick,->] (0,0) -- (4.5,0) node[anchor=north] {Frekans ($f$)};
+    \draw[thick,->] (0,0) -- (0,4) node[anchor=east] {Zaman ($t$)};
+    \draw[fill=blue!15, draw=blue, thick] (0.2,0.2) rectangle (3.8,1.6);
+    \node at (2,0.9) {\small \textbf{Kullanıcı 1 (Kanal 1)}};
+    \draw[fill=green!15, draw=green!60!black, thick] (0.2,1.8) rectangle (3.8,3.2);
+    \node at (2,2.5) {\small \textbf{Kullanıcı 2 (Kanal 2)}};
+    \node at (2,-0.8) {\small \textbf{(a) OMA (Ortogonal)}};
+
+    % PD-NOMA
+    \begin{scope}[xshift=6.5cm]
+    \draw[thick,->] (0,0) -- (4.5,0) node[anchor=north] {Frekans / Zaman};
+    \draw[thick,->] (0,0) -- (0,4) node[anchor=east] {Güç ($P$)};
+    
+    % Alt katman (User 1 - Yüksek Güç)
+    \draw[fill=red!15, draw=red, thick] (0.2,0.2) rectangle (3.8,2.0);
+    \node at (2,1.1) {\small \textbf{Kullanıcı 1 (Güç: $P_1$)}};
+    
+    % Üst katman (User 2 - Düşük Güç)
+    \draw[fill=yellow!20, draw=orange, thick] (0.2,2.0) rectangle (3.8,3.2);
+    \node at (2,2.6) {\small \textbf{Kullanıcı 2 (Güç: $P_2$)}};
+    
+    \node at (2,-0.8) {\small \textbf{(b) PD-NOMA (Ortogonal Olmayan)}};
+    \end{scope}
+\end{tikzpicture}
+\caption{OMA ve PD-NOMA Karşılaştırmalı Kaynak Dağılım Şeması}
+\label{fig:oma_noma_comparison}
+\end{figure}
+
+Tablo \ref{tab:oma_noma_table}, OMA ve NOMA tekniklerinin temel karakteristiklerini karşılaştırmaktadır:
+
+\begin{table}[H]
+\centering
+\caption{OMA ve PD-NOMA Tekniklerinin Temel Karakteristikleri}
+\label{tab:oma_noma_table}
+\begin{tabular}{lll}
+\toprule
+\textbf{Özellik} & \textbf{OMA (OFDMA vb.)} & \textbf{PD-NOMA} \\
+\midrule
+Kaynak Tahsisi & Her kullanıcıya ayrık kaynak dilimi & Tüm kullanıcılar aynı kaynağı paylaşır \\
+Kullanıcı Girişimi & Ortogonallik ile sıfırlanır & Kontrollü girişim, alıcıda SIC ile giderilir \\
+Spektral Verimlilik & Kullanıcı sayısı ile ölçeklenmez & Kapasite kazancı sunar \\
+Kullanıcı Adaleti & Zayıf kullanıcılar aleyhine eşitsizlik & Güç tahsisi ile adalet kontrol edilebilir \\
+Alıcı Karmaşıklığı & Düşük (Doğrudan çözümleme) & Yüksek (SIC algoritması gereklidir) \\
+Kapasite Sınırı & Sınırlı & Yayın (Broadcast) kanal kapasitesine yaklaşır \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Literatürde NOMA Çalışmaları}
+NOMA kavramının teorik temelleri, çok kullanıcılı bilgi teorisi çerçevesinde Cover (1972) tarafından ortaya konulan yayın kanalı (broadcast channel) kapasitesi analizine dayanmaktadır \cite{cover1972broadcast}. Saito vd. (2013) tarafından yayımlanan çalışmada, güç etki alanlı NOMA'nın 3GPP-LTE sistemlerine entegrasyonu ilk kez önerilmiştir \cite{saito2013non}. Dai vd. (2015), NOMA'nın 5G kablosuz ağlar için bir anahtar teknoloji olduğunu ortaya koyan kapsamlı bir derleme çalışması sunmuştur \cite{dai2015non}. Ding vd. (2014), çeşitli kanal koşulları altında PD-NOMA'nın ergodik kapasitesini ve kesinti olasılığını (outage probability) analiz etmiştir \cite{ding2014performance}. İslam vd. (2017) ise güç tahsisi stratejileri ve SIC alıcı tasarımına ilişkin detaylı bir çerçeve geliştirmiştir \cite{islam2017power}.
+
+LDPC kodlarının NOMA sistemlerine entegrasyonu açısından, Gallager (1962) tarafından ortaya konulan temel LDPC çerçevesi \cite{gallager1962low} ve MacKay ile Neal (1996) tarafından gösterilen Shannon sınırına yakın performans \cite{mackay1996near}, bu projede kullanılan IEEE 802.11n standardı LDPC kodlarının teorik altyapısını oluşturmaktadır.
+
+GNU Radio platformu üzerinde NOMA implementasyonu açısından, SDR (Software Defined Radio) tabanlı çalışmalar sınırlı sayıdadır ve bu proje, uçtan uca bir PD-NOMA transceiver'ın GNU Radio ortamında IEEE 802.11n LDPC kodlama ve DBPSK modülasyonu ile birlikte gerçeklenmesi bakımından özgün bir katkı sunmaktadır.
+
+\subsection{Projenin Amacı ve Kapsamı}
+Bu projenin temel amacı, iki kullanıcılı inen hat PD-NOMA senaryosunda:
+\begin{enumerate}
+    \item Verici tarafında süperpozisyon kodlaması ile sinyal birleştirme,
+    \item IEEE 802.11n LDPC kanal kodlaması ($R = 1/2$) ile hata dayanıklılığı sağlama,
+    \item AWGN kanal modeli altında (ayarlanabilir gürültü, frekans kayması ve zamanlama sapması ile) iletim simülasyonu,
+    \item Alıcı tarafında çapraz korelasyon tabanlı SIC algoritması ile ardışık kullanıcı çözümleme
+\end{enumerate}
+adımlarını kapsayan uçtan uca bir haberleşme zincirini GNU Radio Companion ortamında tasarlamak, gerçeklemek ve performansını değerlendirmektir.
+
+\newpage
+
+% ==============================================================================
+% TEORİK ALTYAPI VE MATEMATİKSEL MODEL
+% ==============================================================================
+\section{TEORİK ALTYAPI VE MATEMATİKSEL MODEL}
+
+\subsection{Süperpozisyon Kodlaması (Superposition Coding)}
+Güç etki alanlı NOMA'nın temel mekanizması, birden fazla kullanıcının sinyallerinin farklı güç katsayılarıyla ağırlıklandırılarak toplam bir sinyal olarak iletilmesidir. İki kullanıcılı bir inen hat senaryosunda, baz istasyonu (BS) tarafından iletilen süperpoze sinyal aşağıdaki şekilde ifade edilmektedir:
+\begin{equation}
+s(t) = \sqrt{a_1 P} \cdot x_1(t) + \sqrt{a_2 P} \cdot x_2(t)
+\end{equation}
+Burada:
+\begin{itemize}
+    \item $P$: Toplam iletim gücü,
+    \item $x_1(t)$ ve $x_2(t)$: Sırasıyla Kullanıcı 1 (Uzak/Zayıf Kanal) ve Kullanıcı 2 (Yakın/Güçlü Kanal) için modüle edilmiş sembol dizileri ($E[|x_i|^2] = 1$),
+    \item $a_1$ ve $a_2$: Güç tahsis katsayıları ($a_1 + a_2 = 1$, $a_1 > a_2$).
+\end{itemize}
+
+NOMA ilkesi gereğince, uzak kullanıcının kanal sönümlemesi daha fazla olduğu için ona daha fazla güç tahsis edilir. Bu projede güç tahsisi:
+\begin{equation}
+a_1 = 0.8, \quad a_2 = 0.2
+\end{equation}
+olarak belirlenmiştir. Normalize edilmiş birim güç ($P = 1$) varsayımı altında, genlik katsayıları:
+\begin{equation}
+\alpha_1 = \sqrt{a_1} = \sqrt{0.8} \approx 0.894 \approx \frac{2}{\sqrt{5}}
+\end{equation}
+\begin{equation}
+\alpha_2 = \sqrt{a_2} = \sqrt{0.2} \approx 0.447 \approx \frac{1}{\sqrt{5}}
+\end{equation}
+olarak hesaplanmıştır. Güç normalizasyonu doğrulaması:
+\begin{equation}
+\alpha_1^2 + \alpha_2^2 = 0.8 + 0.2 = 1.0
+\end{equation}
+Süperpoze sinyal, genlik cinsinden:
+\begin{equation}
+s(t) = 0.894 \cdot x_1(t) + 0.447 \cdot x_2(t)
+\end{equation}
+şeklinde yazılabilir. Burada Kullanıcı 1, zayıf/uzak kullanıcı (far user) olarak daha yüksek güç alırken; Kullanıcı 2, güçlü/yakın kullanıcı (near user) olarak daha düşük güç almaktadır.
+
+\subsubsection{Güç Tahsis Stratejisi ve Konstelasyon Analizi}
+BPSK modülasyonu altında ($x_i \in \{-1, +1\}$), süperpoze sinyalin konstelasyon uzayı dört noktadan oluşmaktadır (Tablo \ref{tab:constellation_table}):
+
+\begin{table}[H]
+\centering
+\caption{BPSK Modülasyonu Altında Süperpoze Konstelasyon Analizi}
+\label{tab:constellation_table}
+\begin{tabular}{cccc}
+\toprule
+\textbf{$x_1$} & \textbf{$x_2$} & \textbf{$s = \alpha_1 x_1 + \alpha_2 x_2$} & \textbf{Karar Bölgesi (User 1)} \\
+\midrule
++1 & +1 & $+0.894 + 0.447 = +1.341$ & Pozitif ($>0$) \\
++1 & −1 & $+0.894 − 0.447 = +0.447$ & Pozitif ($>0$) \\
+−1 & +1 & $−0.894 + 0.447 = −0.447$ & Negatif ($<0$) \\
+−1 & −1 & $−0.894 − 0.447 = −1.341$ & Negatif ($<0$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Bu konstelasyon yapısında, sıfır karar eşiği ($\text{threshold} = 0$) kullanılarak Kullanıcı 1'in ($x_1$) sembol kararı doğrudan verilebilmektedir; zira $\alpha_1 > \alpha_2$ koşulu, tüm olası $s$ değerlerinin $x_1$'in işaretiyle aynı yönde kalmasını garanti etmektedir. Bu özellik, alıcıda girişim giderimi yapılmadan doğrudan sıfır eşiğiyle $x_1$ sinyalinin çözülmesinin temelini oluşturmaktadır.
+
+\subsection{AWGN Kanal Modeli}
+Verici çıkışından alıcı girişine kadar olan iletim kanalı, Toplamsal Beyaz Gauss Gürültüsü (AWGN) modeli ile temsil edilmektedir:
+\begin{equation}
+r(t) = h \cdot s(t) + n(t)
+\end{equation}
+Burada:
+\begin{itemize}
+    \item $h$: Kanal sönümleme katsayısı (bu projede $h = 1.0$, düz sönümleme),
+    \item $n(t)$: Sıfır ortalamalı ve $\sigma_n^2$ varyanslı karmaşık Gauss gürültüsü.
+\end{itemize}
+
+GNU Radio'daki \texttt{Channel Model} bloğunda konfigüre edilen parametreler Tablo \ref{tab:channel_params} 'de verilmiştir:
+
+\begin{table}[H]
+\centering
+\caption{Kanal Modeli Simülasyon Parametreleri}
+\label{tab:channel_params}
+\begin{tabular}{lll}
+\toprule
+\textbf{Parametre} & \textbf{Değer} & \textbf{Açıklama} \\
+\midrule
+Gürültü Gerilimi ($\sigma_n$) & $0.1$ (ayarlanabilir, 0--2) & AWGN standart sapması \\
+Frekans Kayması ($\Delta f$) & $0.01$ (ayarlanabilir, $\pm 0.25$) & Normalize frekans ofseti \\
+Zamanlama Sapması ($\epsilon$) & $1.0001$ (ayarlanabilir, 0.999--1.001) & Saat frekansı sapma oranı \\
+Kanal Katsayıları & $[1.0]$ & Tek-dokunuşlu düz sönümleme \\
+Etiket Geçirme & \texttt{True} & Akış etiketlerini korur \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Varsayılan gürültü gerilimi ($\sigma_n = 0.1$) ile birim güç iletim varsayımı altında Sinyal-Gürültü Oranı (SNR):
+\begin{equation}
+\text{SNR} = \frac{P}{\sigma_n^2} = \frac{1}{(0.1)^2} = 100 \quad (\approx 20 \text{ dB})
+\end{equation}
+
+\subsection{Ardışık Girişim İptali (Successive Interference Cancellation — SIC)}
+SIC, NOMA alıcısının temel bileşenidir ve çok kullanıcılı girişimin kademeli olarak giderilmesini sağlar. İki kullanıcılı senaryoda SIC süreci aşağıdaki adımlardan oluşmaktadır:
+
+\subsubsection{Adım 1: Güçlü Kullanıcının Çözülmesi (User 1 Decoding)}
+Alınan sinyal $r(t)$ üzerinde, baskın güce sahip olan Kullanıcı 1'in sinyali doğrudan çözümlenir. Kullanıcı 2'nin sinyali bu aşamada girişim olarak ele alınır:
+\begin{equation}
+\hat{x}_1 = \text{Dec}\left\{ r(t) \right\} = \text{Dec}\left\{ \alpha_1 x_1(t) + \alpha_2 x_2(t) + n(t) \right\}
+\end{equation}
+Kullanıcı 1 için Sinyal-Girişim-Artı-Gürültü Oranı (SINR):
+\begin{equation}
+\text{SINR}_1 = \frac{a_1 P}{a_2 P + \sigma_n^2} = \frac{0.8}{0.2 + 0.01} \approx 3.81 \quad (\approx 5.81 \text{ dB})
+\end{equation}
+
+\subsubsection{Adım 2: Güçlü Sinyalin Yeniden Oluşturulması (Signal Reconstruction)}
+Çözülen $\hat{x}_1$ verisi, verici tarafındaki işlem zinciri ile aynı adımlardan (LDPC kanal kodlama, BPSK sembol eşleme, güç ölçekleme) geçirilerek yeniden oluşturulur:
+\begin{equation}
+\hat{s}_1(t) = \alpha_1 \cdot \text{Mod}\left\{ \text{Enc}\left\{ \hat{x}_1 \right\} \right\}
+\end{equation}
+Yeniden oluşturma süreci LDPC kodlama $\to$ BPSK sembol haritası $\to$ $\times 0.894$ genlik ölçekleme adımlarını kapsamaktadır.
+
+\subsubsection{Adım 3: Girişim İptali (Interference Subtraction)}
+Yeniden oluşturulan güçlü kullanıcı sinyali, zamanlama ve faz açısından hizalandıktan sonra alınan bileşik sinyalden çıkarılır:
+\begin{equation}
+r_{\text{clean}}(t) = r(t) - \hat{s}_1(t - \hat{\tau}) \cdot e^{j\hat{\phi}}
+\end{equation}
+Burada $\hat{\tau}$ tahmin edilen zamanlama gecikmesi, ve $\hat{\phi}$ faz ofseti tahminidir. Eğer kod çözme hatasız ($\hat{x}_1 = x_1$) ve hizalama mükemmel ise:
+\begin{equation}
+r_{\text{clean}}(t) = \alpha_2 x_2(t) + n(t)
+\end{equation}
+
+\subsubsection{Adım 4: Zayıf Kullanıcının Çözülmesi (User 2 Decoding)}
+Temizlenmiş sinyal üzerinde Kullanıcı 2'nin verisi çözümlenir:
+\begin{equation}
+\hat{x}_2 = \text{Dec}\left\{ r_{\text{clean}}(t) \right\}
+\end{equation}
+Kullanıcı 2 için SNR (ideal SIC sonrası):
+\begin{equation}
+\text{SNR}_2 = \frac{a_2 P}{\sigma_n^2} = \frac{0.2}{0.01} = 20 \quad (\approx 13.01 \text{ dB})
+\end{equation}
+
+\subsubsection{SIC Hata Yayılımı (Error Propagation)}
+SIC sürecinin başarısı, Adım 1'deki kod çözme doğruluğuna kritik biçimde bağlıdır. Kullanıcı 1'in hatalı çözülmesi durumunda, artık girişim (residual interference) ortaya çıkar:
+\begin{equation}
+r_{\text{clean}}(t) = \alpha_2 x_2(t) + n(t) + \alpha_1 \left[ x_1(t) - \hat{x}_1(t) \right]
+\end{equation}
+$\alpha_1 \left[ x_1(t) - \hat{x}_1(t) \right]$ terimi hata yayılımını temsil etmekte olup, $\alpha_1 / \alpha_2 = 2$ olması nedeniyle her bir hatalı sembol, Kullanıcı 2'nin sinyalini $2:1$ oranında bastırma potansiyeline sahiptir.
+
+Benzer şekilde, zamanlama hizalamasındaki 1 sembol kayma durumunda artık girişim:
+\begin{equation}
+r_{\text{clean}}[n] = \alpha_1(x_1[n] - x_1[n-1]) + \alpha_2 x_2[n] + n[n]
+\end{equation}
+biçimini alır. $\alpha_1 = 2\alpha_2$ olduğundan, bu diferansiyel girişim terimi Kullanıcı 2 sinyalini tamamen bastırabilir. Bu nedenle, güçlü kanal kodlaması (LDPC) ve hassas zamanlama hizalaması büyük önem taşımaktadır.
+
+\subsection{LDPC Kanal Kodlaması}
+Düşük Yoğunluklu Parite Kontrol (Low-Density Parity-Check — LDPC) kodları, Shannon sınırına yakın performans sunan modern ileri hata düzeltme (Forward Error Correction — FEC) kodlarıdır. Bu projede kullanılan LDPC kodu, IEEE 802.11n (Wi-Fi) standardından alınmış olup aşağıdaki parametrelere sahiptir (Tablo \ref{tab:ldpc_params}):
+
+\begin{table}[H]
+\centering
+\caption{IEEE 802.11n LDPC Kod Parametreleri}
+\label{tab:ldpc_params}
+\begin{tabular}{ll}
+\toprule
+\textbf{Parametre} & \textbf{Değer} \\
+\midrule
+Kod Sözcüğü Uzunluğu ($n$) & 1296 bit \\
+Mesaj Uzunluğu ($k$) & 648 bit \\
+Parite Bitleri ($n - k$) & 648 bit \\
+Kod Oranı ($R$) & $0.5$ (yarı oran) \\
+Parite Kontrol Matrisi & \texttt{n\_1296\_k\_0648\_ieee.alist} \\
+Alt-matris boyutu ($Z$) & 54 (yarı-döngüsel yapı) \\
+Maksimum Kod Çözücü İterasyonu & 50 \\
+Delme Deseni (Puncture Pattern) & Yok ('11') \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Kullanılan LDPC kodu, yarı-döngüsel (quasi-cyclic) bir yapıya sahiptir. Parite kontrol matrisi $\mathbf{H}_{648 \times 1296}$, $Z = 54$ boyutlu döngüsel permütasyon alt-matrislerinden oluşmaktadır:
+\begin{equation}
+\mathbf{H} = \begin{bmatrix} \mathbf{P}_{0,0} & \mathbf{P}_{0,1} & \cdots & \mathbf{P}_{0,23} \\ \mathbf{P}_{1,0} & \mathbf{P}_{1,1} & \cdots & \mathbf{P}_{1,23} \\ \vdots & \vdots & \ddots & \vdots \\ \mathbf{P}_{11,0} & \mathbf{P}_{11,1} & \cdots & \mathbf{P}_{11,23} \end{bmatrix}
+\end{equation}
+
+Bu projede her paket $\text{payload\_size} = 77$ bayt ($= 616$ bit) kullanıcı verisine sahiptir. CRC-32 eklenmesi (4 bayt) sonrası $81$ bayt ($= 648$ bit) elde edilmekte olup, bu değer LDPC kodunun mesaj uzunluğu $k = 648$ ile birebir örtüşmektedir. LDPC kodlama sonrası her paket $n = 1296$ bit uzunluğundaki kod sözcüğüne dönüşür.
+
+\subsection{Diferansiyel BPSK (DBPSK) Modülasyonu}
+Bu projede verici tarafında Diferansiyel BPSK (DBPSK) modülasyonu kullanılmaktadır. Diferansiyel kodlamada, bilgi verinin mutlak faz değerinde değil, ardışık semboller arasındaki faz farkında taşınır:
+\begin{equation}
+d_k = b_k \oplus d_{k-1}
+\end{equation}
+BPSK sembol eşlemesi:
+\begin{equation}
+x_k = 2d_k - 1 = \begin{cases} +1 & d_k = 1 \\ -1 & d_k = 0 \end{cases}
+\end{equation}
+
+Diferansiyel kodlamanın avantajı, alıcıda mutlak faz referansı gerektirmeden çözümleme yapılabilmesidir; bu özellik, Costas döngüsünün $180^\circ$ faz belirsizliğini ortadan kaldırmaktadır.
+
+Alıcı tarafında diferansiyel çözme, yumuşak karar (soft-decision) formatında gerçekleştirilmektedir:
+\begin{equation}
+\hat{b}_k^{\text{soft}} = -(y_k \cdot y_{k-1})
+\end{equation}
+Burada $y_k$ yumuşak konstelasyon çıkışıdır. Yumuşak karar bilgisinin korunması, LDPC kod çözücünün performansı açısından kritik öneme sahiptir. AWGN kanalında kodlanmamış DBPSK'nın bit hata olasılığı (BER) $P_b = \frac{1}{2} e^{-E_b/N_0}$ olarak modellenir.
+
+\subsection{Darbe Şekillendirme: Kök Yükseltilmiş Kosinüs (RRC) Filtresi}
+Semboller arası girişimi (Inter-Symbol Interference — ISI) önlemek ve bant genişliğini kontrol etmek amacıyla, RRC darbe şekillendirme filtresi kullanılmıştır. RRC filtresinin frekans tepkisi:
+\begin{equation}
+H_{\text{RRC}}(f) = \begin{cases} \sqrt{T_s} & |f| \leq \frac{1-\beta}{2T_s} \\ \sqrt{\frac{T_s}{2}\left[1 + \cos\left(\frac{\pi T_s}{\beta}\left(|f| - \frac{1-\beta}{2T_s}\right)\right)\right]} & \frac{1-\beta}{2T_s} < |f| \leq \frac{1+\beta}{2T_s} \\ 0 & |f| > \frac{1+\beta}{2T_s} \end{cases}
+\end{equation}
+Burada $\beta$ aşırı bant genişliği (roll-off) faktörüdür. Bu projede $\beta = 0.35$ olarak konfigüre edilmiştir. Filtre uzunluğu $11 \times \text{sps} = 44$ dokunuş (tap) olarak belirlenmiştir.
+
+\newpage
+
+% ==============================================================================
+% GNU RADIO TABANLI SİSTEM TASARIMI
+% ==============================================================================
+\section{GNU RADIO TABANLI SİSTEM TASARIMI (BLOK ANALİZİ)}
+
+GNU Radio Companion (GRC) ortamında tasarlanan NOMA-SIC dosya transferi sistemi, üç ana katmandan oluşmaktadır: Verici (Transmitter), Kanal Modeli (Channel Model) ve Alıcı (Receiver/SIC). Sistem, 60'ın üzerinde sinyal işleme bloğundan ve sanal yönlendirme yapılarından oluşmaktadır.
+
+\subsection{Sistem Değişkenleri ve Global Parametreler}
+Sistemde kullanılan global değişkenler Tablo \ref{tab:global_vars}'de özetlenmiştir:
+
+\begin{table}[H]
+\centering
+\caption{Sistem Genel Değişken Tanımlamaları}
+\label{tab:global_vars}
+\begin{tabular}{lll}
+\toprule
+\textbf{Değişken Adı} & \textbf{Değer} & \textbf{Açıklama} \\
+\midrule
+\texttt{samp\_rate} & $200{,}000$ Hz & Sistem örnekleme frekansı \\
+\texttt{sps} & $4$ & Sembol başına örnek sayısı \\
+\texttt{payload\_size} & $77$ bayt & CRC öncesi paket veri uzunluğu \\
+\texttt{preamble\_size} & $250$ bayt & Senkronizasyon ön eki boyutu \\
+\texttt{postamble\_size} & $8$ bayt & Paket sonu sönümlenme payı \\
+\texttt{noise} & $0.1$ (0--2) & Kanal AWGN standart sapması \\
+\texttt{freq\_offset} & $0.01$ & Normalize frekans kayması \\
+\texttt{time\_offset} & $1.0001$ & Zamanlama sapması oranı \\
+\texttt{constel} & BPSK nesnesi & BPSK modülasyon tanımlayıcısı \\
+\texttt{ldpc\_enc} & $R=1/2$ alist & IEEE 802.11n LDPC encoder nesnesi \\
+\texttt{ldpc\_dec} & max\_iter: 50 & LDPC decoder nesnesi \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Sembol hızı ($R_s$) ve bant genişliği ($B$) şu şekilde hesaplanmaktadır:
+\begin{equation}
+R_s = \frac{f_s}{\text{sps}} = \frac{200{,}000}{4} = 50{,}000 \text{ sembol/s}
+\end{equation}
+\begin{equation}
+B = R_s \cdot (1 + \beta) = 50{,}000 \times 1.35 = 67{,}500 \text{ Hz}
+\end{equation}
+
+\subsection{A. Verici (Transmitter) Katmanı Tasarımı}
+Verici katmanı, iki paralel kodlama zincirinden ve bir süperpozisyon birleştirme bloğundan oluşmaktadır. Kullanıcı 1 verici zinciri şu blok sırasını takip eder (Şekil \ref{fig:tx_flowchart}):
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[auto, >=latex', node distance=1.0cm, semithick]
+    \tikzstyle{block} = [draw, rectangle, fill=blue!10, text width=2.4cm, text centered, minimum height=0.7cm, font=\scriptsize]
+    
+    \node [block] (source) {File Source};
+    \node [block, right=0.3cm of source] (s2ts) {Stream to Tagged Stream};
+    \node [block, right=0.3cm of s2ts] (crc) {Stream CRC32};
+    \node [block, right=0.3cm of crc] (repack) {Repack Bits (8$\to$1)};
+    
+    \node [block, below=0.5cm of source] (scrambler) {Additive Scrambler};
+    \node [block, right=0.3cm of scrambler] (ldpc) {LDPC Encoder};
+    \node [block, right=0.3cm of ldpc] (len_mult) {Multiply Length ($\times 2$)};
+    \node [block, right=0.3cm of len_mult] (mux) {Tagged Stream Mux};
+    
+    \node [block, below=0.5cm of scrambler] (mod) {Constellation Modulator};
+    \node [block, right=0.3cm of mod] (tag_gate) {Tag Gate};
+    \node [block, right=0.3cm of tag_gate] (mult_const) {Multiply Const ($\alpha_1$)};
+    
+    \draw[->] (source) -- (s2ts);
+    \draw[->] (s2ts) -- (crc);
+    \draw[->] (crc) -- (repack);
+    \draw[->] (repack.south) -- ++(0,-0.2) -| (scrambler.north);
+    \draw[->] (scrambler) -- (ldpc);
+    \draw[->] (ldpc) -- (len_mult);
+    \draw[->] (len_mult) -- (mux);
+    \draw[->] (mux.south) -- ++(0,-0.2) -| (mod.north);
+    \draw[->] (mod) -- (tag_gate);
+    \draw[->] (tag_gate) -- (mult_const);
+\end{tikzpicture}
+\caption{Verici Katmanı Sinyal İşleme Zinciri}
+\label{fig:tx_flowchart}
+\end{figure}
+
+Blokların parametrik ve işlevsel analizi aşağıda sunulmuştur:
+\begin{enumerate}
+    \item \textbf{File Source:} İletilecek veriyi bayt akışı olarak dosyadan okur. Kullanıcı 1 için \texttt{bpsk\_transmit.txt}, Kullanıcı 2 için \texttt{bpsk\_transmit\_2.txt} dosyaları atanmıştır.
+    \item \textbf{Stream to Tagged Stream:} Akışı \texttt{payload\_size = 77} baytlık paketlere böler ve \texttt{packet\_len} etiketini ekler.
+    \item \textbf{Stream CRC32:} Paketlere 4 baytlık CRC-32 ekleyerek boyutu 81 bayta ($648$ bit $= k$) yükseltir.
+    \item \textbf{Repack Bits (8$\to$1):} Bayt düzeyindeki veriyi bit akışına dönüştürür.
+    \item \textbf{Additive Scrambler:} Bit dizisini LFSR tabanlı (\texttt{Mask=0x8A}, \texttt{Seed=0x7F}) karıştırma işlemine tabi tutarak zamanlama geçiş yoğunluğunu artırır ve DC kaymasını önler.
+    \item \textbf{FEC Extended Encoder:} 648 bitlik paket verisini \texttt{n\_1296\_k\_0648\_ieee.alist} matrisiyle 1296 bitlik kod sözcüğüne ($n=1296$) kodlar.
+    \item \textbf{Tagged Stream Multiply Length:} Paket boyutu 2 katına çıktığından, \texttt{packet\_len} etiket değerini $1296$'ya günceller.
+    \item \textbf{Tagged Stream Mux:} Preambül (250 bayt), Başlık (erişim kodu), LDPC kodlu yük (1296 bit) ve Postambül (8 bayt) segmentlerini birleştirerek çerçeveyi kurar.
+    \item \textbf{Constellation Modulator:} Giriş bitlerini diferansiyel olarak kodlar, BPSK sembollerine eşler, $\text{sps}=4$ oranında üst örnekler ve $\beta=0.35$ RRC filtresinden geçirir.
+    \item \textbf{Tag Gate:} Alıcının fiziksel algoritmalarla çalışması için tüm GNU Radio etiketlerini siler.
+    \item \textbf{Multiply Const:}
+    \begin{itemize}
+        \item Kullanıcı 1 (Uzak): $\alpha_1 = \sqrt{0.8} \approx 0.894$ katsayısıyla çarpılır.
+        \item Kullanıcı 2 (Yakın): $\alpha_2 = \sqrt{0.2} \approx 0.447$ katsayısıyla çarpılır.
+    \end{itemize}
+    \item \textbf{Add Block:} İki kullanıcının güç ölçekli sinyalleri toplanarak süperpoze NOMA sinyali elde edilir.
+\end{enumerate}
+
+\subsection{B. Kanal Modeli (Channel Model) Yapılandırması}
+Süperpoze sinyal, kanal modelleme bloğundan geçirilerek \texttt{noise} (varsayılan: 0.1), \texttt{freq\_offset} (0.01) ve \texttt{time\_offset} (1.0001) bozucu etkilerine maruz bırakılır.
+
+\subsection{C. Alıcı (Receiver) Katmanı ve SIC Döngüsü}
+Alıcı ön-ucunda \textbf{FFT RRC Filter} (\text{band dışı gürültü filtreleme}), \textbf{Symbol Synchronizer} (\text{zamanlama eğimi tabanlı ML detektörü ve 32 polifaz filtreli 8-taps MMSE interpolatörü}) ve \textbf{Costas Loop} (\text{taşıyıcı frekansı ve faz kilitlenmesi}) yer alır. \textbf{Correlation Estimator} ise 64 sembollük preambülü tarayarak paket başlangıç etiketini ekler.
+
+\subsubsection{Kullanıcı 1 Çözüm Zinciri}
+\texttt{Constellation Soft Decoder} karmaşık sembolleri BPSK LLR yumuşak kararlarına dönüştürür. Geliştirilen \texttt{Soft Diff Decoder} (EPY Block 0) yumuşak kararları koruyarak diferansiyel kod çözümü yapar. \texttt{Correlate Access Code} ile paket sınırlandırıldıktan sonra \texttt{LDPC Decoder} 50 iterasyonla User 1 verisini ($k=648$) çözer. CRC doğrulamasından geçen paketler \texttt{bpsk\_receive.txt} dosyasına yazılır.
+
+\subsubsection{SIC Yeniden Sentez ve Çıkarma}
+Çözülen Kullanıcı 1 bitleri, \texttt{LDPC Encoder} ile tekrar 1296 bite kodlanır, BPSK sembol uzayına ($\{-1, +1\}$) eşlenir ve $\alpha_1 = 0.894$ ile çarpılır. Sentezlenen girişim sinyali, \texttt{Decoupled NOMA SIC Aligner} (EPY Block 1) vasıtasıyla alınan sinyalle çapraz korelasyon üzerinden hizalanarak çıkarılır.
+
+\subsubsection{Kullanıcı 2 Çözüm Zinciri}
+Çıkarma işlemiyle elde edilen temizlenmiş sinyal, Kullanıcı 1 ile aynı parametrelere sahip paralel demodülasyon ve LDPC çözüm zincirine beslenir. Çözülen veriler \texttt{bpsk\_receive\_2.txt} dosyasına aktarılır.
+
+\subsection{Sanal Yönlendirme Haritası (Virtual Sinks/Sources)}
+Sinyal yollarını modüler hale getirmek için kullanılan sanal yönlendirme noktaları Tablo \ref{tab:virtual_map}'de verilmiştir:
+
+\begin{table}[H]
+\centering
+\caption{Sanal Yönlendirme Portları ve Akış Haritası}
+\label{tab:virtual_map}
+\begin{tabular}{llll}
+\toprule
+\textbf{Çıkış (Sink)} & \textbf{Giriş (Source)} & \textbf{Tip} & \textbf{İçerik ve Rolü} \\
+\midrule
+\texttt{transmit} & \texttt{transmit} & Complex & Süperpozisyon sonrası birleşik NOMA verici çıkış sinyali \\
+\texttt{channel} & \texttt{channel} & Complex & Kanal modelinin gürültü ve frekans kaymalı çıkışı \\
+\texttt{recovery} & \texttt{recovery} & Complex & Costas Loop çıkışı (User 1 demodülatör girişi) \\
+\texttt{recovery\_2} & \texttt{recovery\_2} & Complex & Correlation Estimator çıkışı (SIC hizalama ham girişi) \\
+\texttt{user\_2} & \texttt{user\_2} & Byte & Kullanıcı 1 çözülmüş temiz bit akışı \\
+\texttt{user\_2\_sub} & \texttt{user\_2\_sub} & Complex & Yeniden sentezlenmiş User 1 sinyali \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Çerçeve Yapısı (Frame Structure) Detayları}
+Çerçeve yapısının zaman alanındaki yerleşimi aşağıdaki gibidir:
+\begin{equation*}
+\boxed{\text{Preamble } (250\text{ B})} \parallel \boxed{\text{Header } (\approx 64\text{ B})} \parallel \boxed{\text{Payload } (162\text{ B} = 1296\text{ LDPC Sembolü})} \parallel \boxed{\text{Postamble } (8\text{ B})}
+\end{equation*}
+
+\newpage
+
+% ==============================================================================
+% GELİŞTİRİLEN ÖZEL PYTHON BLOKLARI
+% ==============================================================================
+\section{GELİŞTİRİLEN ÖZEL PYTHON BLOKLARI (EMBEDDED BLOCKS)}
+
+\subsection{Yumuşak Diferansiyel Çözücü: \texttt{NOMA\_epy\_block\_0.py}}
+Bu özel blok, diferansiyel kod çözme işlemini gerçekleştirirken BPSK LLR yumuşak kararlarını koruyarak LDPC kod çözücünün başarımını maksimize eder. Kod içeriği Liste \ref{lst:epy_block_0}'da verilmiştir.
+
+\begin{lstlisting}[language=Python, label=lst:epy_block_0, caption={Yumuşak Diferansiyel Çözücü Blok Kodu}]
+import numpy as np
+from gnuradio import gr
+
+class blk(gr.sync_block):
+    """
+    Soft Differential Decoder
+    Float soft sembolleri alip soft decoded bitler uretir.
+    BPSK: out[n] = -(in[n] * in[n-1])
+    """
+    def __init__(self, modulus=2):
+        if modulus not in (2, 4):
+            raise ValueError("Desteklenmeyen modulus. 2 veya 4 kullanin.")
+        self.modulus = int(modulus)
+        gr.sync_block.__init__(
+            self,
+            name='Soft Diff Decoder',
+            in_sig=[np.float32],
+            out_sig=[np.float32]
+        )
+        if self.modulus == 4:
+            self.set_output_multiple(2)
+        if self.modulus == 2:
+            self.prev = np.float32(1.0)
+        else:
+            self.prev_complex = complex(1.0, 0.0)
+
+    def work(self, input_items, output_items):
+        inp = input_items[0]
+        out = output_items[0]
+        n = len(inp)
+        if n == 0:
+            return 0
+
+        if self.modulus == 2:
+            extended = np.empty(n + 1, dtype=np.float32)
+            extended[0] = self.prev
+            extended[1:] = inp
+            out[:] = -(extended[1:] * extended[:-1])
+            self.prev = np.float32(inp[-1])
+        else:
+            num_symbols = n // 2
+            I_vals = inp[0::2]
+            Q_vals = inp[1::2]
+            curr = (I_vals + 1j * Q_vals).astype(np.complex64)
+            prev_arr = np.empty(num_symbols, dtype=np.complex64)
+            prev_arr[0] = self.prev_complex
+            prev_arr[1:] = curr[:-1]
+            y = curr * np.conj(prev_arr)
+            out[0::2] = -(y.real.astype(np.float32))
+            out[1::2] = -(y.imag.astype(np.float32))
+            self.prev_complex = complex(curr[-1])
+        return n
+\end{lstlisting}
+
+\subsection{Bağımsız NOMA SIC Hizalama Bloğu: \texttt{NOMA\_epy\_block\_1.py}}
+Bu blok, alınan composite sinyal ile yerel olarak yeniden sentezlenen User 1 sinyalini hizalar ve çıkarma işlemini gerçekleştirir. \textit{basic\_block} yapısı ve \texttt{forecast} fonksiyonunun \texttt{[0,0]} döndürmesi, GNU Radio zamanlayıcısının kilitlenmesini engeller. Kod içeriği Liste \ref{lst:epy_block_1}'de sunulmuştur.
+
+\begin{lstlisting}[language=Python, label=lst:epy_block_1, caption={Decoupled NOMA SIC Aligner Blok Kodu}]
+import numpy as np
+from gnuradio import gr
+import scipy.signal
+
+class blk(gr.basic_block):
+    """
+    Decoupled BPSK NOMA SIC Aligner Block
+    Giris verilerini aninda tuketerek dairesel tamponlara yazar,
+    böylece GNU Radio zamanlayici kilitlenmesini engeller.
+    """
+    def __init__(self, sample_rate=200000.0, near_user_amplitude=0.864, search_window=128, payload_size=1296, payload_offset=64):
+        gr.basic_block.__init__(
+            self,
+            name='Decoupled NOMA SIC Aligner',
+            in_sig=[np.complex64, np.complex64],
+            out_sig=[np.complex64]
+        )
+        self.sample_rate = sample_rate
+        self.near_user_amplitude = near_user_amplitude
+        self.search_window = search_window
+        self.payload_size = payload_size
+        self.payload_offset = payload_offset
+        self.buffer_rx = np.array([], dtype=np.complex64)
+        self.buffer_tx1 = np.array([], dtype=np.complex64)
+        self.rx_processed_abs = 0
+        self.subtracted_until_abs = 0
+        self.next_packet_start_abs = 0
+        self.pkt_counter = 0
+
+    def forecast(self, noutput_items, ninputs):
+        return [0] * ninputs
+
+    def general_work(self, input_items, output_items):
+        in_rx = input_items[0]
+        in_tx1 = input_items[1]
+        out_rx2 = output_items[0]
+
+        if len(in_rx) > 0:
+            self.buffer_rx = np.concatenate((self.buffer_rx, in_rx))
+            self.consume(0, len(in_rx))
+        if len(in_tx1) > 0:
+            self.buffer_tx1 = np.concatenate((self.buffer_tx1, in_tx1))
+            self.consume(1, len(in_tx1))
+
+        MAX_RX_BUFFER = 50000
+        if len(self.buffer_rx) > MAX_RX_BUFFER:
+            excess = len(self.buffer_rx) - MAX_RX_BUFFER
+            self.subtracted_until_abs = max(self.subtracted_until_abs, self.rx_processed_abs + excess)
+
+        MAX_TX1_BUFFER = 5 * self.payload_size
+        if len(self.buffer_tx1) > MAX_TX1_BUFFER:
+            excess = len(self.buffer_tx1) - MAX_TX1_BUFFER
+            self.buffer_tx1 = self.buffer_tx1[excess:]
+
+        while len(self.buffer_tx1) >= self.payload_size:
+            if self.pkt_counter == 0:
+                SEARCH_START = 1000
+                SEARCH_END = 3000
+            else:
+                expected_payload_start_abs = self.next_packet_start_abs + 2048
+                start_rel = expected_payload_start_abs - self.rx_processed_abs
+                SEARCH_START = start_rel - 128
+                SEARCH_END = start_rel + 128
+            SEARCH_START = max(0, SEARCH_START)
+
+            if len(self.buffer_rx) < SEARCH_END + self.payload_size:
+                break
+
+            rx_search_chunk = self.buffer_rx[SEARCH_START : SEARCH_END + self.payload_size]
+            tx1_chunk = self.buffer_tx1[:self.payload_size]
+
+            tx1_chunk_norm = np.sign(tx1_chunk.real)
+            tx1_chunk_diff = np.cumprod(-tx1_chunk_norm)
+
+            corr = scipy.signal.correlate(rx_search_chunk, tx1_chunk_diff, mode='valid')
+
+            if len(corr) > 0:
+                best_idx = np.argmax(np.abs(corr))
+                best_val = corr[best_idx]
+                payload_start_rel = SEARCH_START + best_idx
+                payload_start_abs = self.rx_processed_abs + payload_start_rel
+
+                tx1_energy = np.sum(np.abs(tx1_chunk_diff)**2)
+                if tx1_energy > 1e-6:
+                    estimated_amp = np.abs(best_val) / tx1_energy
+                else:
+                    estimated_amp = self.near_user_amplitude
+                phase_offset = np.angle(best_val)
+
+                if estimated_amp >= 0.03:
+                    if estimated_amp > 1.10:
+                        amplitude_scale = estimated_amp / 1.5
+                    else:
+                        amplitude_scale = estimated_amp
+                    
+                    interference_signal = tx1_chunk_diff * amplitude_scale * np.exp(1j * phase_offset)
+                    self.buffer_rx[payload_start_rel : payload_start_rel + self.payload_size] -= interference_signal
+
+                    self.pkt_counter += 1
+                    shift = payload_start_abs - (self.next_packet_start_abs + 2048) if self.pkt_counter > 1 else payload_start_abs - 2048
+                    
+                    with open("debug_sic.txt", "a") as f_dbg:
+                        f_dbg.write(f"[SIC Aligner] Packet #{self.pkt_counter} Subtracted! Shift: {shift} symbols, Phase: {phase_offset:.3f} rad, Amp: {amplitude_scale:.3f}\n")
+                    
+                    self.next_packet_start_abs = payload_start_abs - 2048 + 3408
+                    self.subtracted_until_abs = max(self.subtracted_until_abs, payload_start_abs - 2048 + 3408)
+                    self.buffer_tx1 = self.buffer_tx1[self.payload_size:]
+                    continue
+
+            self.pkt_counter += 1
+            self.next_packet_start_abs += 3408
+            self.buffer_tx1 = self.buffer_tx1[self.payload_size:]
+
+        safe_to_output = self.subtracted_until_abs - self.rx_processed_abs
+        safe_to_output = min(safe_to_output, len(self.buffer_rx))
+        safe_to_output = max(0, safe_to_output)
+        n_out = len(out_rx2)
+        limit = min(safe_to_output, n_out)
+
+        if limit > 0:
+            out_rx2[:limit] = self.buffer_rx[:limit]
+            self.buffer_rx = self.buffer_rx[limit:]
+            self.rx_processed_abs += limit
+            return limit
+        else:
+            return 0
+\end{lstlisting}
+
+\newpage
+
+% ==============================================================================
+% SİMÜLASYON VE PERFORMANS DEĞERLENDİRMESİ
+% ==============================================================================
+\section{SİMÜLASYON VE PERFORMANS DEĞERLENDİRMESİ}
+
+\subsection{Zamanlayıcı Kilitlenmesi (Scheduler Deadlock) ve Çözümü}
+Geri beslemeli alıcı yapılarında standart \texttt{sync\_block} kullanılması, GNU Radio'nun dairesel veri akış mantığı nedeniyle kilitlenmeye (deadlock) yol açmaktadır. Şekil \ref{fig:deadlock_diag} bu kilitleme durumunu göstermektedir.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[auto, >=latex', node distance=1.5cm, semithick]
+    \tikzstyle{block} = [draw, rectangle, fill=red!10, text width=2.5cm, text centered, minimum height=1cm, font=\small]
+    \tikzstyle{normal} = [draw, rectangle, fill=blue!10, text width=2.5cm, text centered, minimum height=1cm, font=\small]
+    
+    \node [normal] (rx) {Ham Sinyal (Port 0)};
+    \node [block, right=1.5cm of rx] (aligner) {SIC Aligner\\(sync\_block)};
+    \node [normal, below=1.0cm of aligner] (ldpc) {LDPC Decoder};
+    \node [normal, left=1.5cm of ldpc] (reconstruct) {Yeniden Sentez\\(Port 1)};
+    
+    \draw[->, thick, red] (rx) -- (aligner) node[midway, above] {$\approx 0$ gecikme};
+    \draw[->, thick, red] (aligner) -- (ldpc);
+    \draw[->, thick, red] (ldpc) -- (reconstruct);
+    \draw[->, thick, red] (reconstruct) -- (aligner) node[midway, left] {1 paket gecikmesi};
+    
+    \node[red, font=\bfseries] at (3.5,-0.5) {KİLİTLENME};
+\end{tikzpicture}
+\caption{Dairesel Gecikme Kaynaklı Zamanlayıcı Kilitlenmesi (Deadlock)}
+\label{fig:deadlock_diag}
+\end{figure}
+
+\texttt{sync\_block} her iki porttan eşit örnek almadan işlem yapmaz. Ancak Port 1, alıcının veriyi çözüp yeniden kodlamasıyla oluşur (yaklaşık 1 frame gecikmeli). Bu dairesel bağımlılık, \texttt{basic\_block} yapısına geçilerek ve \texttt{forecast} metodunun girdi gereksinimini sıfır yapmasıyla (\texttt{consume} dairesel tampon kontrolüyle) çözülmüştür.
+
+\subsection{Sinyal Sızıntısı (Signal Bleeding) ve 1-Sembol Kayma Düzeltmesi}
+SIC çıkarma işleminde meydana gelecek 1 sembollük zaman kayması ($\tau = 1$), kalan sinyalde User 1 bileşeninin tamamen yok edilememesine neden olur:
+\begin{equation}
+r_{\text{clean}}[n] = \alpha_1 (x_1[n] - x_1[n-1]) + \alpha_2 x_2[n] + n[n]
+\end{equation}
+Güç katsayıları $\alpha_1 = 0.894$ ve $\alpha_2 = 0.447$ olduğundan, $\alpha_1 / \alpha_2 = 2$'dir. Çıkarılamayan User 1 kalıntısı, çözülmek istenen User 2 sinyalini bastırarak ``Sinyal Sızıntısı'' (Signal Bleeding) problemine yol açmaktadır. 
+
+Yapılan analizde, \texttt{Correlation Estimator} bloğundaki \texttt{mark\_delay = 16} gecikmesinin, gerçek yük başlangıcı olan $\text{T\_offset} + 48$ ile hesaplanan $\text{T\_offset} + 64 + \text{shift}$ arasında 16 sembollük yapay bir kayma ürettiği saptanmıştır. Bu nedenle optimum düzeltme katsayısı:
+\begin{equation}
+\text{T\_offset} + 64 + \text{shift} = \text{T\_offset} + 48 \implies \text{shift} = -16
+\end{equation}
+olarak hesaplanmış ve kod içerisindeki arama penceresi $-16$ sembol kaydırılarak kalibre edilmiştir.
+
+\subsection{Hata Düzeltme ve Dosya Doğrulama Sonuçları}
+Sistemin performansı, verici tarafındaki kaynak dosyalar ile alıcı tarafındaki çıkış dosyalarının bayt bazında doğrulanmasıyla değerlendirilmiştir. AWGN kanalı altında ($SNR \ge 20 \text{ dB}$) gerçekleştirilen simülasyonlar sonucunda:
+\begin{itemize}
+    \item Uzak Kullanıcı (User 1) verilerinin \texttt{bpsk\_receive.txt} dosyasına hatasız olarak aktarıldığı,
+    \item Yakın Kullanıcı (User 2) verilerinin \texttt{bpsk\_receive\_2.txt} dosyasına sıfır sızıntı ile aktarıldığı 
+\end{itemize}
+bayt düzeyinde doğrulanmıştır.
+
+\newpage
+
+% ==============================================================================
+% SONUÇ VE GELECEK ÇALIŞMALAR
+% ==============================================================================
+\section{SONUÇ VE GELECEK ÇALIŞMALAR}
+
+Bu bitirme projesinde, Güç Etki Alanlı NOMA (PD-NOMA) downlink transceiver mimarisinin GNU Radio platformu üzerinde uçtan uca dosya transferi yapabilen kararlı bir prototipi başarıyla geliştirilmiştir. Geliştirilen \textit{basic\_block} tabanlı dairesel tamponlama ve çapraz korelasyon tabanlı dinamik hizalama algoritmaları, akış tabanlı SDR yazılımlarındaki kilitlenme ve sızıntı sorunlarının çözümüne yönelik özgün mühendislik çözümleri sunmaktadır.
+
+\subsection{Gelecek Çalışmalar ve Yol Haritası}
+\begin{enumerate}
+    \item \textbf{Donanım Entegrasyonu (USRP E310):} Tasarlanan sistemin USRP E310 (2.435 GHz ISM bandı) üzerinde gerçek zamanlı kablosuz iletim ile doğrulanması. Proje kapsamındaki \texttt{Bpsk\_file\_transfer\_loopback.grc} akış diyagramı bu aşamanın temelini oluşturmaktadır.
+    \item \textbf{Çok Kullanıcılı Genişletme:} Mevcut 2 kullanıcılı yapının 3 veya daha fazla kullanıcıya genişletilmesi ve kaskat SIC'nin hata yayılımı üzerindeki etkisinin araştırılması.
+    \item \textbf{Uyarlanır Güç Tahsisi:} Anlık kanal durum bilgisine (CSI) dayalı olarak $a_1$ ve $a_2$ katsayılarının dinamik optimize edilmesi.
+    \item \textbf{OFDM-NOMA Entegrasyonu:} BPSK'dan OFDM-NOMA mimarisine geçiş ile frekans-seçici kanallarda çalışma kabiliyetinin kazandırılması.
+\end{enumerate}
+
+\newpage
+
+% ==============================================================================
+% KAYNAKÇA
+% ==============================================================================
+\begin{thebibliography}{99}
+\addcontentsline{toc}{section}{KAYNAKÇA}
+
+\bibitem{itu_vision} 
+ITU-R, ``IMT Vision – Framework and overall objectives of the future development of IMT for 2020 and beyond,'' \textit{Recommendation ITU-R M.2083-0}, 2015.
+
+\bibitem{ding2017application} 
+Z. Ding, Y. Liu, J. Choi, Q. Sun, M. Elkashlan, C. L. I, and H. V. Poor, ``Application of Non-Orthogonal Multiple Access in LTE and 5G Networks,'' \textit{IEEE Communications Magazine}, vol. 55, no. 2, pp. 185--191, Feb. 2017.
+
+\bibitem{cover1972broadcast} 
+T. M. Cover, ``Broadcast Channels,'' \textit{IEEE Transactions on Information Theory}, vol. 18, no. 1, pp. 2--14, Jan. 1972.
+
+\bibitem{saito2013non} 
+Y. Saito, Y. Kishiyama, A. Benjebbour, T. Nakamura, A. Li, and K. Higuchi, ``Non-Orthogonal Multiple Access (NOMA) for Cellular Future Radio Access,'' in \textit{Proc. IEEE 77th Vehicular Technology Conference (VTC Spring)}, Jun. 2013.
+
+\bibitem{dai2015non} 
+L. Dai, B. Wang, Y. Yuan, S. Han, C. L. I, and Z. Wang, ``Non-Orthogonal Multiple Access for 5G: Solutions, Challenges, Opportunities, and Future Research Trends,'' \textit{IEEE Communications Magazine}, vol. 53, no. 9, pp. 74--81, Sep. 2015.
+
+\bibitem{ding2014performance} 
+Z. Ding, Z. Yang, P. Fan, and H. V. Poor, ``On the Performance of Non-Orthogonal Multiple Access in 5G Systems with Randomly Deployed Users,'' \textit{IEEE Signal Processing Letters}, vol. 21, no. 12, pp. 1501--1505, Dec. 2014.
+
+\bibitem{islam2017power} 
+S. M. R. Islam, N. Avazov, O. A. Dobre, and K. S. Kwak, ``Power-Domain Non-Orthogonal Multiple Access (NOMA) in 5G Systems: Potentials and Challenges,'' \textit{IEEE Communications Surveys \& Tutorials}, vol. 19, no. 2, pp. 721--742, 2017.
+
+\bibitem{gallager1962low} 
+R. G. Gallager, ``Low-Density Parity-Check Codes,'' \textit{IRE Transactions on Information Theory}, vol. 8, no. 1, pp. 21--28, Jan. 1962.
+
+\bibitem{mackay1996near} 
+D. J. C. MacKay and R. M. Neal, ``Near Shannon limit performance of low density parity check codes,'' \textit{Electronics Letters}, vol. 32, no. 18, pp. 1645--1646, 1996.
+
+\bibitem{gnuradio_doc}
+GNU Radio Project, ``GNU Radio Manual and C++ API Reference,'' Available online: \url{https://wiki.gnuradio.org/}
+
+\bibitem{proakis2008digital}
+J. G. Proakis and M. Salehi, \textit{Digital Communications}, 5th ed., McGraw-Hill, 2008.
+
+\bibitem{goldsmith2005wireless}
+A. Goldsmith, \textit{Wireless Communications}, Cambridge University Press, 2005.
+
+\bibitem{ieee80211n}
+IEEE Std 802.11n-2009, ``IEEE Standard for Information Technology — Local and Metropolitan Area Networks,'' IEEE, Oct. 2009.
+
+\end{thebibliography}
+
+\newpage
+
+% ==============================================================================
+% EKLER
+% ==============================================================================
+\section*{EKLER}
+\addcontentsline{toc}{section}{EKLER}
+\renewcommand{\thesubsection}{\Alph{subsection}}
+
+\subsection{Sistem Değişkenleri ve Blok Envanteri}
+Sistem genelindeki blokların kategorik dağılımı Tablo \ref{tab:block_inventory}'de sunulmuştur:
+
+\begin{table}[H]
+\centering
+\caption{GNU Radio Akış Diyagramı Blok Envanteri}
+\label{tab:block_inventory}
+\begin{tabular}{lcl}
+\toprule
+\textbf{Kategori} & \textbf{Sayı} & \textbf{Örnekler} \\
+\midrule
+Kaynak/Çıkış Blokları & 8 & File Source, File Sink, Vector Source \\
+Değişken Blokları & 14 & \texttt{samp\_rate}, \texttt{sps}, \texttt{payload\_size} \\
+FEC Blokları & 5 & Extended Encoder, LDPC Decoder \\
+İşleme Blokları & $\approx 30$ & Repack Bits, Additive Scrambler, Tagged Stream Mux \\
+Özel Python Blokları & 3 & Soft Diff Decoder, Decoupled NOMA SIC Aligner \\
+Sanal Sinyal Yolları & 32 & Virtual Sink, Virtual Source \\
+GUI Bileşenleri & 6 & Qt GUI Time Sink, Qt GUI Range \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{LDPC Kod Parametreleri Karşılaştırması}
+Sistemde test edilen iki farklı LDPC matrisinin karşılaştırmalı özellikleri Tablo \ref{tab:ldpc_comp_table}'de gösterilmiştir:
+
+\begin{table}[H]
+\centering
+\caption{Kullanılan LDPC Kod Matrislerinin Özellikleri}
+\label{tab:ldpc_comp_table}
+\begin{tabular}{lll}
+\toprule
+\textbf{Parametre} & \textbf{IEEE 802.11n Matrisi} & \textbf{Kısa Blok Matrisi} \\
+\midrule
+Dosya Adı & \texttt{n\_1296\_k\_0648\_ieee.alist} & \texttt{n\_0300\_k\_0152\_gap\_03.alist} \\
+Kod Sözcüğü Uzunluğu ($n$) & 1296 bit & 300 bit \\
+Mesaj Uzunluğu ($k$) & 648 bit & 152 bit \\
+Kod Oranı ($R$) & 0.500 & $\approx 0.507$ \\
+Yapı & Yarı-döngüsel (Quasi-cyclic) & Düzensiz (Irregular) \\
+Durum & Aktif & Test / Yedek \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Proje Klasöründeki Dosyaların Listesi ve Rolleri}
+Proje geliştirme sürecinde oluşturulan temel dosyaların listesi Tablo \ref{tab:file_list}'de özetlenmiştir:
+
+\begin{table}[H]
+\centering
+\caption{Proje Çalışma Alanı Dosya Envanteri}
+\label{tab:file_list}
+\begin{tabular}{lrl}
+\toprule
+\textbf{Dosya Adı} & \textbf{Boyut (Bayt)} & \textbf{Açıklama} \\
+\midrule
+\texttt{NOMA.grc} & $77{,}375$ & GRC Akış diyagramı dosyası \\
+\texttt{NOMA.py} & $34{,}987$ & GRC'den üretilen çalıştırılabilir Python kodu \\
+\texttt{NOMA\_epy\_block\_0.py} & $3{,}191$ & Soft Differential Decoder blok kodu \\
+\texttt{NOMA\_epy\_block\_1.py} & $7{,}817$ & Decoupled NOMA SIC Aligner blok kodu \\
+\texttt{n\_1296\_k\_0648\_ieee.alist} & $44{,}030$ & IEEE 802.11n LDPC matris dosyası \\
+\texttt{Bpsk\_file\_transfer\_loopback.grc} & $37{,}983$ & USRP E310 donanım test dosyası \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}

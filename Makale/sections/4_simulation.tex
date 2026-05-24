@@ -1,0 +1,198 @@
+\section{Simülasyon ve Performans Değerlendirmesi}
+
+\subsection{Simülasyon Ortamı ve Koşulları}
+Sistem performansı, GNU Radio Companion 3.10.12+ platformu üzerinde yazılımsal geri-döngü (software loopback) simülasyonlarıyla değerlendirilmiştir. İletim kanalı, AWGN gürültüsü ($\sigma_n = 0.1$, SNR $\approx 20$ dB), normalize frekans kayması ($\Delta f = 0.01$) ve zamanlama sapması ($\epsilon = 1.0001$) bozulmalarını barındırmaktadır. Verici ve alıcı taraflarında metin dosyaları kullanılarak uçtan uca dosya transferi gerçekleştirilmiş ve verilerin doğruluğu bayt düzeyinde test edilmiştir.
+
+\subsection{LDPC Kodlamanın SIC Hata Yayılımı Üzerindeki Rolü}
+NOMA alıcısında SIC aşamasının başarısı, birinci aşamadaki (Kullanıcı 1) kod çözme doğruluğuna doğrudan bağlıdır. Birinci aşamada meydana gelecek tek bir bit hatası, çıkarma işleminde girişimi yok etmek yerine iki katına çıkararak sonraki aşamada hata yayılımına (error propagation) neden olur. Bu riski minimize etmek amacıyla sisteme entegre edilen IEEE 802.11n standardına uygun LDPC kodunun etkileri şunlardır:
+\begin{itemize}
+    \item \textbf{Hata Düzeltme Kapasitesi:} $R=0.5$ oranlı LDPC kodu, 50 iterasyonlu logaritmik olasılık oranları (LLR) tabanlı inanç yayılımı (belief propagation) algoritması sayesinde gürültülü kanallarda $\text{BER} < 10^{-6}$ seviyesine ulaşılmasını ve artık girişimin minimize edilmesini sağlar.
+    \item \textbf{Yumuşak Karar Sinerjisi:} Alıcı zincirinde \texttt{Constellation Soft Decoder} $\to$ \texttt{Soft Diff Decoder} yolu ile korunan yumuşak karar (LLR) bilgisi, LDPC kod çözücünün tam potansiyeline ulaşmasını sağlar. Sert karar tabanlı bir alıcıya kıyasla, yumuşak karar LDPC kombinasyonu 2--3 dB SNR kazancı sunar.
+    \item \textbf{CRC ile Çift Katmanlı Koruma:} CRC-32 kontrolü, kod çözme sonrası paket bütünlüğünü doğrulayarak hatalı paketlerin SIC yeniden kodlama zincirine girmesini engeller ve hata yayılımını sınırlandırır.
+\end{itemize}
+
+\subsection{Karşılaşılan Kritik Sorunlar ve Uygulanan Çözümler}
+
+\subsubsection{Zamanlayıcı Kilitlenmesi (Scheduler Deadlock) ve \textit{basic\_block} Çözümü}
+İlk aşamada SIC hizalama bloğu bir \texttt{sync\_block} olarak tasarlanmıştır. \texttt{sync\_block} yapısında, her iki giriş portundan da eşit miktarda örnek gelmesi zorunludur. Ancak:
+\begin{itemize}
+    \item Giriş 0 (\texttt{in\_rx}), kanal çıkışından gelen anlık veridir (gecikme $\approx 0$).
+    \item Giriş 1 (\texttt{in\_tx1}), alıcının veriyi çözmesi, LDPC kodunu çözmesi, CRC doğrulaması yapması ve ardından bu veriyi yeniden kodlayıp modüle etmesiyle oluşur (en az 1 çerçeve $\approx 1680$ sembol gecikmesi).
+\end{itemize}
+Bu durumda \texttt{sync\_block}, Giriş 1'den veri beklerken Giriş 0'daki veriyi işlemez ve bekletir. Giriş 0 verisi işlenemediği için de LDPC çözücüye veri gitmez ve Giriş 1 hiçbir zaman veri üretemez. Bu dairesel kilitlenme nedeniyle sistem tamamen durmaktadır.
+
+Bu dairesel bağımlılığı kırmak için SIC bloğu \texttt{gr.basic\_block} yapısına çevrilmiştir. Giriş verileri geldikleri anda bağımsız olarak consume edilmiş ve dairesel iç tamponlarda saklanmıştır. \texttt{forecast} fonksiyonu \texttt{[0, 0]} döndürecek şekilde aşırı yüklenerek kilitlenme sorunu \%100 çözülmüştür.
+
+\subsubsection{Sinyal Sızıntısı (Signal Bleeding) ve 1-Sembol Kayma Düzeltmesi}
+SIC çıkarma işleminde meydana gelecek 1 sembollük zaman kayması ($\tau = 1$), kalan sinyalde User 1 bileşeninin tamamen yok edilememesine neden olur:
+\begin{equation}
+r_{\text{clean}}[n] = \alpha_1 (x_1[n] - x_1[n-1]) + \alpha_2 x_2[n] + n[n]
+\end{equation}
+Güç katsayıları $\alpha_1 = 0.894$ ve $\alpha_2 = 0.447$ olduğundan, $\alpha_1 / \alpha_2 = 2$ oranına sahiptir. Bu nedenle, çıkarılamayan 1 sembollük User 1 kalıntı bileşeni, çözülmek istenen User 2 sinyalini genlik bazında tamamen bastırır ve karar eşiği sıfır olduğundan alıcı çıkışına User 1 verileri sızar.
+
+Senkronizasyon etiketlerinin analizi sonucunda, \texttt{Correlation Estimator} bloğunun \texttt{mark\_delay=16} parametresinin çerçeve başlangıcında 16 sembollük bir yapay kayma ürettiği saptanmıştır. Optimum düzeltme katsayısı:
+\begin{equation}
+\text{T\_offset} + 64 + \text{shift} = \text{T\_offset} + 48 \implies \text{shift} = -16
+\end{equation}
+olarak hesaplanmıştır. SIC hizalama bloğundaki paket başlangıç hesabı, bu doğrultuda $-16$ sembol kaydırılarak kalibre edilmiş ve sinyal sızıntısı tamamen giderilmiştir.
+
+\subsection{Geliştirilen Özel Python Blokları}
+Sistemde kullanılan özel gömülü Python bloklarının kaynak kodları aşağıda sunulmuştur.
+
+\subsubsection{Yumuşak Diferansiyel Çözücü (\texttt{NOMA\_epy\_block\_0.py})}
+LLR yumuşak karar bilgisini koruyarak diferansiyel çözme yapan Python bloğunun kodu Liste~\ref{lst:soft_diff_decoder}'de verilmiştir.
+
+\begin{lstlisting}[language=Python, label=lst:soft_diff_decoder, caption={Yumuşak Diferansiyel Çözücü Python Bloğu}]
+import numpy as np
+from gnuradio import gr
+
+class blk(gr.sync_block):
+    def __init__(self, modulus=2):
+        if modulus not in (2, 4):
+            raise ValueError("Modulus 2 (BPSK) veya 4 (QPSK) olmalidir.")
+        self.modulus = int(modulus)
+        gr.sync_block.__init__(
+            self,
+            name='Soft Diff Decoder',
+            in_sig=[np.float32],
+            out_sig=[np.float32]
+        )
+        if self.modulus == 4:
+            self.set_output_multiple(2)
+        if self.modulus == 2:
+            self.prev = np.float32(1.0)
+        else:
+            self.prev_complex = complex(1.0, 0.0)
+
+    def work(self, input_items, output_items):
+        inp = input_items[0]
+        out = output_items[0]
+        n = len(inp)
+        if n == 0:
+            return 0
+        if self.modulus == 2:
+            extended = np.empty(n + 1, dtype=np.float32)
+            extended[0] = self.prev
+            extended[1:] = inp
+            out[:] = -(extended[1:] * extended[:-1])
+            self.prev = np.float32(inp[-1])
+        else:
+            num_symbols = n // 2
+            I_vals = inp[0::2]
+            Q_vals = inp[1::2]
+            curr = (I_vals + 1j * Q_vals).astype(np.complex64)
+            prev_arr = np.empty(num_symbols, dtype=np.complex64)
+            prev_arr[0] = self.prev_complex
+            prev_arr[1:] = curr[:-1]
+            y = curr * np.conj(prev_arr)
+            out[0::2] = -(y.real.astype(np.float32))
+            out[1::2] = -(y.imag.astype(np.float32))
+            self.prev_complex = complex(curr[-1])
+        return n
+\end{lstlisting}
+
+\subsubsection{Bağımsız NOMA SIC Hizalama Bloğu (\texttt{NOMA\_epy\_block\_1.py})}
+Dairesel tamponlama ve çapraz korelasyon tabanlı dinamik hizalamayı kilitlenmesiz şekilde uygulayan Python bloğunun kodu Liste~\ref{lst:noma_sic_aligner}'de verilmiştir.
+
+\begin{lstlisting}[language=Python, label=lst:noma_sic_aligner, caption={Decoupled NOMA SIC Aligner Python Bloğu}]
+import numpy as np
+from gnuradio import gr
+import scipy.signal
+
+class blk(gr.basic_block):
+    def __init__(self, sample_rate=200000.0, near_user_amplitude=0.864, search_window=128, payload_size=1296, payload_offset=64):
+        gr.basic_block.__init__(
+            self,
+            name='Decoupled NOMA SIC Aligner',
+            in_sig=[np.complex64, np.complex64],
+            out_sig=[np.complex64]
+        )
+        self.sample_rate = sample_rate
+        self.near_user_amplitude = near_user_amplitude
+        self.search_window = search_window
+        self.payload_size = payload_size
+        self.payload_offset = payload_offset
+        self.buffer_rx = np.array([], dtype=np.complex64)
+        self.buffer_tx1 = np.array([], dtype=np.complex64)
+        self.rx_processed_abs = 0
+        self.subtracted_until_abs = 0
+        self.next_packet_start_abs = 0
+        self.pkt_counter = 0
+
+    def forecast(self, noutput_items, ninputs):
+        return [0] * ninputs
+
+    def general_work(self, input_items, output_items):
+        in_rx = input_items[0]
+        in_tx1 = input_items[1]
+        out_rx2 = output_items[0]
+        if len(in_rx) > 0:
+            self.buffer_rx = np.concatenate((self.buffer_rx, in_rx))
+            self.consume(0, len(in_rx))
+        if len(in_tx1) > 0:
+            self.buffer_tx1 = np.concatenate((self.buffer_tx1, in_tx1))
+            self.consume(1, len(in_tx1))
+        MAX_RX_BUFFER = 50000
+        if len(self.buffer_rx) > MAX_RX_BUFFER:
+            excess = len(self.buffer_rx) - MAX_RX_BUFFER
+            self.subtracted_until_abs = max(self.subtracted_until_abs, self.rx_processed_abs + excess)
+        MAX_TX1_BUFFER = 5 * self.payload_size
+        if len(self.buffer_tx1) > MAX_TX1_BUFFER:
+            excess = len(self.buffer_tx1) - MAX_TX1_BUFFER
+            self.buffer_tx1 = self.buffer_tx1[excess:]
+        while len(self.buffer_tx1) >= self.payload_size:
+            if self.pkt_counter == 0:
+                SEARCH_START = 1000
+                SEARCH_END = 3000
+            else:
+                expected_payload_start_abs = self.next_packet_start_abs + 2048
+                start_rel = expected_payload_start_abs - self.rx_processed_abs
+                SEARCH_START = start_rel - 128
+                SEARCH_END = start_rel + 128
+            SEARCH_START = max(0, SEARCH_START)
+            if len(self.buffer_rx) < SEARCH_END + self.payload_size:
+                break
+            rx_search_chunk = self.buffer_rx[SEARCH_START : SEARCH_END + self.payload_size]
+            tx1_chunk = self.buffer_tx1[:self.payload_size]
+            tx1_chunk_norm = np.sign(tx1_chunk.real)
+            tx1_chunk_diff = np.cumprod(-tx1_chunk_norm)
+            corr = scipy.signal.correlate(rx_search_chunk, tx1_chunk_diff, mode='valid')
+            if len(corr) > 0:
+                best_idx = np.argmax(np.abs(corr))
+                best_val = corr[best_idx]
+                payload_start_rel = SEARCH_START + best_idx
+                payload_start_abs = self.rx_processed_abs + payload_start_rel
+                tx1_energy = np.sum(np.abs(tx1_chunk_diff)**2)
+                if tx1_energy > 1e-6:
+                    estimated_amp = np.abs(best_val) / tx1_energy
+                else:
+                    estimated_amp = self.near_user_amplitude
+                phase_offset = np.angle(best_val)
+                if estimated_amp >= 0.03:
+                    if estimated_amp > 1.10:
+                        amplitude_scale = estimated_amp / 1.5
+                    else:
+                        amplitude_scale = estimated_amp
+                    interference_signal = tx1_chunk_diff * amplitude_scale * np.exp(1j * phase_offset)
+                    self.buffer_rx[payload_start_rel : payload_start_rel + self.payload_size] -= interference_signal
+                    self.pkt_counter += 1
+                    self.next_packet_start_abs = payload_start_abs - 2048 + 3408
+                    self.subtracted_until_abs = max(self.subtracted_until_abs, payload_start_abs - 2048 + 3408)
+                    self.buffer_tx1 = self.buffer_tx1[self.payload_size:]
+                    continue
+            self.pkt_counter += 1
+            self.next_packet_start_abs += 3408
+            self.buffer_tx1 = self.buffer_tx1[self.payload_size:]
+        safe_to_output = self.subtracted_until_abs - self.rx_processed_abs
+        safe_to_output = min(safe_to_output, len(self.buffer_rx))
+        safe_to_output = max(0, safe_to_output)
+        n_out = len(out_rx2)
+        limit = min(safe_to_output, n_out)
+        if limit > 0:
+            out_rx2[:limit] = self.buffer_rx[:limit]
+            self.buffer_rx = self.buffer_rx[limit:]
+            self.rx_processed_abs += limit
+            return limit
+        else:
+            return 0
+\end{lstlisting}

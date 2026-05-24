@@ -1,0 +1,70 @@
+report_ieee.tex:164:62: Error: `]' expected, found `}'. \(10^6\) cihaz/km² bağlantı yoğunluğu yer almaktadır {[}1{]}. Bu  
+report_ieee.tex:164:65: Error: `}' expected, found `]'. \(10^6\) cihaz/km² bağlantı yoğunluğu yer almaktadır {[}1{]}. Bu  
+report_ieee.tex:193:50: Error: `]' expected, found `}'.   algoritması ile girişim giderimi yapılır {[}2{]}.  
+report_ieee.tex:193:53: Error: `}' expected, found `]'.   algoritması ile girişim giderimi yapılır {[}2{]}.  
+report_ieee.tex:254:59: Error: `]' expected, found `}'. (broadcast channel) kapasitesi analizine dayanmaktadır {[}3{]}. Saito  
+report_ieee.tex:254:62: Error: `}' expected, found `]'. (broadcast channel) kapasitesi analizine dayanmaktadır {[}3{]}. Saito  
+report_ieee.tex:256:61: Error: `]' expected, found `}'. 3GPP-LTE sistemlerine entegrasyonu ilk kez önerilmiştir {[}4{]}. Dai vd.  
+report_ieee.tex:256:64: Error: `}' expected, found `]'. 3GPP-LTE sistemlerine entegrasyonu ilk kez önerilmiştir {[}4{]}. Dai vd.  
+report_ieee.tex:258:63: Error: `]' expected, found `}'. ortaya koyan kapsamlı bir derleme çalışması sunmuştur {[}5{]}. Ding vd.  
+report_ieee.tex:258:66: Error: `}' expected, found `]'. ortaya koyan kapsamlı bir derleme çalışması sunmuştur {[}5{]}. Ding vd.  
+report_ieee.tex:260:69: Error: `]' expected, found `}'. ve kesinti olasılığını (outage probability) analiz etmiştir {[}6{]}.  
+report_ieee.tex:260:72: Error: `}' expected, found `]'. ve kesinti olasılığını (outage probability) analiz etmiştir {[}6{]}.  
+report_ieee.tex:262:52: Error: `]' expected, found `}'. ilişkin detaylı bir çerçeve geliştirmiştir {[}7{]}.  
+report_ieee.tex:262:55: Error: `}' expected, found `]'. ilişkin detaylı bir çerçeve geliştirmiştir {[}7{]}.  
+report_ieee.tex:265:60: Error: `]' expected, found `}'. (1962) tarafından ortaya konulan temel LDPC çerçevesi {[}8{]} ve MacKay  
+report_ieee.tex:265:63: Error: `}' expected, found `]'. (1962) tarafından ortaya konulan temel LDPC çerçevesi {[}8{]} ve MacKay  
+report_ieee.tex:267:3: Error: `]' expected, found `}'. {[}9{]}, bu projede kullanılan IEEE 802.11n standardı LDPC kodlarının  
+report_ieee.tex:267:6: Error: `}' expected, found `]'. {[}9{]}, bu projede kullanılan IEEE 802.11n standardı LDPC kodlarının  
+report_ieee.tex:515:61: Error: `]' expected, found `}'. düzeltme (Forward Error Correction --- FEC) kodlarıdır {[}8, 9{]}. Bu  
+report_ieee.tex:515:67: Error: `}' expected, found `]'. düzeltme (Forward Error Correction --- FEC) kodlarıdır {[}8, 9{]}. Bu  
+report_ieee.tex:741:3: Error: `]' expected, found `}'. {[}Preambül, Başlık, LDPC Yük, Postambül{]} → Constellation Modulator  
+report_ieee.tex:741:47: Error: `}' expected, found `]'. {[}Preambül, Başlık, LDPC Yük, Postambül{]} → Constellation Modulator  
+report_ieee.tex:931:31: Error: `]' expected, found `}'. Port 0 & Preambül (\texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan) & 250 bayt \\  
+report_ieee.tex:931:44: Error: `}' expected, found `]'. Port 0 & Preambül (\texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan) & 250 bayt \\  
+report_ieee.tex:934:32: Error: `]' expected, found `}'. Port 3 & Postambül (\texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan) & 8 bayt \\  
+report_ieee.tex:934:45: Error: `}' expected, found `]'. Port 3 & Postambül (\texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan) & 8 bayt \\  
+report_ieee.tex:944:11: Error: `]' expected, found `}'. \texttt{{[}0xC0,\ 0xAF{]}} bayt dizisinin tekrarı olarak üretilmektedir.  
+report_ieee.tex:944:24: Error: `}' expected, found `]'. \texttt{{[}0xC0,\ 0xAF{]}} bayt dizisinin tekrarı olarak üretilmektedir.  
+report_ieee.tex:1497:44: Error: `]' expected, found `}'.   \texttt{forecast()} fonksiyonu \texttt{{[}0,\ 0{]}} döndürerek GNU  
+report_ieee.tex:1497:51: Error: `}' expected, found `]'.   \texttt{forecast()} fonksiyonu \texttt{{[}0,\ 0{]}} döndürerek GNU  
+report_ieee.tex:1724:32: Error: `]' expected, found `}'. \textbf{Preambül} & \texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan dizi & 250  
+report_ieee.tex:1724:45: Error: `}' expected, found `]'. \textbf{Preambül} & \texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan dizi & 250  
+report_ieee.tex:1730:33: Error: `]' expected, found `}'. \textbf{Postambül} & \texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan dizi & 8  
+report_ieee.tex:1730:46: Error: `}' expected, found `]'. \textbf{Postambül} & \texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan dizi & 8  
+report_ieee.tex:1737:11: Error: `]' expected, found `}'. \texttt{{[}0xC0,\ 0xAF{]}\ =\ {[}11000000,\ 10101111{]}}: - Zengin geçiş  
+report_ieee.tex:1737:24: Error: `}' expected, found `]'. \texttt{{[}0xC0,\ 0xAF{]}\ =\ {[}11000000,\ 10101111{]}}: - Zengin geçiş  
+report_ieee.tex:1737:33: Error: `]' expected, found `}'. \texttt{{[}0xC0,\ 0xAF{]}\ =\ {[}11000000,\ 10101111{]}}: - Zengin geçiş  
+report_ieee.tex:1737:54: Error: `}' expected, found `]'. \texttt{{[}0xC0,\ 0xAF{]}\ =\ {[}11000000,\ 10101111{]}}: - Zengin geçiş  
+report_ieee.tex:1796:11: Error: `]' expected, found `}'. \texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan deseniyle Symbol Synchronizer  
+report_ieee.tex:1796:24: Error: `}' expected, found `]'. \texttt{{[}0xC0,\ 0xAF{]}} tekrarlayan deseniyle Symbol Synchronizer  
+report_ieee.tex:2075:3: Error: `]' expected, found `}'. {[}1{]} ITU-R, ``IMT Vision -- Framework and overall objectives of the  
+report_ieee.tex:2075:6: Error: `}' expected, found `]'. {[}1{]} ITU-R, ``IMT Vision -- Framework and overall objectives of the  
+report_ieee.tex:2079:3: Error: `]' expected, found `}'. {[}2{]} Z. Ding, Y. Liu, J. Choi, Q. Sun, M. Elkashlan, C. L. I, and H.  
+report_ieee.tex:2079:6: Error: `}' expected, found `]'. {[}2{]} Z. Ding, Y. Liu, J. Choi, Q. Sun, M. Elkashlan, C. L. I, and H.  
+report_ieee.tex:2084:3: Error: `]' expected, found `}'. {[}3{]} T. M. Cover, ``Broadcast Channels,'' \emph{IEEE Transactions on  
+report_ieee.tex:2084:6: Error: `}' expected, found `]'. {[}3{]} T. M. Cover, ``Broadcast Channels,'' \emph{IEEE Transactions on  
+report_ieee.tex:2087:3: Error: `]' expected, found `}'. {[}4{]} Y. Saito, Y. Kishiyama, A. Benjebbour, T. Nakamura, A. Li, and  
+report_ieee.tex:2087:6: Error: `}' expected, found `]'. {[}4{]} Y. Saito, Y. Kishiyama, A. Benjebbour, T. Nakamura, A. Li, and  
+report_ieee.tex:2092:3: Error: `]' expected, found `}'. {[}5{]} L. Dai, B. Wang, Y. Yuan, S. Han, C. L. I, and Z. Wang,  
+report_ieee.tex:2092:6: Error: `}' expected, found `]'. {[}5{]} L. Dai, B. Wang, Y. Yuan, S. Han, C. L. I, and Z. Wang,  
+report_ieee.tex:2097:3: Error: `]' expected, found `}'. {[}6{]} Z. Ding, Z. Yang, P. Fan, and H. V. Poor, ``On the Performance  
+report_ieee.tex:2097:6: Error: `}' expected, found `]'. {[}6{]} Z. Ding, Z. Yang, P. Fan, and H. V. Poor, ``On the Performance  
+report_ieee.tex:2102:3: Error: `]' expected, found `}'. {[}7{]} S. M. R. Islam, N. Avazov, O. A. Dobre, and K. S. Kwak,  
+report_ieee.tex:2102:6: Error: `}' expected, found `]'. {[}7{]} S. M. R. Islam, N. Avazov, O. A. Dobre, and K. S. Kwak,  
+report_ieee.tex:2107:3: Error: `]' expected, found `}'. {[}8{]} R. G. Gallager, ``Low-Density Parity-Check Codes,'' \emph{IRE  
+report_ieee.tex:2107:6: Error: `}' expected, found `]'. {[}8{]} R. G. Gallager, ``Low-Density Parity-Check Codes,'' \emph{IRE  
+report_ieee.tex:2111:3: Error: `]' expected, found `}'. {[}9{]} D. J. C. MacKay and R. M. Neal, ``Near Shannon limit performance  
+report_ieee.tex:2111:6: Error: `}' expected, found `]'. {[}9{]} D. J. C. MacKay and R. M. Neal, ``Near Shannon limit performance  
+report_ieee.tex:2115:3: Error: `]' expected, found `}'. {[}10{]} GNU Radio Project, ``GNU Radio Manual and C++ API Reference,''  
+report_ieee.tex:2115:7: Error: `}' expected, found `]'. {[}10{]} GNU Radio Project, ``GNU Radio Manual and C++ API Reference,''  
+report_ieee.tex:2116:3: Error: `]' expected, found `}'. {[}Çevrimiçi{]}. Erişim: https://wiki.gnuradio.org/  
+report_ieee.tex:2116:16: Error: `}' expected, found `]'. {[}Çevrimiçi{]}. Erişim: https://wiki.gnuradio.org/  
+report_ieee.tex:2118:3: Error: `]' expected, found `}'. {[}11{]} J. G. Proakis and M. Salehi, \emph{Digital Communications}, 5th  
+report_ieee.tex:2118:7: Error: `}' expected, found `]'. {[}11{]} J. G. Proakis and M. Salehi, \emph{Digital Communications}, 5th  
+report_ieee.tex:2121:3: Error: `]' expected, found `}'. {[}12{]} A. Goldsmith, \emph{Wireless Communications}, Cambridge  
+report_ieee.tex:2121:7: Error: `}' expected, found `]'. {[}12{]} A. Goldsmith, \emph{Wireless Communications}, Cambridge  
+report_ieee.tex:2124:3: Error: `]' expected, found `}'. {[}13{]} IEEE Std 802.11n-2009, ``IEEE Standard for Information  
+report_ieee.tex:2124:7: Error: `}' expected, found `]'. {[}13{]} IEEE Std 802.11n-2009, ``IEEE Standard for Information  
+report_ieee.tex:2160:11: Error: `]' expected, found `}'. \texttt{{[}0xC0,\ 0xAF{]}\ ×\ 4} → bit → BPSK \\  
+report_ieee.tex:2160:24: Error: `}' expected, found `]'. \texttt{{[}0xC0,\ 0xAF{]}\ ×\ 4} → bit → BPSK \\  

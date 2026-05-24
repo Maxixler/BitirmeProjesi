@@ -1,0 +1,213 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex.fmt)
+ restricted \write18 enabled.
+entering extended mode
+(report_ieee.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2025-12-24>
+
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/ieeetran\IEEEtr
+an.cls
+Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
+-- See the "IEEEtran_HOWTO" manual for usage information.
+-- http://www.michaelshell.org/tex/ieeetran/
+
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\ot1ptm.f
+d)
+-- Using 8.5in x 11in (letter) paper.
+-- Using PDF output.
+-- This is a 10 point document.
+)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/xcolor\xcolor.s
+ty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\co
+lor.cfg)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pd
+ftex.def)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/graphics\mathco
+lor.ltx))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath
+.sty
+For additional information on amsmath, use the `?' option.
+
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext
+.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.
+sty))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.
+sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.
+sty))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssym
+b.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amsfon
+ts.sty))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/iftex\iftex.s
+ty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.st
+y
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/psnfss\t1ptm.fd
+))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/base\inputenc.s
+ty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/base\textcomp.s
+ty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/lm\lmodern.sty)
+
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/upquote\upquote
+.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/microtype\micro
+type.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval
+.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolb
+ox.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/microtype\micro
+type-pdftex.def)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/microtype\micro
+type.cfg))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/parskip\parskip
+.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/kvoptions\kvopt
+ions.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/ltxcmds\ltxcm
+ds.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/kvsetkeys\kvset
+keys.sty)))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/tools\longtable
+.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\bookta
+bs.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/tools\array.sty
+)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/tools\calc.sty)
+
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/footnotehyper\f
+ootnotehyper.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/bookmark\bookma
+rk.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperr
+ef.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/kvdefinekeys\
+kvdefinekeys.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/pdfescape\pdf
+escape.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/pdftexcmds\pd
+ftexcmds.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/infwarerr\inf
+warerr.sty)))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/hycolor\hycolor
+.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\namere
+f.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/refcount\refcou
+nt.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/gettitlestrin
+g\gettitlestring.sty))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/stringenc\str
+ingenc.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc
+.def)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/intcalc\intca
+lc.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.
+def)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset
+.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/bigintcalc\bi
+gintcalc.sty)))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdfte
+x.def
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\
+rerunfilecheck.sty
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/generic/uniquecounter
+\uniquecounter.sty)))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/bookmark\bkm-pd
+ftex.def))
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/xurl\xurl.sty)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmr.fd)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3bac
+kend-pdftex.def)
+No file report_ieee.aux.
+-- Lines per column: 58 (exact).
+
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\sup
+p-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-cm
+r.cfg)
+
+LaTeX Warning: Hyper reference `1-uxf6zet-abstract' on page 1 undefined on inpu
+t line 82.
+
+
+LaTeX Warning: Hyper reference `2-giriux15f-ve-literatuxfcr-uxf6zeti' on page 1
+ undefined on input line 85.
+
+
+LaTeX Warning: Hyper reference `3-teorik-altyapux131-ve-matematiksel-model' on 
+page 1 undefined on input line 88.
+
+
+LaTeX Warning: Hyper reference `4-gnu-radio-tabanlux131-sistem-tasarux131mux131
+-blok-analizi' on page 1 undefined on input line 91.
+
+
+Underfull \hbox (badness 2735) in paragraph at lines 91--93
+[]\T1/lmr/m/n/10 (+20) GNU RA-DIO TA-BANLI SùS-TEM TASARIMI
+
+LaTeX Warning: Hyper reference `5-simuxfclasyon-ve-performans-deux11ferlendirme
+si' on page 1 undefined on input line 94.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--96
+[]\T1/lmr/m/n/10 (+20) SùM‹LASYON VE PER-FOR-MANS
+
+LaTeX Warning: Hyper reference `6-sonuuxe7-ve-gelecek-uxe7alux131ux15fmalar' on
+ page 1 undefined on input line 97.
+
+
+LaTeX Warning: Hyper reference `7-kaynakuxe7a' on page 1 undefined on input lin
+e 99.
+
+
+LaTeX Warning: Hyper reference `8-ekler' on page 1 undefined on input line 101.
+
+
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/lm\ot1lmr.fd)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/lm\omllmm.fd)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/lm\omslmsy.fd)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/lm\omxlmex.fd)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.f
+d)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-ms
+a.cfg)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.f
+d)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/microtype\mt-ms
+b.cfg)
+(C:\Users\Administrator\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd)
+Underfull \hbox (badness 2469) in paragraph at lines 190--195
+[]\T1/lmr/bx/n/10 (+20) G¸Á Etki Alanl^^Y NOMA (Power-Domain
+
+Underfull \hbox (badness 4454) in paragraph at lines 195--199
+[]\T1/lmr/bx/n/10 (+20) Kod Etki Alanl^^Y NOMA (Code-Domain
+[1{C:/Users/Administrator/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/
+Users/Administrator/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ec.enc}
+{C:/Users/Administrator/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mat
+hit.enc}{C:/Users/Administrator/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/l
+m/lm-rm.enc}{C:/Users/Administrator/AppData/Local/Programs/MiKTeX/fonts/enc/dvi
+ps/lm/lm-ts1.enc}]
+
+! Package longtable Error: longtable not in 1-column mode.
+
+See the longtable package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.211 \begin{longtable}
+                       []{@{}
+!  ==> Fatal error occurred, no output PDF file produced!
+Transcript written on report_ieee.log.
+pdflatex: major issue: So far, you have not checked for MiKTeX updates.
