@@ -148,15 +148,41 @@ NOMA simülasyonunu dinamik derleme, dolgulama, throttle yönetimi ve otomatik d
 python run_image_transfer.py
 ```
 
+### 🚀 Donanımsal USRP E310 Testlerini Çalıştırma
+
+Projenin son aşaması olan USRP E310 donanım testleri için alıcı ve verici kodları ayrıştırılmıştır. Headless (GUI olmayan) yapısı sayesinde SSH üzerinden terminal ortamlarında kararlı çalışır.
+
+1. **Alıcı Tarafında (Receiver - USRP RX):**
+   ```bash
+   cd usrp
+   python run_usrp_rx.py --freq 868e6 --gain 25 --rate 200e3
+   ```
+   *Alıcı havadan sinyal beklemeye başlar.*
+
+2. **Verici Tarafında (Transmitter - USRP TX):**
+   ```bash
+   cd usrp
+   python run_usrp_tx.py --freq 868e6 --gain 20 --rate 200e3
+   ```
+   *Verici, resimleri otomatik dolgulayarak havaya sürekli iletir.*
+
 ---
 
 ## 📂 Proje Klasör Yapısı
 
 ```text
+├── usrp/                       # Gerçek ortam USRP E310 donanım test klasörü
+│   ├── NOMA_TX.py              # Headless USRP Transmitter Flowgraph
+│   ├── NOMA_RX.py              # Headless USRP Receiver Flowgraph
+│   ├── NOMA_epy_block_0.py     # Soft Diff Decoder (User 2)
+│   ├── NOMA_epy_block_0_0.py   # Soft Diff Decoder (User 1)
+│   ├── NOMA_epy_block_1.py     # Custom Decoupled SIC Aligner
+│   ├── run_usrp_tx.py          # TX hazırlık (padding) ve iletim betiği
+│   └── run_usrp_rx.py          # RX alım, temizleme (stripping) ve doğrulama betiği
 ├── NOMA.grc                    # GNU Radio Companion tasarım dosyası
 ├── NOMA.py                     # GRC dosyasından derlenen Python akış grafiği
-├── NOMA_epy_block_1.py         # Custom Python SIC Aligner Bloğu
-├── run_image_transfer.py       # Uçtan uca otomatik aktarım ve doğrulama betiği
+├── NOMA_epy_block_1.py         # Custom Python SIC Aligner Bloğu (Simülasyon)
+├── run_image_transfer.py       # Uçtan uca otomatik simülasyon ve doğrulama betiği
 ├── transmit_1.png              # User 1 için gönderilecek örnek resim
 ├── transmit_2.png              # User 2 için gönderilecek örnek resim
 ├── n_1296_k_0648_ieee.alist    # LDPC Parite Kontrol Matrisi
