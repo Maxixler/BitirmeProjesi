@@ -99,31 +99,31 @@ Bu modül, güce dayalı bölmeli (Power-Domain) NOMA prensibine dayanır. İki 
 
 ```mermaid
 graph TD
-    subgraph Verici (Transmitter)
-        F1[User 1 Dosyası] --> P1[Dinamik Dolgu & CRC32]
-        F2[User 2 Dosyası] --> P2[Dinamik Dolgu & CRC32]
-        P1 --> L1[LDPC Kodlayıcı 1/2]
-        P2 --> L2[LDPC Kodlayıcı 1/2]
-        L1 --> M1[BPSK Modülatör]
-        L2 --> M2[BPSK Modülatör]
-        M1 --> G1[Güç Katsayısı: 0.894]
+    subgraph "Verici (Transmitter)"
+        F1["User 1 Dosyası"] --> P1["Dinamik Dolgu & CRC32"]
+        F2["User 2 Dosyası"] --> P2["Dinamik Dolgu & CRC32"]
+        P1 --> L1["LDPC Kodlayıcı 1/2"]
+        P2 --> L2["LDPC Kodlayıcı 1/2"]
+        L1 --> M1["BPSK Modülatör"]
+        L2 --> M2["BPSK Modülatör"]
+        M1 --> G1["Güç Katsayısı: 0.894"]
         L2 --> M2
-        M2 --> G2[Güç Katsayısı: 0.447]
-        G1 & G2 --> Add[Sinyal Toplayıcı - Süperpozisyon]
+        M2 --> G2["Güç Katsayısı: 0.447"]
+        G1 & G2 --> Add["Sinyal Toplayıcı - Süperpozisyon"]
     end
 
-    subgraph Kanal (AWGN & Fading)
-        Add --> Ch[Gürültü & Zaman/Frekans Kayması]
+    subgraph "Kanal (AWGN & Fading)"
+        Add --> Ch["Gürültü & Zaman/Frekans Kayması"]
     end
 
-    subgraph Alıcı (Receiver - SIC)
-        Ch --> S1[User 1 Çözücü]
-        S1 --> D1[User 1 Çözülmüş Veri]
-        D1 --> Rec1[Yeniden Kodlama & Modülasyon]
-        Ch & Rec1 --> SIC[SIC Aligner - Çapraz Korelasyon]
-        SIC --> Sub[User 1 Sinyalini Çıkarma]
-        Sub --> S2[User 2 Çözücü]
-        S2 --> D2[User 2 Çözülmüş Veri]
+    subgraph "Alıcı (Receiver - SIC)"
+        Ch --> S1["User 1 Çözücü"]
+        S1 --> D1["User 1 Çözülmüş Veri"]
+        D1 --> Rec1["Yeniden Kodlama & Modülasyon"]
+        Ch & Rec1 --> SIC["SIC Aligner - Çapraz Korelasyon"]
+        SIC --> Sub["User 1 Sinyalini Çıkarma"]
+        Sub --> S2["User 2 Çözücü"]
+        S2 --> D2["User 2 Çözülmüş Veri"]
     end
 ```
 
