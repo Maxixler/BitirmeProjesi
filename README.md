@@ -166,6 +166,37 @@ Projenin son aşaması olan USRP E310 donanım testleri için alıcı ve verici 
    ```
    *Verici, resimleri otomatik dolgulayarak havaya sürekli iletir.*
 
+### 💻 Linux Host Bilgisayarlar ve 2 USRP ile Donanım Testlerini Çalıştırma
+
+Projenin tam donanımlı laboratuvar testlerinde, **iki ayrı Linux host bilgisayar** ve bunlara bağlı **iki adet USRP** üzerinden dosya transferini otomatikleştirmek için `run_host_transfer.py` scripti geliştirilmiştir. Bu script hem fotoğrafları hem de düz yazıları (text) veya diğer dosya türlerini otomatik olarak dolgulayıp hatasız kurtarabilir.
+
+#### Ağ Kurulumu ve Bağlantılar:
+1. **Verici (TX) Tarafı:**
+   * Host Bilgisayar IP adresi: `192.168.10.1` olarak ayarlanmalıdır.
+   * USRP Cihazı doğrudan Ethernet portuna bağlanır (USRP varsayılan IP: `192.168.10.2`).
+2. **Alıcı (RX) Tarafı:**
+   * Host Bilgisayar IP adresi: `192.168.10.1` olarak ayarlanmalıdır.
+   * USRP RX Cihazı doğrudan Ethernet portuna bağlanır (USRP varsayılan IP: `192.168.10.2`).
+
+#### İletim Adımları:
+
+1. **Alıcı Bilgisayarda (Host RX - Akıllı Alıcı Bekleme Modu):**
+   Alıcı tarafında dosya boyutu, uzantısı veya MD5 bilgisi girmenize gerek yoktur. Sadece aşağıdaki komutla alıcıyı başlatmanız yeterlidir:
+   ```bash
+   python3 run_host_transfer.py --mode rx
+   ```
+   *Script `RX_host.grc` dosyasını derler, alıcıyı başlatır ve havadan ilk verilerin gelmesini bekler. İlk 16 baytlık başlık (metadata) paketi çözümlendiği anda yüzde (%) ilerleme çubuğu ekranda dinamik olarak başlar.*
+
+2. **Verici Bilgisayarda (Host TX - Gönderim Başlatma):**
+   Verici tarafında gönderilmek istenen herhangi iki dosya (fotoğraf, yazı vb.) belirtilir:
+   ```bash
+   python3 run_host_transfer.py --mode tx --file1 transmit_1.png --file2 transmit_2.txt
+   ```
+   *Script `TX_host.grc` dosyasını derler, dosyaların başına 16 baytlık otomatik boyut-uzantı-MD5 başlığını ekler, 77 baytın katına dolgular (padding) ve fiziksel USRP üzerinden iletimi başlatır.*
+
+3. **Otomatik Kapanma ve Kurtarma:**
+   Verici tarafında gönderim tamamlandığında veya kesildiğinde, alıcı tarafında **5 saniyelik bir sessizlik (idle timeout)** algılanır. Alıcı akışı otomatik olarak sonlandırıp, başlıkta okunan orijinal boyutlara göre dolguları kırpar (strip) ve `recovered_user_1.png` ile `recovered_user_2.txt` dosyalarını sıfır hata ve MD5 eşleşme kontrolüyle diske kaydeder.
+
 ---
 
 ## 📂 Proje Klasör Yapısı
@@ -179,6 +210,9 @@ Projenin son aşaması olan USRP E310 donanım testleri için alıcı ve verici 
 │   ├── NOMA_epy_block_1.py     # Custom Decoupled SIC Aligner
 │   ├── run_usrp_tx.py          # TX hazırlık (padding) ve iletim betiği
 │   └── run_usrp_rx.py          # RX alım, temizleme (stripping) ve doğrulama betiği
+├── TX_host.grc                 # Host bilgisayar verici GRC dosyası
+├── RX_host.grc                 # Host bilgisayar alıcı GRC dosyası
+├── run_host_transfer.py        # Host-USRP arası transferi yöneten ana betik
 ├── NOMA.grc                    # GNU Radio Companion tasarım dosyası
 ├── NOMA.py                     # GRC dosyasından derlenen Python akış grafiği
 ├── NOMA_epy_block_1.py         # Custom Python SIC Aligner Bloğu (Simülasyon)
