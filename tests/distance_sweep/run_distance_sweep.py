@@ -13,19 +13,19 @@ import numpy as np
 import shutil
 
 # Dosya yollari
-TRANSMIT_1_PATH = "bpsk_transmit.txt"
-TRANSMIT_2_PATH = "bpsk_transmit_2.txt"
-RECEIVE_1_PATH = "bpsk_receive.txt"
-RECEIVE_2_PATH = "bpsk_receive_2.txt"
-NOMA_PY_PATH = "NOMA.py"
+TRANSMIT_1_PATH = "../../bpsk_transmit.txt"
+TRANSMIT_2_PATH = "../../bpsk_transmit_2.txt"
+RECEIVE_1_PATH = "../../bpsk_receive.txt"
+RECEIVE_2_PATH = "../../bpsk_receive_2.txt"
+NOMA_PY_PATH = "../../NOMA.py"
 PYTHON_EXE = r"C:\Users\Armagan\radioconda\python.exe"
 
 if not os.path.exists(PYTHON_EXE):
     PYTHON_EXE = "python"
 
 def prepare_test_files():
-    tx1_data = ("1234567890" * 7 + "1234567") * 20
-    tx2_data = ("abcdefghij" * 7 + "abcdefg") * 20
+    tx1_data = ("1234567890" * 7 + "1234567") * 1000
+    tx2_data = ("abcdefghij" * 7 + "abcdefg") * 1000
 
     with open(TRANSMIT_1_PATH, "wb") as f:
         f.write(tx1_data.encode('utf-8'))
@@ -93,9 +93,31 @@ def modify_noma_noise(noise_val):
     with open(NOMA_PY_PATH, "w", encoding="utf-8") as f:
         f.write(content)
 
-def run_simulation(duration=15):
+def run_simulation(target_size=77000, timeout=60, idle_timeout=5):
     proc = subprocess.Popen([PYTHON_EXE, NOMA_PY_PATH], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(duration)
+    start_time = time.time()
+    prev_sz1 = 0
+    prev_sz2 = 0
+    idle_counter = 0
+    while True:
+        elapsed = time.time() - start_time
+        if elapsed > timeout:
+            break
+        sz1 = os.path.getsize(RECEIVE_1_PATH) if os.path.exists(RECEIVE_1_PATH) else 0
+        sz2 = os.path.getsize(RECEIVE_2_PATH) if os.path.exists(RECEIVE_2_PATH) else 0
+        if sz1 >= target_size and sz2 >= target_size:
+            time.sleep(1.0)
+            break
+        if sz1 > 0 or sz2 > 0:
+            if sz1 == prev_sz1 and sz2 == prev_sz2:
+                idle_counter += 1
+            else:
+                idle_counter = 0
+        if idle_counter >= idle_timeout:
+            break
+        prev_sz1 = sz1
+        prev_sz2 = sz2
+        time.sleep(0.5)
     proc.terminate()
     try:
         proc.wait(timeout=2)
@@ -136,8 +158,8 @@ def main():
             prepare_test_files()
             modify_noma_noise(sigma_clipped)
             
-            # 500k hizda 15 saniye veri akisinin tamamlanmasi icin fazlasiyla yeterlidir
-            run_simulation(duration=15)
+            # Hedeflenen boyuta ulasana kadar dinamik bekle
+            run_simulation(target_size=77000)
             
             ber1 = calculate_ber(TRANSMIT_1_PATH, RECEIVE_1_PATH)
             ber2 = calculate_ber(TRANSMIT_2_PATH, RECEIVE_2_PATH)

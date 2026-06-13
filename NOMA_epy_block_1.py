@@ -53,9 +53,25 @@ class blk(gr.basic_block):
         in_tx1 = input_items[1]
         out_rx2 = output_items[0]
 
+        # RHI Parameters (modified dynamically by test scripts)
+        g_val = 0.0
+        phi_val = 0.0
+        phase_noise_std_val = 0.0
+
         # 1. Gelen RX Verilerini Tampona Ekleme
         if len(in_rx) > 0:
-            self.buffer_rx = np.concatenate((self.buffer_rx, in_rx))
+            rx_proc = in_rx
+            if g_val != 0.0 or phi_val != 0.0:
+                I = rx_proc.real
+                Q = rx_proc.imag
+                I_out = (1.0 + g_val/2.0)*np.cos(phi_val/2.0)*I - (1.0 + g_val/2.0)*np.sin(phi_val/2.0)*Q
+                Q_out = (1.0 - g_val/2.0)*np.sin(phi_val/2.0)*I + (1.0 - g_val/2.0)*np.cos(phi_val/2.0)*Q
+                rx_proc = I_out + 1j * Q_out
+            if phase_noise_std_val > 0.0:
+                pn = np.random.normal(0, phase_noise_std_val, len(rx_proc))
+                rx_proc = rx_proc * np.exp(1j * pn)
+
+            self.buffer_rx = np.concatenate((self.buffer_rx, rx_proc))
             self.consume(0, len(in_rx))
 
         # 2. Gelen TX1 Verilerini Tampona Ekleme
