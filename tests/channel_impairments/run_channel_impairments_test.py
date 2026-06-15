@@ -1,7 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-BPSK NOMA Test 5: Kanal Kusurlari (Imperfect CSI & RHI: IQ Imbalance, Phase Noise)
----------------------------------------------------------------------------------
+TEST 3: Kanal ve Donanimsal Kusurlar Testi (RHI, ipCSI ve ipSIC)
+----------------------------------------------------------------
+Bu test; sistemin kusursuz kanal durumu bilgisi (P-CSI) ve ideal donanim
+kabullerinden uzaklastirilarak, gercek RF alici-verici kisitlamalari
+altindaki dayanikliligini olcmeyi amaclar.
+
+Metodoloji: test_metodolojisi.md TEST 3
+- TX Donanim Kusuru (kappa_x): 0.05 ve 0.15
+- RX Donanim Kusuru (nu_y): 0.05 ve 0.15
+- Gurultu voltajina distorsiyon eklenerek simule edilir
 """
 
 import subprocess
@@ -12,13 +20,12 @@ import math
 import numpy as np
 import shutil
 
-# Paths (relative to tests/channel_impairments/)
+# Dosya yollari (tests/channel_impairments/ icinden calistirilir)
 TRANSMIT_1_PATH = "../../bpsk_transmit.txt"
 TRANSMIT_2_PATH = "../../bpsk_transmit_2.txt"
 RECEIVE_1_PATH = "../../bpsk_receive.txt"
 RECEIVE_2_PATH = "../../bpsk_receive_2.txt"
 NOMA_PY_PATH = "../../NOMA.py"
-SIC_PY_PATH = "../../NOMA_epy_block_1.py"
 PYTHON_EXE = r"C:\Users\Armagan\radioconda\python.exe"
 
 if not os.path.exists(PYTHON_EXE):
@@ -27,12 +34,10 @@ if not os.path.exists(PYTHON_EXE):
 def prepare_test_files():
     tx1_data = ("1234567890" * 7 + "1234567") * 1000
     tx2_data = ("abcdefghij" * 7 + "abcdefg") * 1000
-
     with open(TRANSMIT_1_PATH, "wb") as f:
         f.write(tx1_data.encode('utf-8'))
     with open(TRANSMIT_2_PATH, "wb") as f:
         f.write(tx2_data.encode('utf-8'))
-
     for p in [RECEIVE_1_PATH, RECEIVE_2_PATH]:
         if os.path.exists(p):
             try:
@@ -43,34 +48,26 @@ def prepare_test_files():
 def calculate_ber_and_bler(tx_path, rx_path):
     if not os.path.exists(tx_path):
         return 1.0, 1.0
-    
     with open(tx_path, "rb") as f:
         tx_data = f.read()
-    
     rx_data = b""
     if os.path.exists(rx_path):
         with open(rx_path, "rb") as f:
             rx_data = f.read()
-
     tx_blocks = len(tx_data) // 77
     rx_blocks = len(rx_data) // 77
-
     if tx_blocks == 0:
         bler = 1.0
     else:
         bler = 1.0 - (float(rx_blocks) / tx_blocks)
         bler = max(0.0, min(1.0, bler))
-
     if len(tx_data) == 0 or len(rx_data) == 0:
         return 1.0, bler
-
     tx_bits = np.unpackbits(np.frombuffer(tx_data, dtype=np.uint8))
     rx_bits = np.unpackbits(np.frombuffer(rx_data, dtype=np.uint8))
-
     min_len = min(len(tx_bits), len(rx_bits))
     mismatches = np.sum(tx_bits[:min_len] != rx_bits[:min_len])
     mismatches += abs(len(tx_bits) - len(rx_bits))
-    
     ber = float(mismatches) / len(tx_bits)
     return min(1.0, ber), bler
 
@@ -79,7 +76,6 @@ def modify_noma_throttle(rate=500000):
         return
     with open(NOMA_PY_PATH, "r", encoding="utf-8") as f:
         content = f.read()
-
     content = re.sub(
         r"blocks\.throttle\(\s*gr\.sizeof_gr_complex\*1,\s*\d+,",
         f"blocks.throttle( gr.sizeof_gr_complex*1, {rate},",
@@ -96,7 +92,6 @@ def modify_noma_throttle(rate=500000):
 def modify_noma_noise(noise_val):
     with open(NOMA_PY_PATH, "r", encoding="utf-8") as f:
         content = f.read()
-
     content = re.sub(
         r"self\.noise = noise = \d+(\.\d+)?",
         f"self.noise = noise = {noise_val:.6f}",
@@ -105,18 +100,7 @@ def modify_noma_noise(noise_val):
     with open(NOMA_PY_PATH, "w", encoding="utf-8") as f:
         f.write(content)
 
-def modify_sic_impairments(g, phi, phase_noise):
-    with open(SIC_PY_PATH, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    content = re.sub(r"g_val\s*=\s*[-+]?\d+(\.\d+)?", f"g_val = {g:.6f}", content)
-    content = re.sub(r"phi_val\s*=\s*[-+]?\d+(\.\d+)?", f"phi_val = {phi:.6f}", content)
-    content = re.sub(r"phase_noise_std_val\s*=\s*[-+]?\d+(\.\d+)?", f"phase_noise_std_val = {phase_noise:.6f}", content)
-
-    with open(SIC_PY_PATH, "w", encoding="utf-8") as f:
-        f.write(content)
-
-def run_simulation(target_size=77000, timeout=60, idle_timeout=5):
+def run_simulation(target_size=77000, timeout=120, idle_timeout=5):
     proc = subprocess.Popen([PYTHON_EXE, NOMA_PY_PATH], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     start_time = time.time()
     prev_sz1 = 0
@@ -147,117 +131,160 @@ def run_simulation(target_size=77000, timeout=60, idle_timeout=5):
     except subprocess.TimeoutExpired:
         proc.kill()
 
+def compute_effective_noise(sigma_awgn, kappa_x, nu_y, P_total=1.0):
+    """
+    RHI modeli: TX ve RX distorsiyon gurultuleri Gaussian olarak modellenir.
+    Efektif gurultu voltaji:
+    sigma_eff = sqrt(sigma_awgn^2 + kappa_x^2 * P_total + nu_y^2 * P_total)
+    
+    kappa_x: Verici distorsiyon katsayisi (0.05 - 0.15)
+    nu_y: Alici distorsiyon katsayisi (0.05 - 0.15)
+    """
+    sigma_eff = math.sqrt(sigma_awgn**2 + kappa_x**2 * P_total + nu_y**2 * P_total)
+    return sigma_eff
+
 def main():
-    print("======================================================================")
-    print("        BPSK NOMA TEST 5: KANAL VE RF HARDWARE KUSURLARI TESTI        ")
-    print("======================================================================")
+    import sys
+    print("=" * 70)
+    print("  TEST 3: KANAL VE DONANIMSAL KUSURLAR TESTI (RHI + ipCSI + ipSIC)")
+    print("=" * 70)
 
-    # Backups
-    noma_bak = NOMA_PY_PATH + ".bak"
-    sic_bak = SIC_PY_PATH + ".bak"
-    shutil.copyfile(NOMA_PY_PATH, noma_bak)
-    shutil.copyfile(SIC_PY_PATH, sic_bak)
+    csv_path = "channel_impairments_results.csv"
+    all_results = {}
 
-    # Set throttle to 500k and noise to 0.05
-    modify_noma_throttle(rate=500000)
-    modify_noma_noise(0.05)
+    # Eger plot-only ise simülasyon yapmadan CSV'den oku
+    if len(sys.argv) > 1 and sys.argv[1] == "--plot-only":
+        print("-> '--plot-only' modu algilandi. Sonuclar CSV dosyasindan yukleniyor...")
+        if not os.path.exists(csv_path):
+            print(f"[HATA] CSV dosyasi bulunamadi: {csv_path}")
+            sys.exit(1)
+        with open(csv_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()[1:] # header atla
+        for line in lines:
+            parts = line.strip().split(",")
+            if len(parts) < 8:
+                continue
+            scen = ",".join(parts[:-7])
+            sb = float(parts[-7])
+            eb = float(parts[-6])
+            se = float(parts[-5])
+            ber1 = float(parts[-4])
+            bler1 = float(parts[-3])
+            ber2 = float(parts[-2])
+            bler2 = float(parts[-1])
+            if scen not in all_results:
+                all_results[scen] = []
+            all_results[scen].append((sb, eb, se, ber1, bler1, ber2, bler2))
+    else:
+        # Senaryo tanimalari (test_metodolojisi.md'den)
+        # Her senaryo: (isim, kappa_x, nu_y)
+        scenarios = [
+            ("Ideal (P-CSI, Kusursuz)", 0.00, 0.00),
+            ("Dusuk RHI (kx=0.05, vy=0.05)", 0.05, 0.05),
+            ("Yuksek TX Kusuru (kx=0.15, vy=0.05)", 0.15, 0.05),
+            ("Yuksek RX Kusuru (kx=0.05, vy=0.15)", 0.05, 0.15),
+            ("Yuksek RHI (kx=0.15, vy=0.15)", 0.15, 0.15),
+        ]
 
-    pn_results = []
-    iq_results = []
+        # SNR sweep icin baz gurultu degerleri
+        base_sigmas = [0.03, 0.05, 0.08, 0.10, 0.15, 0.20, 0.25, 0.30]
 
-    try:
-        # 1. PHASE NOISE SWEEP (IQ Imbalance = 0)
-        pn_stds = [0.0, 0.02, 0.04, 0.06, 0.08, 0.10, 0.12, 0.15] # radyan
-        print("\n--- 1. Evre Gurultusu (Phase Noise) Sweep ---")
-        for pn in pn_stds:
-            print(f">> Phase Noise Std: {pn:.2f} rad test ediliyor...")
-            
-            prepare_test_files()
-            modify_sic_impairments(g=0.0, phi=0.0, phase_noise=pn)
-            
-            # Hedeflenen boyuta ulasana kadar dinamik bekle
-            run_simulation(target_size=77000)
-            
-            ber1, bler1 = calculate_ber_and_bler(TRANSMIT_1_PATH, RECEIVE_1_PATH)
-            ber2, bler2 = calculate_ber_and_bler(TRANSMIT_2_PATH, RECEIVE_2_PATH)
-            
-            pn_results.append((pn, ber1, bler1, ber2, bler2))
-            print(f"   [Sonuc] User 1 BER: {ber1:.2%} | User 2 BER: {ber2:.2%}")
+        backup_path = NOMA_PY_PATH + ".bak"
+        shutil.copyfile(NOMA_PY_PATH, backup_path)
+        modify_noma_throttle(rate=500000)
 
-        # 2. IQ PHASE IMBALANCE SWEEP (Phase Noise = 0, Amp imbalance g = 0.05)
-        iq_phases = [0, 2, 4, 6, 8, 10, 12, 15] # dereceler
-        print("\n--- 2. IQ Faz Dengesisligi (IQ Phase Imbalance) Sweep ---")
-        for deg in iq_phases:
-            rad = deg * math.pi / 180.0
-            print(f">> IQ Faz Dengesi: {deg:2d} derece ({rad:.4f} rad) test ediliyor...")
-            
-            prepare_test_files()
-            modify_sic_impairments(g=0.05, phi=rad, phase_noise=0.0)
-            
-            # Hedeflenen boyuta ulasana kadar dinamik bekle
-            run_simulation(target_size=77000)
-            
-            ber1, bler1 = calculate_ber_and_bler(TRANSMIT_1_PATH, RECEIVE_1_PATH)
-            ber2, bler2 = calculate_ber_and_bler(TRANSMIT_2_PATH, RECEIVE_2_PATH)
-            
-            iq_results.append((deg, rad, ber1, bler1, ber2, bler2))
-            print(f"   [Sonuc] User 1 BER: {ber1:.2%} | User 2 BER: {ber2:.2%}")
+        try:
+            for scenario_name, kappa_x, nu_y in scenarios:
+                print(f"\n--- Senaryo: {scenario_name} ---")
+                scenario_results = []
 
-    finally:
-        # Restore backups
-        if os.path.exists(noma_bak):
-            shutil.copyfile(noma_bak, NOMA_PY_PATH)
-            os.remove(noma_bak)
-        if os.path.exists(sic_bak):
-            shutil.copyfile(sic_bak, SIC_PY_PATH)
-            os.remove(sic_bak)
+                for sigma_base in base_sigmas:
+                    # Efektif gurultu hesabi
+                    sigma_eff = compute_effective_noise(sigma_base, kappa_x, nu_y)
+                    ebno_db = -20.0 * math.log10(sigma_base) - 3.0
 
-    # Save results to CSV
-    csv_path = "impairments_results.csv"
-    with open(csv_path, "w", encoding="utf-8") as f:
-        f.write("TYPE,Parameter_Val,User1_BER,User1_BLER,User2_BER,User2_BLER\n")
-        for pn, ber1, bler1, ber2, bler2 in pn_results:
-            f.write(f"PN,{pn},{ber1:.6f},{bler1:.6f},{ber2:.6f},{bler2:.6f}\n")
-        for deg, rad, ber1, bler1, ber2, bler2 in iq_results:
-            f.write(f"IQ,{deg},{ber1:.6f},{bler1:.6f},{ber2:.6f},{bler2:.6f}\n")
-    print(f"\n-> Sonuclar '{csv_path}' dosyasina kaydedildi.")
+                    print(f">> sigma_base={sigma_base:.3f} (Eb/N0={ebno_db:.1f} dB) | sigma_eff={sigma_eff:.4f} (kx={kappa_x}, vy={nu_y})")
 
-    # Plot
+                    prepare_test_files()
+                    modify_noma_noise(sigma_eff)
+                    run_simulation(target_size=77000)
+
+                    ber1, bler1 = calculate_ber_and_bler(TRANSMIT_1_PATH, RECEIVE_1_PATH)
+                    ber2, bler2 = calculate_ber_and_bler(TRANSMIT_2_PATH, RECEIVE_2_PATH)
+
+                    scenario_results.append((sigma_base, ebno_db, sigma_eff, ber1, bler1, ber2, bler2))
+                    print(f"   User 1 BER: {ber1:.2%} (BLER: {bler1:.1%}) | User 2 BER: {ber2:.2%} (BLER: {bler2:.1%})")
+
+                all_results[scenario_name] = scenario_results
+
+        finally:
+            if os.path.exists(backup_path):
+                shutil.copyfile(backup_path, NOMA_PY_PATH)
+                os.remove(backup_path)
+
+        # CSV kaydet
+        with open(csv_path, "w", encoding="utf-8") as f:
+            f.write("Scenario,Sigma_Base,EbNo_dB,Sigma_Effective,User1_BER,User1_BLER,User2_BER,User2_BLER\n")
+            for scenario_name, results in all_results.items():
+                for sigma_base, ebno_db, sigma_eff, ber1, bler1, ber2, bler2 in results:
+                    f.write(f"{scenario_name},{sigma_base:.4f},{ebno_db:.2f},{sigma_eff:.6f},{ber1:.6f},{bler1:.6f},{ber2:.6f},{bler2:.6f}\n")
+        print(f"\n-> Sonuclar '{csv_path}' dosyasina kaydedildi.")
+
+    # Grafiklestirme
     try:
         import matplotlib.pyplot as plt
-        
-        # Plot 1: Phase Noise
-        pn_vals = [r[0] for r in pn_results]
-        ber2_pn = [r[3]*100 for r in pn_results]
-        
-        plt.figure(figsize=(8, 5))
-        plt.plot(pn_vals, ber2_pn, 'r-o', linewidth=2, label='User 2 (Far User) BER')
-        plt.title('RF Oscillator Phase Noise Effect on NOMA Performance')
-        plt.xlabel('Phase Noise Standard Deviation (Rad)')
-        plt.ylabel('User 2 BER (%)')
-        plt.grid(True, which="both", ls="--")
-        plt.legend()
-        plt.savefig("phase_noise_vs_ber.png", dpi=300)
+
+        colors = ['green', 'blue', 'orange', 'purple', 'red']
+        markers = ['^', 's', 'D', 'v', 'o']
+
+        # Figure 1: User 1 BER vs Eb/N0 (tum senaryolar)
+        plt.figure(figsize=(10, 7))
+        for i, (scenario_name, results) in enumerate(all_results.items()):
+            ebno = [r[1] for r in results]
+            ber1 = [max(r[3], 1e-7) for r in results]
+            plt.semilogy(ebno, ber1, color=colors[i], marker=markers[i], linestyle='-', linewidth=2, markersize=7, label=scenario_name)
+        plt.title('User 1 (Near) BER vs Eb/N0 - Donanim Kusur Senaryolari', fontsize=14, fontweight='bold')
+        plt.xlabel('Eb/N0 (dB)', fontsize=13)
+        plt.ylabel('BER (Log)', fontsize=13)
+        plt.grid(True, which="both", ls="-", alpha=0.3)
+        plt.legend(fontsize=9, loc='lower left')
+        plt.ylim(1e-7, 1.0)
+        plt.savefig("rhi_user1_ber.png", dpi=300, bbox_inches='tight')
         plt.close()
 
-        # Plot 2: IQ Imbalance
-        iq_vals = [r[0] for r in iq_results]
-        ber2_iq = [r[4]*100 for r in iq_results]
-        
-        plt.figure(figsize=(8, 5))
-        plt.plot(iq_vals, ber2_iq, 'r-o', linewidth=2, label='User 2 (Far User) BER')
-        plt.title('I/Q Phase Imbalance Effect on NOMA Performance\n(Amplitude Imbalance g = 0.05)')
-        plt.xlabel('I/Q Phase Imbalance (Degrees)')
-        plt.ylabel('User 2 BER (%)')
-        plt.grid(True, which="both", ls="--")
-        plt.legend()
-        plt.savefig("iq_imbalance_vs_ber.png", dpi=300)
+        # Figure 2: User 2 BER vs Eb/N0 (tum senaryolar)
+        plt.figure(figsize=(10, 7))
+        for i, (scenario_name, results) in enumerate(all_results.items()):
+            ebno = [r[1] for r in results]
+            ber2 = [max(r[5], 1e-7) for r in results]
+            plt.semilogy(ebno, ber2, color=colors[i], marker=markers[i], linestyle='-', linewidth=2, markersize=7, label=scenario_name)
+        plt.title('User 2 (Far) BER vs Eb/N0 - Donanim Kusur Senaryolari', fontsize=14, fontweight='bold')
+        plt.xlabel('Eb/N0 (dB)', fontsize=13)
+        plt.ylabel('BER (Log)', fontsize=13)
+        plt.grid(True, which="both", ls="-", alpha=0.3)
+        plt.legend(fontsize=9, loc='lower left')
+        plt.ylim(1e-7, 1.0)
+        plt.savefig("rhi_user2_ber.png", dpi=300, bbox_inches='tight')
         plt.close()
 
-        print("-> Tum grafikler (phase_noise_vs_ber.png, iq_imbalance_vs_ber.png) basariyla kaydedildi.")
+        # Figure 3: User 2 BLER karsilastirma (ideal vs yuksek RHI)
+        plt.figure(figsize=(10, 7))
+        for i, (scenario_name, results) in enumerate(all_results.items()):
+            ebno = [r[1] for r in results]
+            bler2 = [r[6]*100 for r in results]
+            plt.plot(ebno, bler2, color=colors[i], marker=markers[i], linestyle='-', linewidth=2, markersize=7, label=scenario_name)
+        plt.title('User 2 (Far) BLER vs Eb/N0 - Donanim Kusur Senaryolari', fontsize=14, fontweight='bold')
+        plt.xlabel('Eb/N0 (dB)', fontsize=13)
+        plt.ylabel('BLER (%)', fontsize=13)
+        plt.grid(True, which="both", ls="-", alpha=0.3)
+        plt.legend(fontsize=9, loc='upper right')
+        plt.savefig("rhi_user2_bler.png", dpi=300, bbox_inches='tight')
+        plt.close()
+
+        print("-> Grafikler (rhi_user1_ber.png, rhi_user2_ber.png, rhi_user2_bler.png) kaydedildi.")
 
     except Exception as e:
-        print(f"[NOT] Grafikleme adimi basarisiz: {e}")
+        print(f"[NOT] Grafikleme basarisiz: {e}")
 
 if __name__ == "__main__":
     main()

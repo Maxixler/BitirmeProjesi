@@ -1,7 +1,34 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -c \"import gnuradio.grc; print\\('GNU Radio GRC available'\\)\")"
+      "Bash(python -c \"import gnuradio.grc; print\\('GNU Radio GRC available'\\)\")",
+      "Bash(python -m py_compile tests/ber_waterfall/run_ber_sweep.py)",
+      "Bash(python run_ber_sweep.py)",
+      "Read(//c:/Users/Armagan/Documents/GitHub/**)",
+      "Bash(python run_image_transfer.py)",
+      "Bash(timeout 10 /bin/true)",
+      "Bash(ls -la ../NOMA.py)",
+      "Read(//c/Users/Armagan/Documents/GitHub/**)",
+      "Bash(timeout 20 /bin/true)",
+      "Bash(timeout 10 python NOMA.py)",
+      "Bash(timeout 5 python NOMA.py)",
+      "Bash(C:\\\\Users\\\\Armagan\\\\radioconda\\\\python.exe -c \"import PyQt5; print\\('PyQt5 available'\\)\")",
+      "Bash(\"/c/Users/Armagan/radioconda/python.exe\" -c \"import PyQt5; print\\('PyQt5 available'\\)\")",
+      "Bash(\"/c/Users/Armagan/radioconda/python.exe\" NOMA.py)",
+      "Bash(del /f /q bpsk_receive.txt bpsk_receive_2.txt)",
+      "Bash(python test_noma_simple.py)",
+      "Bash(C:\\\\Users\\\\Armagan\\\\radioconda\\\\python.exe run_ber_sweep.py)",
+      "Bash(\"/c/Users/Armagan/radioconda/python.exe\" run_ber_sweep.py)",
+      "Bash(ls -la \"c:\\\\Users\\\\Armagan\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Armagan-Documents-GitHub-BitirmeProjesi\\\\d466965f-d712-4fca-bf43-95f48d2290a0\\\\tasks\\\\b2ngkw285.output\")",
+      "Read(//c/Users/Armagan/AppData/Local/Temp/claude/c--Users-Armagan-Documents-GitHub-BitirmeProjesi/d466965f-d712-4fca-bf43-95f48d2290a0/tasks/**)",
+      "Bash(timeout 10 bash -c \"while [ ! -s \\\\\"c:\\\\Users\\\\Armagan\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Armagan-Documents-GitHub-BitirmeProjesi\\\\d466965f-d712-4fca-bf43-95f48d2290a0\\\\tasks\\\\b2ngkw285.output\\\\\" ]; do sleep 2; echo 'Waiting for output...'; done\")",
+      "Bash(sleep 10 && ls -la \"c:\\\\Users\\\\Armagan advantage*\"\"\")",
+      "Read(//c/Users/**)",
+      "Bash(\"/c/Users/Armagan/radioconda/python.exe\" academic_ldpc_test.py)",
+      "Bash(git ls-tree *)",
+      "Bash(git restore *)",
+      "Bash(python tests/distance_sweep/run_distance_sweep.py)",
+      "Bash(python run_distance_sweep.py)"
     ]
   }
 }

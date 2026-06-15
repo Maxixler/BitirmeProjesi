@@ -80,7 +80,7 @@ class NOMA(gr.top_block, Qt.QWidget):
         self.preamble_size = preamble_size = 250
         self.postamble_size = postamble_size = 8
         self.payload_size = payload_size = 77
-        self.noise = noise = 0.1
+        self.noise = noise = 1.000000
         self.ldpc_enc = ldpc_enc = fec.ldpc_encoder_make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\n_1296_k_0648_ieee.alist')
         self.ldpc_dec_2 = ldpc_dec_2 = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\n_1296_k_0648_ieee.alist', 10)
         self.ldpc_dec = ldpc_dec = fec.ldpc_decoder.make('C:\\Users\\Armagan\\Documents\\GitHub\\BitirmeProjesi\\n_1296_k_0648_ieee.alist', 10)
@@ -350,8 +350,8 @@ class NOMA(gr.top_block, Qt.QWidget):
         self.blocks_vector_source_x_0_0_0 = blocks.vector_source_b([0xc0, 0xaf], True, 1, [])
         self.blocks_vector_source_x_0_0 = blocks.vector_source_b([0xc0, 0xaf], True, 1, [])
         self.blocks_vector_source_x_0 = blocks.vector_source_b([0xc0, 0xaf], True, 1, [])
-        self.blocks_throttle2_0_0 = blocks.throttle( gr.sizeof_gr_complex*1, 8000, True, 0 if "items" == "auto" else max( int(float(512) * 8000) if "items" == "time" else int(512), 1) )
-        self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, 8000, True, 0 if "items" == "auto" else max( int(float(512) * 8000) if "items" == "time" else int(512), 1) )
+        self.blocks_throttle2_0_0 = blocks.throttle( gr.sizeof_gr_complex*1, 500000, True, 0 if "items" == "auto" else max( int(float(512) * 500000) if "items" == "time" else int(512), 1) )
+        self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, 500000, True, 0 if "items" == "auto" else max( int(float(512) * 500000) if "items" == "time" else int(512), 1) )
         self.blocks_tagged_stream_mux_0_0 = blocks.tagged_stream_mux(gr.sizeof_char*1, 'packet_len', 0)
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_char*1, 'packet_len', 0)
         self.blocks_tagged_stream_multiply_length_0_1_0 = blocks.tagged_stream_multiply_length(gr.sizeof_char*1, "packet_len", 0.5)
