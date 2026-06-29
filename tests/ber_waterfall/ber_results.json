@@ -1,0 +1,620 @@
+{
+  "ebn0_db": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "noise_voltages": [
+    0.7071067811865476,
+    0.6302095820932436,
+    0.5616748812614791,
+    0.5005932648504534,
+    0.4461542169214011,
+    0.3976353643835253,
+    0.3543928915419707,
+    0.31585299705471215,
+    0.2815042799373673,
+    0.25089095358284313,
+    0.22360679774997896,
+    0.19928976826775144,
+    0.17761719292909026,
+    0.15830148982673414,
+    0.1410863513160464
+  ],
+  "ldpc": {
+    "user1_ber": [
+      0.480625,
+      0.446875,
+      0.348125,
+      0.2225,
+      0.22875,
+      0.209375,
+      0.21,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "user2_ber": [
+      0.5,
+      0.4975,
+      0.485,
+      0.4625,
+      0.4625,
+      0.4625,
+      0.4625,
+      0.0025,
+      0.0025,
+      0.0025,
+      0.0025,
+      0.0025,
+      0.0025,
+      0.0025,
+      0.0025
+    ],
+    "user1_details": [
+      {
+        "ber": 0.480625,
+        "error_bits": 59213,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 1232,
+        "packet_loss_ratio": 0.92
+      },
+      {
+        "ber": 0.446875,
+        "error_bits": 55055,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 3080,
+        "packet_loss_ratio": 0.8
+      },
+      {
+        "ber": 0.348125,
+        "error_bits": 42889,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 8393,
+        "packet_loss_ratio": 0.455
+      },
+      {
+        "ber": 0.2225,
+        "error_bits": 27412,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 14168,
+        "packet_loss_ratio": 0.08
+      },
+      {
+        "ber": 0.22875,
+        "error_bits": 28182,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 14938,
+        "packet_loss_ratio": 0.03
+      },
+      {
+        "ber": 0.209375,
+        "error_bits": 25795,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15246,
+        "packet_loss_ratio": 0.01
+      },
+      {
+        "ber": 0.21,
+        "error_bits": 25872,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      },
+      {
+        "ber": 0.0,
+        "error_bits": 0,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15400,
+        "packet_loss_ratio": 0.0
+      },
+      {
+        "ber": 0.0,
+        "error_bits": 0,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15400,
+        "packet_loss_ratio": 0.0
+      },
+      {
+        "ber": 0.0,
+        "error_bits": 0,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15400,
+        "packet_loss_ratio": 0.0
+      },
+      {
+        "ber": 0.0,
+        "error_bits": 0,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15400,
+        "packet_loss_ratio": 0.0
+      },
+      {
+        "ber": 0.0,
+        "error_bits": 0,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15400,
+        "packet_loss_ratio": 0.0
+      },
+      {
+        "ber": 0.0,
+        "error_bits": 0,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15400,
+        "packet_loss_ratio": 0.0
+      },
+      {
+        "ber": 0.0,
+        "error_bits": 0,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15400,
+        "packet_loss_ratio": 0.0
+      },
+      {
+        "ber": 0.0,
+        "error_bits": 0,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15400,
+        "packet_loss_ratio": 0.0
+      }
+    ],
+    "user2_details": [
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.4975,
+        "error_bits": 61292,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 77,
+        "packet_loss_ratio": 0.995
+      },
+      {
+        "ber": 0.485,
+        "error_bits": 59752,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 539,
+        "packet_loss_ratio": 0.965
+      },
+      {
+        "ber": 0.4625,
+        "error_bits": 56980,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 1155,
+        "packet_loss_ratio": 0.925
+      },
+      {
+        "ber": 0.4625,
+        "error_bits": 56980,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 1155,
+        "packet_loss_ratio": 0.925
+      },
+      {
+        "ber": 0.4625,
+        "error_bits": 56980,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 1155,
+        "packet_loss_ratio": 0.925
+      },
+      {
+        "ber": 0.4625,
+        "error_bits": 56980,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 1155,
+        "packet_loss_ratio": 0.925
+      },
+      {
+        "ber": 0.0025,
+        "error_bits": 308,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      },
+      {
+        "ber": 0.0025,
+        "error_bits": 308,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      },
+      {
+        "ber": 0.0025,
+        "error_bits": 308,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      },
+      {
+        "ber": 0.0025,
+        "error_bits": 308,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      },
+      {
+        "ber": 0.0025,
+        "error_bits": 308,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      },
+      {
+        "ber": 0.0025,
+        "error_bits": 308,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      },
+      {
+        "ber": 0.0025,
+        "error_bits": 308,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      },
+      {
+        "ber": 0.0025,
+        "error_bits": 308,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 15323,
+        "packet_loss_ratio": 0.005
+      }
+    ]
+  },
+  "no_ldpc": {
+    "user1_ber": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.4975,
+      0.4975,
+      0.4975,
+      0.4975,
+      0.4975,
+      0.4975,
+      0.4975
+    ],
+    "user2_ber": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "user1_details": [
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.4975,
+        "error_bits": 61292,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 77,
+        "packet_loss_ratio": 0.995
+      },
+      {
+        "ber": 0.4975,
+        "error_bits": 61292,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 77,
+        "packet_loss_ratio": 0.995
+      },
+      {
+        "ber": 0.4975,
+        "error_bits": 61292,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 77,
+        "packet_loss_ratio": 0.995
+      },
+      {
+        "ber": 0.4975,
+        "error_bits": 61292,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 77,
+        "packet_loss_ratio": 0.995
+      },
+      {
+        "ber": 0.4975,
+        "error_bits": 61292,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 77,
+        "packet_loss_ratio": 0.995
+      },
+      {
+        "ber": 0.4975,
+        "error_bits": 61292,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 77,
+        "packet_loss_ratio": 0.995
+      },
+      {
+        "ber": 0.4975,
+        "error_bits": 61292,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 77,
+        "packet_loss_ratio": 0.995
+      }
+    ],
+    "user2_details": [
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      },
+      {
+        "ber": 0.5,
+        "error_bits": 61600,
+        "total_bits": 123200,
+        "tx_bytes": 15400,
+        "rx_bytes": 0,
+        "packet_loss_ratio": 1.0
+      }
+    ]
+  },
+  "theoretical_bpsk_ber": [
+    0.07864960352514255,
+    0.05628195197654146,
+    0.03750612835892598,
+    0.02287840756108532,
+    0.012500818040737556,
+    0.0059538671477786615,
+    0.0023882907809328075,
+    0.0007726748153784444,
+    0.00019090777407599314,
+    3.362722841961749e-05,
+    3.872108215522038e-06,
+    2.6130679535751977e-07,
+    9.006010350628752e-09,
+    1.33293101753005e-10,
+    6.810189128780765e-13
+  ],
+  "test_params": {
+    "simulation_duration": 120,
+    "num_packets": 200,
+    "payload_size": 77,
+    "freq_offset": 0.01,
+    "time_offset": 1.0001
+  }
+}
