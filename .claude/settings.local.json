@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python -c \"import gnuradio.grc; print\\('GNU Radio GRC available'\\)\")"
-    ]
-  }
-}

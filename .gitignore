@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# GNU Radio Generated files (if compiled dynamically)
+# NOMA.py
+# LDPC.py
+
+# Simülasyon ve Geçici Veri Dosyaları
+bpsk_transmit.txt
+bpsk_transmit_2.txt
+bpsk_receive.txt
+bpsk_receive_2.txt
+bpsk_receive.png
+bpsk_receive_2.png
+debug_sic.txt
+*.npy
+
+# IDE ve Sistem Dosyaları
+.vscode/
+.idea/
+.claude/
+.gemini/
+*.log
